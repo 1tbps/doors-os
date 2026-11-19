@@ -1,6 +1,6 @@
 # Doors OS — ambiente de build (Debian 13 "trixie")
-# O digest da imagem base é fixado após o primeiro pull (ver docs/decisoes/0002-builder.md)
-FROM debian:trixie
+# Imagem base fixada por digest (debian 13.7, pull de 2026-11-18)
+FROM debian:trixie@sha256:9c6e381421d0f48d1b8133e573f33c185ee16cbf505eda9c4a8a4791b25ea8a6
 
 ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8
 RUN apt-get update && apt-get install -y --no-install-recommends \
