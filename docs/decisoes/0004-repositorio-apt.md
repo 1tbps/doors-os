@@ -1,7 +1,7 @@
 # 0004: Repositório APT próprio do Doors OS
 
 - **Data:** 2026-11-19
-- **Status:** aceito. A hospedagem pública ainda está pendente (ver "Em aberto").
+- **Status:** aceito e implantado.
 
 ## Contexto
 
@@ -27,7 +27,19 @@ Na 0.1, a identidade (os-release), o tema e o logo de login eram aplicados por h
 - **Backup:** fazer uma cópia offline de `/mnt/doors/keys`. Sem a chave não é possível publicar atualizações que os sistemas instalados aceitem.
 - **Testado:** o APT recusa um repositório adulterado.
 
-## Em aberto
+## Hospedagem
 
-- **URL pública definitiva** (hospedagem). Enquanto isso, a URL é de teste: `http://192.168.122.1:8080/`, servida pelo host para as VMs. A URL é gravada no sistema instalado, então precisa estar definida antes do próximo release.
-- **Os sistemas 0.1 já instalados não têm o repositório.** Para receberem atualizações, é preciso instalar `doors-archive-keyring` manualmente, uma única vez.
+- O repositório é servido pelo **GitHub Pages**, a partir do repositório **público** separado `1tbps/doors-os-apt`, no endereço `https://1tbps.github.io/doors-os-apt/`.
+- O código-fonte continua privado em `1tbps/doors-os`. O repositório público contém só a árvore do APT: `dists/`, `pool/` e a chave **pública**.
+- O script `scripts/apt-pages.sh` sincroniza `/mnt/doors/apt/public` com esse repositório.
+  - Ele recusa a publicação se encontrar material de chave privada.
+  - Os commits usam uma identidade neutra: "Doors OS Project".
+- **Validado:**
+  - um sistema na `0.2~dev1` (URL de teste) recebeu a `0.2~dev3` e passou a apontar para o Pages sozinho;
+  - `apt update` e download de pacotes funcionam pelo HTTPS do Pages, com a assinatura verificada.
+
+## Limitações
+
+- Os sistemas 0.1 já instalados não têm o repositório. Para receberem atualizações, é preciso instalar `doors-archive-keyring` manualmente, uma única vez.
+- A ISO de teste `doors-0.2-dev-xfce` aponta para a URL de teste antiga. As próximas ISOs já saem com a URL do Pages.
+- O GitHub Pages tem limites de uso: cerca de 1 GB por site e 100 GB de banda por mês, como limite flexível. Isso sobra para pacotes de identidade e tema, mas não serve para hospedar ISOs.

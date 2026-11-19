@@ -14,7 +14,13 @@ scripts/builder.sh run bash /doors/repo/scripts/apt-repo.sh publish
 scripts/builder.sh run bash /doors/repo/scripts/apt-repo.sh list
 ```
 
-4. Envie o conteúdo de `/mnt/doors/apt/public/` para a hospedagem. Os sistemas instalados recebem a atualização no próximo `apt update && apt upgrade`, ou pelo atualizador gráfico.
+4. Publique no GitHub Pages (`https://1tbps.github.io/doors-os-apt/`):
+
+```
+scripts/apt-pages.sh
+```
+
+   O Pages leva cerca de 1 minuto para atualizar. Os sistemas instalados recebem a atualização no próximo `apt update && apt upgrade`, ou pelo atualizador gráfico.
 
 ## Gerar ISOs
 
@@ -28,6 +34,7 @@ O `scripts/build.sh` copia para a ISO os `.deb` **publicados**, que ficam em `ap
 | `config/doors.env` | Versão da distro e URL do repositório | sim |
 | `/mnt/doors/apt/public/` | Árvore pública do repositório (`dists/`, `pool/`, chave `.asc`) | não (é publicada) |
 | `/mnt/doors/apt/reprepro/` | Banco de dados do reprepro | não |
+| `/mnt/doors/apt/pages/` | Clone do repositório público `1tbps/doors-os-apt` (GitHub Pages) | é o próprio repositório público |
 | `/mnt/doors/keys/` | **Chave secreta**, certificado de revogação, impressão digital | **nunca** |
 
 ## Chave de assinatura
@@ -44,10 +51,10 @@ GNUPGHOME=/doors/keys/gnupg gpg --quick-set-expire <fpr> 3y
   - Publique a revogação.
   - Gere uma chave nova e distribua-a num `doors-archive-keyring` assinado ainda com a chave antiga, se ela continuar confiável. Se não for, a nova chave terá de ser instalada manualmente.
 
-## Testar localmente com VMs
+## Testar localmente com VMs (antes de publicar)
 
 ```
 python3 -m http.server 8080 --bind 192.168.122.1 --directory /mnt/doors/apt/public
 ```
 
-Esse comando serve o repositório no endereço de teste usado por `DOORS_APT_URL`.
+Na VM, aponte um arquivo `.sources` temporário para `http://192.168.122.1:8080/`.
