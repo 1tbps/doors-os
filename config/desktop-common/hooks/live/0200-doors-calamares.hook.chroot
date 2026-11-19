@@ -1,0 +1,6 @@
+#!/bin/sh
+# Ajustes Doors no Calamares (arquivos do pacote calamares-settings-debian)
+set -e
+sed -i 's/^branding: .*/branding: doors/' /etc/calamares/settings.conf
+# Manter ID EFI "debian": grub assinado (Secure Boot) procura /EFI/debian
+grep -q '^efiBootloaderId' /etc/calamares/modules/bootloader.conf || echo 'efiBootloaderId: "debian"' >> /etc/calamares/modules/bootloader.conf

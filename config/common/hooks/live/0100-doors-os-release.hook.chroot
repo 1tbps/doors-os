@@ -12,6 +12,8 @@ VERSION="${DOORS_VERSION:-0.1-dev} (base Debian ${DEB_VER})"
 VERSION_CODENAME=trixie
 ID=doors
 ID_LIKE=debian
-HOME_URL="https://doors-os.invalid/"
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
 EOT
 ln -sf ../usr/lib/os-release /etc/os-release

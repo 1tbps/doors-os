@@ -1,0 +1,32 @@
+---
+componentName:   doors
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 800px,580px
+windowPlacement: center
+strings:
+    productName:         Doors OS
+    shortProductName:    Doors OS
+    version:             0.1-dev
+    shortVersion:        0.1
+    versionedName:       Doors OS 0.1-dev
+    shortVersionedName:  Doors OS 0.1
+    bootloaderEntryName: Doors OS
+    productUrl:          https://www.debian.org
+    supportUrl:          https://www.debian.org/support
+    knownIssuesUrl:      https://bugs.debian.org
+    releaseNotesUrl:     https://www.debian.org/releases/trixie/releasenotes
+sidebar: widget
+navigation: widget
+images:
+    productLogo:         "doors-logo.png"
+    productIcon:         "doors-logo.png"
+    productWelcome:      "welcome.png"
+slideshow:               "show.qml"
+style:
+   SidebarBackground:    "#162e42"
+   SidebarText:          "#FFFFFF"
+   SidebarTextCurrent:   "#FFB84C"
+   SidebarBackgroundCurrent: "#1e5e8c"
+slideshowAPI: 2
