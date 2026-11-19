@@ -1,0 +1,6 @@
+xfce/panel/default.xml etc/xdg/xfce4/panel/
+xfce/xfconf/xsettings.xml etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
+xfce/xfconf/xfwm4.xml etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
+xfce/xfconf/xfce4-notifyd.xml etc/xdg/xfce4/xfconf/xfce-perchannel-xml/
+xfce/lightdm/50-doors.conf usr/share/lightdm/lightdm-gtk-greeter.conf.d/
+xfce/xfconf/xfce4-desktop.xml etc/xdg/xfce4/xfconf/xfce-perchannel-xml/

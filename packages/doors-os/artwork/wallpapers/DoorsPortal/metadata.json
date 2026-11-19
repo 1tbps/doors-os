@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsPortal",
+    "Name": "Doors Portal",
+    "License": "GPLv2+",
+    "Authors": [
+      {
+        "Name": "Doors OS Project"
+      }
+    ]
+  }
+}

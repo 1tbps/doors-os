@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsGeometrico",
+    "Name": "Doors Geométrico",
+    "License": "GPLv2+",
+    "Authors": [
+      {
+        "Name": "Doors OS Project"
+      }
+    ]
+  }
+}

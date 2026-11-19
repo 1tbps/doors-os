@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>Doors Portal</name>
+    <filename>/usr/share/backgrounds/doors/portal.svg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors Aurora</name>
+    <filename>/usr/share/backgrounds/doors/aurora.svg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors Geométrico</name>
+    <filename>/usr/share/backgrounds/doors/geometrico.svg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors Horizonte</name>
+    <filename>/usr/share/backgrounds/doors/horizonte.svg</filename>
+    <options>zoom</options>
+  </wallpaper>
+</wallpapers>

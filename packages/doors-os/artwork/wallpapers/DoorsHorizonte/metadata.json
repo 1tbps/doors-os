@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsHorizonte",
+    "Name": "Doors Horizonte",
+    "License": "GPLv2+",
+    "Authors": [
+      {
+        "Name": "Doors OS Project"
+      }
+    ]
+  }
+}

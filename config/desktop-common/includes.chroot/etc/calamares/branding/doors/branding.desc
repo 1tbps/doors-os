@@ -9,9 +9,9 @@ strings:
     productName:         Doors OS
     shortProductName:    Doors OS
     version:             @VERSION@
-    shortVersion:        0.1
+    shortVersion:        @VERSION@
     versionedName:       Doors OS @VERSION@
-    shortVersionedName:  Doors OS 0.1
+    shortVersionedName:  Doors OS @VERSION@
     bootloaderEntryName: Doors OS
     productUrl:          https://www.debian.org
     supportUrl:          https://www.debian.org/support

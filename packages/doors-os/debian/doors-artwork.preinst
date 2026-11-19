@@ -9,5 +9,6 @@ if [ "$1" = install ] || [ "$1" = upgrade ]; then
   fi
   dpkg-divert --package doors-artwork --add --rename --divert $F.debian $F
   [ -e $F.doors-tmp ] && mv $F.doors-tmp $F.debian || true
+  dpkg-divert --package doors-artwork --add --rename --divert /etc/skel/.face.debian /etc/skel/.face
 fi
 #DEBHELPER#

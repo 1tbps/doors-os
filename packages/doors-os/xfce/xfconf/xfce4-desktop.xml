@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Doors OS: rótulos dos ícones da área de trabalho brancos e sem fundo (o Greybird pinta de branco no xfdesktop 4.20) -->
+<channel name="xfce4-desktop" version="1.0">
+  <property name="desktop-icons" type="empty">
+    <property name="use-custom-label-background-color" type="bool" value="true"/>
+    <property name="label-background-color" type="array">
+      <value type="double" value="0"/>
+      <value type="double" value="0"/>
+      <value type="double" value="0"/>
+      <value type="double" value="0"/>
+    </property>
+    <property name="use-custom-label-text-color" type="bool" value="true"/>
+    <property name="label-text-color" type="array">
+      <value type="double" value="1"/>
+      <value type="double" value="1"/>
+      <value type="double" value="1"/>
+      <value type="double" value="1"/>
+    </property>
+  </property>
+</channel>

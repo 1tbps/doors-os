@@ -27,3 +27,14 @@ Description: tema visual do Doors OS
  Papéis de parede, tela de bloqueio, fundo de login e GRUB do Doors OS,
  registrados como tema do desktop-base, além do logo da tela de login (SDDM)
  e do papel de parede padrão do XFCE.
+
+Package: doors-xfce-settings
+Architecture: all
+Depends: ${misc:Depends}, doors-artwork, xfce4-panel, xfce4-settings, xfwm4,
+ greybird-gtk-theme, elementary-xfce-icon-theme, fonts-noto-core,
+ xfce4-whiskermenu-plugin, xfce4-pulseaudio-plugin, xfce4-notifyd
+Description: aparência padrão do Doors OS para o XFCE
+ Painel único na parte de baixo (menu Whisker, atalhos, lista de janelas,
+ bandeja e relógio), tema de janelas e controles Greybird, ícones
+ elementary-xfce, fontes Noto Sans e tela de login no mesmo estilo.
+ Vale para novos usuários; quem já tem configuração própria não é alterado.

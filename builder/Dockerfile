@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       isolinux syslinux-common \
       ca-certificates git rsync cpio xz-utils zstd \
       dpkg-dev debhelper fakeroot reprepro gnupg \
+      librsvg2-bin fonts-noto-core python3 python3-pil \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /work

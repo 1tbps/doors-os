@@ -20,7 +20,10 @@ if [ "$ED" != base ]; then rsync -a "$R/config/desktop-common/" config/; rsync -
 # pacotes Doors publicados no repositório (doors-release, doors-archive-keyring; doors-artwork só nas edições desktop)
 mkdir -p config/packages.chroot
 for d in /doors/apt/public/pool/main/d/doors-os/*.deb; do
-  case "$d" in *doors-artwork_*) [ "$ED" = base ] && continue;; esac
+  case "$d" in
+    *doors-artwork_*) [ "$ED" = base ] && continue;;
+    *doors-xfce-settings_*) [ "$ED" = xfce ] || continue;;
+  esac
   cp "$d" config/packages.chroot/
 done
 ls config/packages.chroot/*.deb >/dev/null || { echo "sem pacotes Doors: rode build-packages.sh e apt-repo.sh publish" >&2; exit 1; }

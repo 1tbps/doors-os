@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+if [ "$1" = remove ] || [ "$1" = abort-install ] || [ "$1" = disappear ]; then
+  dpkg-divert --package doors-xfce-settings --remove --rename \
+    --divert /etc/xdg/xfce4/panel/default.xml.debian /etc/xdg/xfce4/panel/default.xml
+  dpkg-divert --package doors-xfce-settings --remove --rename \
+    --divert /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml.debian \
+    /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
+fi
+#DEBHELPER#

@@ -1,3 +1,28 @@
+doors-os (0.2~dev6) trixie; urgency=medium
+
+  * doors-xfce-settings: texto dos rótulos da área de trabalho em branco
+    (contraste sobre o papel de parede escuro).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Thu, 19 Nov 2026 10:05:00 -0300
+
+doors-os (0.2~dev5) trixie; urgency=medium
+
+  * doors-artwork: avatar padrão Doors para novos usuários (/etc/skel/.face).
+  * doors-xfce-settings: rótulos dos ícones da área de trabalho sem fundo.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Thu, 19 Nov 2026 10:00:00 -0300
+
+doors-os (0.2~dev4) trixie; urgency=medium
+
+  * doors-artwork: arte nova (papel de parede "Portal", tela de login,
+    bloqueio, GRUB) e papéis de parede extras: Portal, Aurora, Geométrico e
+    Horizonte (XFCE, KDE, Cinnamon/GNOME/MATE).
+  * Novo pacote doors-xfce-settings: painel único embaixo com menu Whisker,
+    tema Greybird, ícones elementary-xfce, fontes Noto Sans e login no mesmo
+    estilo.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Thu, 19 Nov 2026 09:45:00 -0300
+
 doors-os (0.2~dev3) trixie; urgency=medium
 
   * doors-archive-keyring: repositório passa a ser servido pelo GitHub Pages
