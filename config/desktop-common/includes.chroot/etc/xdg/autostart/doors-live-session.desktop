@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Doors OS live session setup
+Exec=/usr/lib/doors/live-session-setup
+NoDisplay=true
+X-GNOME-Autostart-Phase=Initialization
+X-KDE-autostart-phase=1
