@@ -1,6 +1,7 @@
 [Unit]
 Description=Doors OS: ajustes da sessão live
 ConditionKernelCommandLine=boot=live
+After=live-config.service
 Before=display-manager.service
 
 [Service]

@@ -17,3 +17,16 @@ idle-delay=uint32 0
 EOT
   glib-compile-schemas /usr/share/glib-2.0/schemas 2>/dev/null || true
 fi
+# Pastas do usuário live (no idioma da live) + ícone do instalador, ANTES do login gráfico.
+# Evita a corrida no autostart entre xdg-user-dirs e o helper do Debian (ícone sumia no KDE).
+L=$(sed -n 's/^LANG=//p' /etc/default/locale 2>/dev/null | tr -d '"'); L=${L:-pt_BR.UTF-8}
+APP=/usr/share/applications/calamares-install-debian.desktop
+for H in /home/*; do
+  [ -d "$H" ] || continue
+  U=$(stat -c %U "$H"); id "$U" >/dev/null 2>&1 || continue
+  runuser -u "$U" -- env HOME="$H" LANG="$L" LC_ALL="$L" xdg-user-dirs-update || true
+  D=$(runuser -u "$U" -- env HOME="$H" xdg-user-dir DESKTOP 2>/dev/null || true)
+  if [ -n "$D" ] && [ "$D" != "$H" ] && [ -f "$APP" ]; then
+    mkdir -p "$D"; cp "$APP" "$D/"; chmod +x "$D/calamares-install-debian.desktop"; chown -R "$U:" "$D"
+  fi
+done
