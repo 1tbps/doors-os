@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       grub-pc-bin grub-efi-amd64-bin grub-efi-amd64-signed shim-signed \
       isolinux syslinux-common \
       ca-certificates git rsync cpio xz-utils zstd \
+      dpkg-dev debhelper fakeroot reprepro gnupg \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /work

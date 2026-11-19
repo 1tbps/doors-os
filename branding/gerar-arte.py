@@ -4,7 +4,7 @@ Uso: python3 -I branding/gerar-arte.py /mnt/doors/repo"""
 import sys, os
 from PIL import Image, ImageDraw, ImageFont
 R = sys.argv[1]
-TH = f"{R}/config/desktop-common/includes.chroot/usr/share/desktop-base/doors-theme"
+TH = f"{R}/packages/doors-os/artwork/doors-theme"
 SIZES = ["1920x1080","1920x1200","1280x800","1280x1024","2520x1080","1080x2160"]
 
 def logo_svg(x, y, s):

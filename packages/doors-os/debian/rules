@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+# Variáveis de build: DOORS_VERSION (ex.: 0.2-dev) e DOORS_APT_URL (URL do repositório)
+DOORS_VERSION ?= $(error defina DOORS_VERSION)
+DOORS_APT_URL ?= $(error defina DOORS_APT_URL)
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	sed 's|@VERSION@|$(DOORS_VERSION)|g' release/os-release.in > release/os-release
+	sed 's|@DOORS_APT_URL@|$(DOORS_APT_URL)|g' keyring/doors.sources.in > keyring/doors.sources
+
+override_dh_auto_clean:
+	rm -f release/os-release keyring/doors.sources

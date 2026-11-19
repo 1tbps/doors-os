@@ -1,0 +1,4 @@
+artwork/doors-theme usr/share/desktop-base/
+artwork/doors-install.png usr/share/icons/hicolor/256x256/apps/
+artwork/sddm/theme.conf.user usr/share/sddm/themes/debian-breeze/
+artwork/doors-logo.png usr/share/icons/hicolor/256x256/apps/

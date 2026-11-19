@@ -1,0 +1,12 @@
+PRETTY_NAME="Doors OS @VERSION@"
+NAME="Doors OS"
+VERSION_ID="@VERSION@"
+VERSION="@VERSION@ (base Debian 13 trixie)"
+VERSION_CODENAME=trixie
+DEBIAN_VERSION_CODENAME=trixie
+ID=doors
+ID_LIKE=debian
+LOGO=doors-logo
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"

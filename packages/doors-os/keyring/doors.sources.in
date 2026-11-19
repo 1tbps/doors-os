@@ -1,0 +1,7 @@
+# Repositório de atualizações do Doors OS (pacotes próprios: identidade, tema, chave).
+# Os demais pacotes vêm dos repositórios oficiais do Debian.
+Types: deb
+URIs: @DOORS_APT_URL@
+Suites: trixie
+Components: main
+Signed-By: /usr/share/keyrings/doors-archive-keyring.pgp

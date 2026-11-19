@@ -8,9 +8,9 @@ windowPlacement: center
 strings:
     productName:         Doors OS
     shortProductName:    Doors OS
-    version:             0.1-dev
+    version:             @VERSION@
     shortVersion:        0.1
-    versionedName:       Doors OS 0.1-dev
+    versionedName:       Doors OS @VERSION@
     shortVersionedName:  Doors OS 0.1
     bootloaderEntryName: Doors OS
     productUrl:          https://www.debian.org

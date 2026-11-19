@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+if [ "$1" = install ] || [ "$1" = upgrade ]; then
+  # imagens 0.1 desviavam com --local; troca pela diversão do pacote
+  F=/usr/share/backgrounds/xfce/xfce-x.svg
+  if dpkg-divert --listpackage $F | grep -qx LOCAL; then
+    dpkg-divert --local --remove --no-rename $F; rm -f $F
+    [ -e $F.distrib ] && mv $F.distrib $F.doors-tmp || true
+  fi
+  dpkg-divert --package doors-artwork --add --rename --divert $F.debian $F
+  [ -e $F.doors-tmp ] && mv $F.doors-tmp $F.debian || true
+fi
+#DEBHELPER#

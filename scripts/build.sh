@@ -3,7 +3,7 @@
 # Uso: build.sh <base|xfce|kde|cinnamon>
 # Camadas: config/common  +  config/editions/<edição> (se não for "base").
 set -euo pipefail
-ED=${1:?edição}; VER=${DOORS_VERSION:-0.1}
+ED=${1:?edição}; . /doors/repo/config/doors.env; VER=$DOORS_VERSION
 R=/doors/repo; W=/doors/build/$ED; CACHE=/doors/cache/lb-trixie
 OWNER=$(stat -c %u:%g /doors/repo)
 [ "$ED" = base ] || [ -d "$R/config/editions/$ED" ] || { echo "edição desconhecida: $ED" >&2; exit 1; }
@@ -17,8 +17,14 @@ eval lb config $(grep -v '^#' "$R/config/common/lb-config.args" | tr '\n' ' ') \
   --iso-application "\"Doors OS\"" --iso-volume "DOORS_${ED^^}" --image-name "$NAME"
 rsync -a "$R/config/common/" config/ --exclude lb-config.args
 if [ "$ED" != base ]; then rsync -a "$R/config/desktop-common/" config/; rsync -a "$R/config/editions/$ED/" config/; fi
-sed -i "s/\${DOORS_VERSION:-0.1-dev}/$VER/g" config/hooks/live/0100-doors-os-release.hook.chroot
-B=config/includes.chroot/etc/calamares/branding/doors/branding.desc; if [ -f "$B" ]; then sed -i "s/0\\.1-dev/$VER/g" "$B"; fi
+# pacotes Doors publicados no repositório (doors-release, doors-archive-keyring; doors-artwork só nas edições desktop)
+mkdir -p config/packages.chroot
+for d in /doors/apt/public/pool/main/d/doors-os/*.deb; do
+  case "$d" in *doors-artwork_*) [ "$ED" = base ] && continue;; esac
+  cp "$d" config/packages.chroot/
+done
+ls config/packages.chroot/*.deb >/dev/null || { echo "sem pacotes Doors: rode build-packages.sh e apt-repo.sh publish" >&2; exit 1; }
+B=config/includes.chroot/etc/calamares/branding/doors/branding.desc; if [ -f "$B" ]; then sed -i "s/@VERSION@/$VER/g" "$B"; fi
 lb build
 ISO="$NAME-amd64.hybrid.iso"
 mkdir -p /doors/isos

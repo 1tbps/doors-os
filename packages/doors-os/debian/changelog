@@ -1,0 +1,13 @@
+doors-os (0.2~dev2) trixie; urgency=medium
+
+  * os-release: campo LOGO=doors-logo (logo nas telas "Sobre o sistema").
+  * doors-artwork: ícone doors-logo.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Thu, 19 Nov 2026 08:45:00 -0300
+
+doors-os (0.2~dev1) trixie; urgency=medium
+
+  * Primeira versão empacotada: doors-archive-keyring, doors-release e
+    doors-artwork (antes eram hooks/arquivos soltos na ISO).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Thu, 19 Nov 2026 08:30:00 -0300

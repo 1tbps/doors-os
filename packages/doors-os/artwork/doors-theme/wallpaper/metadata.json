@@ -1,0 +1,8 @@
+{
+    "KPlugin": {
+        "Name": "Doors OS",
+        "Id": "DoorsOS",
+        "License": "GPLv2+",
+        "Authors": [ { "Name": "Doors OS Project" } ]
+    }
+}

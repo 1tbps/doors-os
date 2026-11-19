@@ -1,0 +1,29 @@
+Source: doors-os
+Section: misc
+Priority: optional
+Maintainer: Doors OS Project <noreply@doors-os.invalid>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: doors-archive-keyring
+Architecture: all
+Depends: ${misc:Depends}
+Description: chave e origem APT do Doors OS
+ Instala a chave pública de assinatura do repositório do Doors OS e a
+ configuração APT (deb822) que aponta para ele.
+
+Package: doors-release
+Architecture: all
+Depends: ${misc:Depends}, base-files, doors-archive-keyring
+Description: identificação do sistema Doors OS
+ Fornece /usr/lib/os-release com o nome e a versão do Doors OS,
+ desviando (dpkg-divert) o arquivo do base-files do Debian.
+
+Package: doors-artwork
+Architecture: all
+Depends: ${misc:Depends}, desktop-base
+Description: tema visual do Doors OS
+ Papéis de parede, tela de bloqueio, fundo de login e GRUB do Doors OS,
+ registrados como tema do desktop-base, além do logo da tela de login (SDDM)
+ e do papel de parede padrão do XFCE.

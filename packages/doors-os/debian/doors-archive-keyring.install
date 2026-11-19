@@ -1,0 +1,2 @@
+keyring/doors-archive-keyring.pgp usr/share/keyrings/
+keyring/doors.sources etc/apt/sources.list.d/

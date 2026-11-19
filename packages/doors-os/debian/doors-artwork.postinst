@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+T=/usr/share/desktop-base/doors-theme
+if [ "$1" = configure ]; then
+  update-alternatives --install /usr/share/desktop-base/active-theme desktop-theme $T 100
+  # na primeira instalação torna o tema Doors o ativo (depois respeita a escolha do admin)
+  if [ -z "$2" ]; then
+    update-alternatives --set desktop-theme $T
+  fi
+  # em atualizações num sistema instalado, regenera o menu do GRUB (fundo pode ter mudado)
+  if [ -n "$2" ] && [ -x /usr/sbin/update-grub ] && [ -e /boot/grub/grub.cfg ]; then
+    update-grub >/dev/null 2>&1 || true
+  fi
+fi
+#DEBHELPER#
