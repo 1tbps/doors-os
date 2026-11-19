@@ -1,0 +1,39 @@
+# Doors OS — base comum (todas as edições)
+# sessão live
+live-boot
+live-config
+live-config-systemd
+user-setup
+sudo
+# sistema
+systemd-timesyncd
+locales
+tzdata
+keyboard-configuration
+console-setup
+bash-completion
+man-db
+less
+nano
+curl
+wget
+ca-certificates
+gnupg
+# rede
+network-manager
+iw
+wpasupplicant
+# hardware / firmware
+firmware-linux-free
+firmware-linux-nonfree
+firmware-misc-nonfree
+firmware-amd-graphics
+firmware-realtek
+firmware-iwlwifi
+intel-microcode
+amd64-microcode
+# boot
+grub-efi-amd64
+shim-signed
+efibootmgr
+os-prober

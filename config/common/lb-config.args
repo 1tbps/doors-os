@@ -1,0 +1,10 @@
+--distribution trixie
+--archive-areas "main contrib non-free non-free-firmware"
+--mirror-bootstrap http://deb.debian.org/debian/
+--mirror-binary http://deb.debian.org/debian/
+--security true
+--updates true
+--binary-images iso-hybrid
+--debian-installer none
+--iso-publisher "Doors OS Project"
+--bootappend-live "boot=live components locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo username=doors hostname=doors"
