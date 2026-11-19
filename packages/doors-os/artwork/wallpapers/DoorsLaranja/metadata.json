@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsLaranja",
+    "Name": "Doors — Laranja",
+    "License": "Pexels License",
+    "Authors": [
+      {
+        "Name": "Jan van der Wolf (Pexels)"
+      }
+    ]
+  }
+}

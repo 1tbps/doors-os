@@ -1,3 +1,13 @@
+doors-os (0.2~dev7) trixie; urgency=medium
+
+  * doors-artwork: papéis de parede trocados por fotos de portas (Pexels,
+    licença de uso livre): Lavanda (padrão), Azulejos, Casarão, Colonial,
+    Laranja, Grade vermelha, Número 45 e Arco. Login, bloqueio, GRUB,
+    menu de boot e instalador usam as fotos. Créditos em
+    /usr/share/doc/doors-artwork/CREDITOS.md.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Thu, 19 Nov 2026 10:50:00 -0300
+
 doors-os (0.2~dev6) trixie; urgency=medium
 
   * doors-xfce-settings: texto dos rótulos da área de trabalho em branco

@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsLavanda",
+    "Name": "Doors — Lavanda",
+    "License": "Pexels License",
+    "Authors": [
+      {
+        "Name": "lich (Pexels)"
+      }
+    ]
+  }
+}

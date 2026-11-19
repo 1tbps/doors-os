@@ -2,23 +2,43 @@
 <!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
 <wallpapers>
   <wallpaper deleted="false">
-    <name>Doors Portal</name>
-    <filename>/usr/share/backgrounds/doors/portal.svg</filename>
+    <name>Doors — Lavanda</name>
+    <filename>/usr/share/backgrounds/doors/lavanda.jpg</filename>
     <options>zoom</options>
   </wallpaper>
   <wallpaper deleted="false">
-    <name>Doors Aurora</name>
-    <filename>/usr/share/backgrounds/doors/aurora.svg</filename>
+    <name>Doors — Azulejos</name>
+    <filename>/usr/share/backgrounds/doors/azulejos.jpg</filename>
     <options>zoom</options>
   </wallpaper>
   <wallpaper deleted="false">
-    <name>Doors Geométrico</name>
-    <filename>/usr/share/backgrounds/doors/geometrico.svg</filename>
+    <name>Doors — Casarão</name>
+    <filename>/usr/share/backgrounds/doors/casarao.jpg</filename>
     <options>zoom</options>
   </wallpaper>
   <wallpaper deleted="false">
-    <name>Doors Horizonte</name>
-    <filename>/usr/share/backgrounds/doors/horizonte.svg</filename>
+    <name>Doors — Colonial</name>
+    <filename>/usr/share/backgrounds/doors/colonial.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Laranja</name>
+    <filename>/usr/share/backgrounds/doors/laranja.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Grade vermelha</name>
+    <filename>/usr/share/backgrounds/doors/grade.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Número 45</name>
+    <filename>/usr/share/backgrounds/doors/numero45.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Arco</name>
+    <filename>/usr/share/backgrounds/doors/arco.jpg</filename>
     <options>zoom</options>
   </wallpaper>
 </wallpapers>

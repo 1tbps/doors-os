@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsGrade",
+    "Name": "Doors — Grade vermelha",
+    "License": "Pexels License",
+    "Authors": [
+      {
+        "Name": "Furkan Aktaş (Pexels)"
+      }
+    ]
+  }
+}

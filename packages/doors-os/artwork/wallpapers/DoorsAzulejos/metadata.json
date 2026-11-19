@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsAzulejos",
+    "Name": "Doors — Azulejos",
+    "License": "Pexels License",
+    "Authors": [
+      {
+        "Name": "Lucas Carlini (Pexels)"
+      }
+    ]
+  }
+}

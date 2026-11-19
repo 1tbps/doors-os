@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Doors OS — ícone original (estilo contorno + cor chapada). Licença do projeto. -->
+  <g stroke="#1b2433" stroke-width="20" stroke-linejoin="round" stroke-linecap="round">
+    <!-- batente (azul da marca) -->
+    <path d="M62 474 V60 a24 24 0 0 1 24 -24 H426 a24 24 0 0 1 24 24 V474" fill="#2f7fc1"/>
+    <!-- vão interno claro -->
+    <path d="M100 474 V86 a10 10 0 0 1 10 -10 H402 a10 10 0 0 1 10 10 V474" fill="#8cc4ee"/>
+    <!-- folha da porta (âmbar) -->
+    <rect x="122" y="98" width="268" height="376" rx="10" fill="#f2a23c"/>
+    <!-- soleira / piso -->
+    <line x1="34" y1="476" x2="478" y2="476"/>
+  </g>
+  <!-- brilho lateral da folha -->
+  <rect x="136" y="112" width="16" height="350" rx="8" fill="#f8cb78"/>
+  <g stroke="#1b2433" stroke-width="15" stroke-linejoin="round" stroke-linecap="round">
+    <!-- janelinha redonda -->
+    <circle cx="242" cy="170" r="42" fill="#bfe6ff"/>
+    <!-- almofadas -->
+    <rect x="166" y="244" width="152" height="90" rx="12" fill="#d9822b"/>
+    <rect x="166" y="358" width="152" height="90" rx="12" fill="#d9822b"/>
+    <!-- maçaneta -->
+    <rect x="340" y="262" width="26" height="70" rx="10" fill="#e9eef4"/>
+    <line x1="353" y1="286" x2="336" y2="286"/>
+  </g>
+  <!-- reflexo no vidro -->
+  <path d="M216 164 a28 28 0 0 1 28 -26" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round"/>
+</svg>

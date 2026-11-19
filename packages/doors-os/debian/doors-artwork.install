@@ -4,6 +4,7 @@ artwork/sddm/theme.conf.user usr/share/sddm/themes/debian-breeze/
 artwork/doors-logo.png usr/share/icons/hicolor/256x256/apps/
 artwork/backgrounds/doors usr/share/backgrounds/
 artwork/wallpapers/* usr/share/wallpapers/
+artwork/CREDITOS.md usr/share/doc/doors-artwork/
 artwork/gnome-background-properties/doors.xml usr/share/gnome-background-properties/
 artwork/cinnamon-background-properties/doors.xml usr/share/cinnamon-background-properties/
 artwork/mate-background-properties/doors.xml usr/share/mate-background-properties/
