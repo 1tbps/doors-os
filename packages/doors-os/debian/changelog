@@ -1,3 +1,14 @@
+doors-os (0.2) trixie; urgency=medium
+
+  * Versão 0.2 do Doors OS:
+    - repositório de atualizações próprio (GitHub Pages, assinado);
+    - XFCE com painel embaixo (estilo Mint) e aparência Greybird/elementary
+      (estilo Xubuntu);
+    - papéis de parede com fotos de portas (Pexels);
+    - logo novo: porta de madeira em arco.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Thu, 19 Nov 2026 12:10:00 -0300
+
 doors-os (0.2~dev9) trixie; urgency=medium
 
   * doors-release: /etc/os-release passa a ser link para /usr/lib/os-release
