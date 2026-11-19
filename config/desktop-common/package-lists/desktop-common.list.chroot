@@ -1,0 +1,18 @@
+# Doors OS — comum a todas as edições gráficas
+# instalador
+calamares
+calamares-settings-debian
+# idioma
+task-brazilian-portuguese
+task-brazilian-portuguese-desktop
+firefox-esr-l10n-pt-br
+# áudio / multimídia
+pipewire-audio
+# fontes
+fonts-noto-core
+fonts-noto-color-emoji
+# aplicações básicas
+firefox-esr
+# VM (testes em QEMU/KVM)
+spice-vdagent
+qemu-guest-agent

@@ -16,7 +16,7 @@ NAME="doors-$VER-$ED"
 eval lb config $(grep -v '^#' "$R/config/common/lb-config.args" | tr '\n' ' ') \
   --iso-application "\"Doors OS\"" --iso-volume "DOORS_${ED^^}" --image-name "$NAME"
 rsync -a "$R/config/common/" config/ --exclude lb-config.args
-[ "$ED" = base ] || rsync -a "$R/config/editions/$ED/" config/
+if [ "$ED" != base ]; then rsync -a "$R/config/desktop-common/" config/; rsync -a "$R/config/editions/$ED/" config/; fi
 sed -i "s/\${DOORS_VERSION:-0.1-dev}/$VER/g" config/hooks/live/0100-doors-os-release.hook.chroot
 lb build
 ISO="$NAME-amd64.hybrid.iso"
