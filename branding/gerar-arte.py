@@ -65,19 +65,16 @@ def data_uri(im, q=82):
 
 
 # ---------------------------------------------------------------- logo (vetorial)
-LOGO_DEFS = ('<linearGradient id="lg_bg" x1="0" y1="0" x2="1" y2="1">'
-             '<stop offset="0" stop-color="#2a78ad"/><stop offset="1" stop-color="#16456e"/></linearGradient>'
-             '<linearGradient id="lg_door" x1="0" y1="0" x2="1" y2="1">'
-             f'<stop offset="0" stop-color="{GOLD}"/><stop offset="1" stop-color="#f59e2a"/></linearGradient>')
+# Logo oficial: porta de madeira em arco (desenho original, branding/fontes/icone-porta-arco.svg, 512x512)
+_LOGO = open(f"{R}/branding/fontes/icone-porta-arco.svg").read()
+LOGO_DEFS = _LOGO.split("<defs>", 1)[1].split("</defs>", 1)[0]
+_LOGO_BODY = _LOGO.split("</defs>", 1)[1].rsplit("</svg>", 1)[0]
 
 
 def logo_svg(x, y, s, opacity=1.0):
-    k = s / 256
-    return (f'<g transform="translate({x:.1f},{y:.1f}) scale({k:.4f})" opacity="{opacity}">'
-            '<rect x="8" y="8" width="240" height="240" rx="52" fill="url(#lg_bg)"/>'
-            '<rect x="78" y="40" width="100" height="184" rx="10" fill="#f0f4f8"/>'
-            '<polygon points="78,40 150,58 150,238 78,224" fill="url(#lg_door)"/>'
-            '<circle cx="138" cy="134" r="6" fill="#1e5e8c"/></g>')
+    """logo dentro de um quadrado s×s com canto em (x, y)"""
+    return (f'<g transform="translate({x:.1f},{y:.1f}) scale({s / 512:.4f})" opacity="{opacity}">'
+            f'{_LOGO_BODY}</g>')
 
 
 def wordmark(x, y, s, opacity=1.0):
@@ -160,10 +157,8 @@ put(f"{ART}/CREDITOS.md", "\n".join(cred) + "\n")
 
 # ---------------------------------------------------------------- avatar padrão
 put(f"{R}/branding/fontes/face.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><defs>'
-    + LOGO_DEFS + '<radialGradient id="fbg" cx="0.5" cy="0.35" r="0.75"><stop offset="0" stop-color="#2a78ad"/><stop offset="1" stop-color="#0a1a2e"/></radialGradient></defs>'
-    '<rect width="256" height="256" fill="url(#fbg)"/>'
-    '<g transform="translate(40,32) scale(0.75)"><rect x="78" y="40" width="100" height="184" rx="10" fill="#f0f4f8"/>'
-    '<polygon points="78,40 150,58 150,238 78,224" fill="url(#lg_door)"/><circle cx="138" cy="134" r="6" fill="#1e5e8c"/></g></svg>')
+    + LOGO_DEFS + '<radialGradient id="fbg" cx="0.5" cy="0.35" r="0.75"><stop offset="0" stop-color="#cfe9fb"/><stop offset="1" stop-color="#7fb6de"/></radialGradient></defs>'
+    '<rect width="256" height="256" fill="url(#fbg)"/>' + logo_svg(38, 34, 180) + '</svg>')
 
 # ---------------------------------------------------------------- menu de boot da ISO live (live-build troca @VERSION@)
 sp = escurecer(foto(PADRAO, 800, 600), 0.40)

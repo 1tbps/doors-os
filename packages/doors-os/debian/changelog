@@ -1,3 +1,19 @@
+doors-os (0.2~dev9) trixie; urgency=medium
+
+  * doors-release: /etc/os-release passa a ser link para /usr/lib/os-release
+    (o live-build deixava uma cópia do os-release do Debian em /etc, e o
+    sistema se identificava como Debian).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Thu, 19 Nov 2026 11:35:00 -0300
+
+doors-os (0.2~dev8) trixie; urgency=medium
+
+  * Logo novo do Doors OS: porta de madeira azul em arco (desenho original).
+    Ícones doors-logo/doors-install em todos os tamanhos (16–512 px e SVG),
+    avatar padrão, logo da tela de login (SDDM) e fundos com o logo.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Thu, 19 Nov 2026 11:20:00 -0300
+
 doors-os (0.2~dev7) trixie; urgency=medium
 
   * doors-artwork: papéis de parede trocados por fotos de portas (Pexels,

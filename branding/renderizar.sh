@@ -4,6 +4,15 @@
 set -euo pipefail
 R=/doors/repo; F=$R/branding/fontes; TH=$R/packages/doors-os/artwork/doors-theme
 PREV=/doors/logs/arte; mkdir -p "$PREV"
+# ícones do logo (hicolor) e logo do Calamares — antes do gerador (os banners usam doors-logo.png)
+IC=$R/packages/doors-os/artwork/icons/hicolor; LOGO=$F/icone-porta-arco.svg
+rm -rf "$IC"
+for s in 16 22 24 32 48 64 128 256 512; do
+  mkdir -p "$IC/${s}x${s}/apps"; rsvg-convert -w $s -h $s "$LOGO" -o "$IC/${s}x${s}/apps/doors-logo.png"
+  ln -s doors-logo.png "$IC/${s}x${s}/apps/doors-install.png"
+done
+mkdir -p "$IC/scalable/apps"; cp "$LOGO" "$IC/scalable/apps/doors-logo.svg"; ln -s doors-logo.svg "$IC/scalable/apps/doors-install.svg"
+rsvg-convert -w 256 -h 256 "$LOGO" -o "$R/config/desktop-common/includes.chroot/etc/calamares/branding/doors/doors-logo.png"
 python3 -I "$R/branding/gerar-arte.py" "$R"
 mkdir -p "$R/packages/doors-os/artwork/skel"
 rsvg-convert -w 256 -h 256 "$F/face.svg" -o "$R/packages/doors-os/artwork/skel/.face"

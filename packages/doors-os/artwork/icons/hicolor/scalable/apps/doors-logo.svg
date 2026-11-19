@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Doors OS — ícone original: porta de madeira em arco (estilo cartum). Licença do projeto. -->
+  <defs>
+    <linearGradient id="madeira" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a5a32"/><stop offset="0.5" stop-color="#b07a48"/><stop offset="1" stop-color="#7d4f2b"/>
+    </linearGradient>
+    <linearGradient id="azul" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2f86cf"/><stop offset="0.55" stop-color="#47a1e6"/><stop offset="1" stop-color="#2a76b8"/>
+    </linearGradient>
+    <linearGradient id="latao" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6cf6a"/><stop offset="1" stop-color="#c98f22"/>
+    </linearGradient>
+  </defs>
+  <!-- batente de madeira em arco -->
+  <path d="M92 462 V236 C92 112 166 34 256 34 C346 34 420 112 420 236 V462 Z"
+        fill="url(#madeira)" stroke="#2a1b10" stroke-width="12" stroke-linejoin="round"/>
+  <!-- veios do batente -->
+  <g fill="none" stroke="#5e3a1d" stroke-width="5" stroke-linecap="round" opacity="0.7">
+    <path d="M112 430 V300"/><path d="M108 250 C110 190 130 140 160 106"/>
+    <path d="M400 420 V330"/><path d="M404 270 C402 200 384 150 352 110"/>
+    <path d="M220 52 C240 47 270 47 292 52"/>
+  </g>
+  <!-- folha da porta (tábuas azuis) -->
+  <path d="M132 462 V244 C132 144 188 78 256 78 C324 78 380 144 380 244 V462 Z"
+        fill="url(#azul)" stroke="#16324d" stroke-width="10" stroke-linejoin="round"/>
+  <!-- divisões das tábuas -->
+  <g stroke="#1b5287" stroke-width="6" stroke-linecap="round">
+    <line x1="182" y1="128" x2="182" y2="458"/>
+    <line x1="231" y1="86" x2="231" y2="458"/>
+    <line x1="281" y1="86" x2="281" y2="458"/>
+    <line x1="330" y1="128" x2="330" y2="458"/>
+  </g>
+  <!-- brilho nas tábuas -->
+  <g stroke="#8fd0ff" stroke-width="7" stroke-linecap="round" opacity="0.55">
+    <line x1="194" y1="140" x2="194" y2="440"/><line x1="243" y1="104" x2="243" y2="300"/>
+    <line x1="293" y1="104" x2="293" y2="360"/><line x1="342" y1="150" x2="342" y2="420"/>
+  </g>
+  <!-- veios da madeira azul -->
+  <g fill="none" stroke="#1b5287" stroke-width="4" stroke-linecap="round" opacity="0.6">
+    <path d="M152 300 c6 18 4 34 -2 50"/><path d="M206 200 c8 14 8 28 2 40"/>
+    <path d="M256 380 c-6 14 -6 26 0 38"/><path d="M306 230 c6 16 6 30 0 44"/>
+    <path d="M356 330 c-6 16 -4 30 2 42"/>
+  </g>
+  <!-- dobradiças de ferro (à direita) -->
+  <g stroke="#1a1d22" stroke-width="7" stroke-linejoin="round">
+    <path d="M300 172 H388 a8 8 0 0 1 0 16 H300 l-12 -8 Z" fill="#5b6470"/>
+    <path d="M300 392 H388 a8 8 0 0 1 0 16 H300 l-12 -8 Z" fill="#5b6470"/>
+    <rect x="384" y="160" width="22" height="40" rx="6" fill="#3d8fd1"/>
+    <rect x="384" y="380" width="22" height="40" rx="6" fill="#3d8fd1"/>
+  </g>
+  <g fill="#1a1d22"><circle cx="312" cy="180" r="4.5"/><circle cx="350" cy="180" r="4.5"/>
+    <circle cx="312" cy="400" r="4.5"/><circle cx="350" cy="400" r="4.5"/></g>
+  <!-- olho mágico -->
+  <circle cx="256" cy="168" r="13" fill="#141414" stroke="#6b4a1f" stroke-width="6"/>
+  <g fill="url(#latao)" stroke="#5a3d10" stroke-width="3">
+    <circle cx="256" cy="144" r="5"/><circle cx="256" cy="192" r="5"/><circle cx="232" cy="168" r="5"/><circle cx="280" cy="168" r="5"/>
+  </g>
+  <!-- maçaneta de argola (latão) -->
+  <g stroke="#4a3210" stroke-width="7" stroke-linejoin="round">
+    <circle cx="184" cy="292" r="22" fill="url(#latao)"/>
+    <rect x="176" y="300" width="16" height="44" rx="7" fill="url(#latao)"/>
+    <circle cx="184" cy="352" r="15" fill="url(#latao)"/>
+  </g>
+  <circle cx="178" cy="286" r="6" fill="#fff4c8" opacity="0.8"/>
+  <!-- soleira de madeira -->
+  <rect x="62" y="458" width="388" height="30" rx="10" fill="#b98352" stroke="#2a1b10" stroke-width="10"/>
+  <line x1="92" y1="472" x2="200" y2="472" stroke="#7d4f2b" stroke-width="4" stroke-linecap="round"/>
+  <line x1="290" y1="476" x2="420" y2="476" stroke="#7d4f2b" stroke-width="4" stroke-linecap="round"/>
+</svg>

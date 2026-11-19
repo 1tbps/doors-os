@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+if [ "$1" = configure ]; then
+  # /etc/os-release deve apontar para /usr/lib/os-release (o do Doors OS).
+  # O live-build grava em /etc uma cópia do os-release do Debian (IMAGE_ID=live); troca pelo link.
+  if [ ! -L /etc/os-release ]; then
+    ln -sf ../usr/lib/os-release /etc/os-release
+  fi
+fi
+#DEBHELPER#
