@@ -16,3 +16,7 @@ if [ -e /usr/share/backgrounds/xfce/xfce-x.svg ]; then
   dpkg-divert --quiet --local --rename --add /usr/share/backgrounds/xfce/xfce-x.svg
   ln -sf "$T/wallpaper/contents/images/1920x1080.svg" /usr/share/backgrounds/xfce/xfce-x.svg
 fi
+# KDE/SDDM: logo da tela de login (o tema debian-breeze aponta para o logo do Debian)
+if [ -d /usr/share/sddm/themes/debian-breeze ] && [ -f "$T/login/logo-text.svg" ]; then
+  printf '[General]\nlogo=%s\n' "$T/login/logo-text.svg" > /usr/share/sddm/themes/debian-breeze/theme.conf.user
+fi

@@ -43,6 +43,9 @@ for sz in SIZES:
     put(f"{TH}/lockscreen/contents/images/{sz}.svg", wall_svg(w, h, logo=False))
 put(f"{TH}/login/background.svg", wall_svg(1920, 1080))
 put(f"{TH}/login/background-nologo.svg", wall_svg(1920, 1080, logo=False))
+# Logo com texto para a tela de login (SDDM/KDE), no lugar do debian-logos/logo-text.svg
+put(f"{TH}/login/logo-text.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="80" viewBox="0 0 300 80">'
+    + logo_svg(4, 4, 72) + '<text x="88" y="54" font-family="Noto Sans, DejaVu Sans, sans-serif" font-weight="700" font-size="38" fill="#f0f4f8">Doors OS</text></svg>')
 
 # GRUB (PNG, sem texto) — sistema instalado
 def grub_png(w, h, path):
