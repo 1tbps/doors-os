@@ -3,7 +3,12 @@
 grep -qw 'boot=live' /proc/cmdline || exit 0
 # XFCE: marcar como confiável o ícone do instalador (o helper do Debian usa ~/Desktop fixo)
 DESK=$(xdg-user-dir DESKTOP 2>/dev/null); F="$DESK/calamares-install-debian.desktop"
-for i in $(seq 1 30); do [ -f "$F" ] && break; sleep 1; done
+for i in $(seq 1 15); do [ -f "$F" ] && break; sleep 1; done
+# se o helper do Debian gravou em outro lugar (ex.: ~/Desktop antes da pasta localizada existir), cria aqui
+if [ ! -f "$F" ] && [ -f /usr/share/applications/calamares-install-debian.desktop ]; then
+  mkdir -p "$DESK"; cp /usr/share/applications/calamares-install-debian.desktop "$F"; chmod +x "$F"
+fi
+[ "$DESK" != "$HOME/Desktop" ] && rm -f "$HOME/Desktop/calamares-install-debian.desktop" && rmdir "$HOME/Desktop" 2>/dev/null
 if [ -f "$F" ] && [ "$XDG_CURRENT_DESKTOP" = "XFCE" ]; then
   chmod +x "$F"
   gio set -t string "$F" metadata::trusted true 2>/dev/null || true

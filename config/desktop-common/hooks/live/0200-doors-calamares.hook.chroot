@@ -11,3 +11,9 @@ if [ -f "$F" ]; then
 fi
 gtk-update-icon-cache -q /usr/share/icons/hicolor 2>/dev/null || true
 systemctl enable doors-live-setup.service
+# Bug do Debian: add-calamares-desktop-icon não usa aspas em $DESKTOP ("Área de trabalho" vira 3 pastas)
+# e usa ~/Desktop fixo para marcar confiança no XFCE. Corrigir no pacote da live.
+H=/usr/bin/add-calamares-desktop-icon
+if [ -f "$H" ]; then
+  sed -i 's|mkdir -p \$DESKTOP|mkdir -p "$DESKTOP"|; s| \$DESKTOP/calamares-install-debian.desktop| "$DESKTOP/calamares-install-debian.desktop"|g; s|cp /usr/share/applications/calamares-install-debian.desktop \$DESKTOP$|cp /usr/share/applications/calamares-install-debian.desktop "$DESKTOP"|; s|~/Desktop/calamares-install-debian.desktop|"$DESKTOP/calamares-install-debian.desktop"|g; s|): do$|); do|' "$H"
+fi
