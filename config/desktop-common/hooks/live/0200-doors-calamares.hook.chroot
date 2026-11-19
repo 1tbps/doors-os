@@ -4,3 +4,10 @@ set -e
 sed -i 's/^branding: .*/branding: doors/' /etc/calamares/settings.conf
 # Manter ID EFI "debian": grub assinado (Secure Boot) procura /EFI/debian
 grep -q '^efiBootloaderId' /etc/calamares/modules/bootloader.conf || echo 'efiBootloaderId: "debian"' >> /etc/calamares/modules/bootloader.conf
+# Atalho do instalador (menu e ícone da área de trabalho criado por add-calamares-desktop-icon)
+F=/usr/share/applications/calamares-install-debian.desktop
+if [ -f "$F" ]; then
+  sed -i 's/^Name=.*/Name=Instalar Doors OS/; /^Name\[/d; s/^Comment=.*/Comment=Instala o Doors OS no computador/; /^Comment\[/d; s/^Icon=.*/Icon=doors-install/' "$F"
+fi
+gtk-update-icon-cache -q /usr/share/icons/hicolor 2>/dev/null || true
+systemctl enable doors-live-setup.service

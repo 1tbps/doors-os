@@ -1,0 +1,19 @@
+#!/bin/sh
+# Doors OS — ajustes de sistema SÓ na sessão live (raiz em overlay: nada disso vai para o sistema instalado)
+set -e
+# KDE: sem bloqueio automático
+printf '[Daemon]\nAutolock=false\nLockOnResume=false\n' > /etc/xdg/kscreenlockerrc
+# XFCE/LightDM: desativar light-locker e xfce4-screensaver
+for f in /etc/xdg/autostart/light-locker.desktop /etc/xdg/autostart/xfce4-screensaver.desktop; do
+  [ -f "$f" ] && { grep -q '^Hidden=true' "$f" || echo 'Hidden=true' >> "$f"; }
+done
+# Cinnamon/GNOME: sem bloqueio
+if [ -d /usr/share/glib-2.0/schemas ]; then
+  cat > /usr/share/glib-2.0/schemas/99-doors-live.gschema.override <<EOT
+[org.cinnamon.desktop.screensaver]
+lock-enabled=false
+[org.cinnamon.desktop.session]
+idle-delay=uint32 0
+EOT
+  glib-compile-schemas /usr/share/glib-2.0/schemas 2>/dev/null || true
+fi

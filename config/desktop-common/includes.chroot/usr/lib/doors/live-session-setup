@@ -1,18 +1,13 @@
 #!/bin/sh
 # Doors OS — ajustes da sessão LIVE (roda no login gráfico; não faz nada fora da live)
 grep -qw 'boot=live' /proc/cmdline || exit 0
-DESK=$(xdg-user-dir DESKTOP 2>/dev/null); [ -n "$DESK" ] || DESK="$HOME/Desktop"
-mkdir -p "$DESK"
-SRC=/usr/share/applications/calamares-install-debian.desktop
-if [ -f "$SRC" ]; then
-  F="$DESK/instalar-doors.desktop"
-  sed 's/^Name=.*/Name=Instalar Doors OS/; /^Name\[/d; s/^Icon=.*/Icon=\/etc\/calamares\/branding\/doors\/doors-logo.png/' "$SRC" > "$F"
+# XFCE: marcar como confiável o ícone do instalador (o helper do Debian usa ~/Desktop fixo)
+DESK=$(xdg-user-dir DESKTOP 2>/dev/null); F="$DESK/calamares-install-debian.desktop"
+for i in $(seq 1 30); do [ -f "$F" ] && break; sleep 1; done
+if [ -f "$F" ] && [ "$XDG_CURRENT_DESKTOP" = "XFCE" ]; then
   chmod +x "$F"
-  gio set "$F" metadata::trusted true 2>/dev/null || true
+  gio set -t string "$F" metadata::trusted true 2>/dev/null || true
   gio set -t string "$F" metadata::xfce-exe-checksum "$(sha256sum "$F" | cut -d' ' -f1)" 2>/dev/null || true
+  touch "$F"
 fi
-# sem bloqueio de tela / descanso na live
-command -v kwriteconfig6 >/dev/null && { kwriteconfig6 --file kscreenlockerrc --group Daemon --key Autolock false; kwriteconfig6 --file kscreenlockerrc --group Daemon --key LockOnResume false; }
-command -v gsettings >/dev/null && { gsettings set org.cinnamon.desktop.screensaver lock-enabled false 2>/dev/null; gsettings set org.cinnamon.desktop.session idle-delay 0 2>/dev/null; }
-command -v xfconf-query >/dev/null && { xfconf-query -c xfce4-screensaver -p /lock/enabled -n -t bool -s false 2>/dev/null; xfconf-query -c xfce4-screensaver -p /saver/enabled -n -t bool -s false 2>/dev/null; }
 exit 0

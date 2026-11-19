@@ -1,0 +1,11 @@
+[Unit]
+Description=Doors OS: ajustes da sessão live
+ConditionKernelCommandLine=boot=live
+Before=display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/doors/live-system-setup
+
+[Install]
+WantedBy=multi-user.target
