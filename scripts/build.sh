@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build de uma edição Doors OS. Roda DENTRO do container (/doors = /mnt/doors).
+# Build de uma edição Doors OS. Roda DENTRO do container (/doors = /mnt/disco/doors).
 # Uso: build.sh <base|xfce|kde|cinnamon>
 # Camadas: config/common  +  config/editions/<edição> (se não for "base").
 set -euo pipefail
@@ -35,4 +35,4 @@ cp "$ISO" /doors/isos/
 cp chroot.packages.live "/doors/isos/$NAME.packages" 2>/dev/null || true
 cd /doors/isos && sha256sum "$ISO" > "$ISO.sha256"
 chown "$OWNER" "/doors/isos/$NAME"*
-echo "ISO=/mnt/doors/isos/$ISO"
+echo "ISO=/mnt/disco/doors/isos/$ISO"

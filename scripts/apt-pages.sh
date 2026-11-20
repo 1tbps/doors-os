@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Publica /mnt/doors/apt/public no GitHub Pages (repositório PÚBLICO 1tbps/doors-os-apt). Roda no HOST.
+# Publica /mnt/disco/doors/apt/public no GitHub Pages (repositório PÚBLICO 1tbps/doors-os-apt). Roda no HOST.
 # Uso: scripts/apt-pages.sh            (requer gh autenticado)
-# Só a árvore pública do APT (dists/, pool/, chave pública) vai para lá — nunca /mnt/doors/keys.
+# Só a árvore pública do APT (dists/, pool/, chave pública) vai para lá — nunca /mnt/disco/doors/keys.
 set -euo pipefail
-PUB=/mnt/doors/apt/public; W=/mnt/doors/apt/pages; REPO=1tbps/doors-os-apt
-FPR=$(cat /mnt/doors/keys/fingerprint)
+PUB=/mnt/disco/doors/apt/public; W=/mnt/disco/doors/apt/pages; REPO=1tbps/doors-os-apt
+FPR=$(cat /mnt/disco/doors/keys/fingerprint)
 [ -f "$PUB/dists/trixie/InRelease" ] || { echo "repositório não publicado (rode apt-repo.sh publish)" >&2; exit 1; }
 if [ ! -d "$W/.git" ]; then git clone -q "https://github.com/$REPO.git" "$W"; fi
 cd "$W"; git pull -q --rebase 2>/dev/null || true

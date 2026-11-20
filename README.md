@@ -22,7 +22,7 @@ O Doors OS é uma distribuição baseada no Debian 13 "trixie", com edições XF
   - relatórios de validação;
   - guia do repositório APT (`repositorio-apt.md`).
 
-Fora do repositório, em `/mnt/doors`, ficam:
+Fora do repositório, em `/mnt/disco/doors`, ficam:
 - `build/`, `cache/`, `isos/`, `logs/` e `vms/`;
 - `apt/`: estado do reprepro e árvore pública do repositório;
 - `keys/`: **chave secreta de assinatura, que nunca vai para o git**.

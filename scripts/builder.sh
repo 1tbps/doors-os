@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Uso: scripts/builder.sh build-image | shell | run <comando...>
-# Executa o container de build com /mnt/doors montado em /doors.
+# Executa o container de build com /mnt/disco/doors montado em /doors.
 set -euo pipefail
-ROOT=/mnt/doors
+ROOT=/mnt/disco/doors
 IMG=doors-builder:trixie
 case "${1:-}" in
   build-image)

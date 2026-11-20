@@ -1,6 +1,6 @@
 # Repositório de atualizações: como operar
 
-Todos os comandos rodam no host, a partir de `/mnt/doors/repo`. O container de build precisa estar disponível; se o Docker estiver parado, rode `sudo systemctl start docker`.
+Todos os comandos rodam no host, a partir de `/mnt/disco/doors/repo`. O container de build precisa estar disponível; se o Docker estiver parado, rode `sudo systemctl start docker`.
 
 ## Publicar uma atualização dos pacotes Doors
 
@@ -32,10 +32,10 @@ O `scripts/build.sh` copia para a ISO os `.deb` **publicados**, que ficam em `ap
 |---|---|---|
 | `packages/doors-os/` | Fonte dos pacotes | sim |
 | `config/doors.env` | Versão da distro e URL do repositório | sim |
-| `/mnt/doors/apt/public/` | Árvore pública do repositório (`dists/`, `pool/`, chave `.asc`) | não (é publicada) |
-| `/mnt/doors/apt/reprepro/` | Banco de dados do reprepro | não |
-| `/mnt/doors/apt/pages/` | Clone do repositório público `1tbps/doors-os-apt` (GitHub Pages) | é o próprio repositório público |
-| `/mnt/doors/keys/` | **Chave secreta**, certificado de revogação, impressão digital | **nunca** |
+| `/mnt/disco/doors/apt/public/` | Árvore pública do repositório (`dists/`, `pool/`, chave `.asc`) | não (é publicada) |
+| `/mnt/disco/doors/apt/reprepro/` | Banco de dados do reprepro | não |
+| `/mnt/disco/doors/apt/pages/` | Clone do repositório público `1tbps/doors-os-apt` (GitHub Pages) | é o próprio repositório público |
+| `/mnt/disco/doors/keys/` | **Chave secreta**, certificado de revogação, impressão digital | **nunca** |
 
 ## Chave de assinatura
 
@@ -54,7 +54,7 @@ GNUPGHOME=/doors/keys/gnupg gpg --quick-set-expire <fpr> 3y
 ## Testar localmente com VMs (antes de publicar)
 
 ```
-python3 -m http.server 8080 --bind 192.168.122.1 --directory /mnt/doors/apt/public
+python3 -m http.server 8080 --bind 192.168.122.1 --directory /mnt/disco/doors/apt/public
 ```
 
 Na VM, aponte um arquivo `.sources` temporário para `http://192.168.122.1:8080/`.

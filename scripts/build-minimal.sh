@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build mínimo de validação (sem desktop). Roda DENTRO do container (/doors = /mnt/doors).
+# Build mínimo de validação (sem desktop). Roda DENTRO do container (/doors = /mnt/disco/doors).
 set -euo pipefail
 W=/doors/build/minimal
 CACHE=/doors/cache/lb-trixie

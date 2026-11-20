@@ -22,16 +22,16 @@ Na 0.1, a identidade (os-release), o tema e o logo de login eram aplicados por h
 
 ## Segurança
 
-- **Chave secreta:** fica em `/mnt/doors/keys/gnupg`, com modo 700, **fora do git** e sem senha, porque a assinatura é automatizada. A proteção é o acesso ao disco.
-- **Revogação:** o certificado fica em `/mnt/doors/keys/gnupg/openpgp-revocs.d/`.
-- **Backup:** fazer uma cópia offline de `/mnt/doors/keys`. Sem a chave não é possível publicar atualizações que os sistemas instalados aceitem.
+- **Chave secreta:** fica em `/mnt/disco/doors/keys/gnupg`, com modo 700, **fora do git** e sem senha, porque a assinatura é automatizada. A proteção é o acesso ao disco.
+- **Revogação:** o certificado fica em `/mnt/disco/doors/keys/gnupg/openpgp-revocs.d/`.
+- **Backup:** fazer uma cópia offline de `/mnt/disco/doors/keys`. Sem a chave não é possível publicar atualizações que os sistemas instalados aceitem.
 - **Testado:** o APT recusa um repositório adulterado.
 
 ## Hospedagem
 
 - O repositório é servido pelo **GitHub Pages**, a partir do repositório **público** separado `1tbps/doors-os-apt`, no endereço `https://1tbps.github.io/doors-os-apt/`.
 - O código-fonte continua privado em `1tbps/doors-os`. O repositório público contém só a árvore do APT: `dists/`, `pool/` e a chave **pública**.
-- O script `scripts/apt-pages.sh` sincroniza `/mnt/doors/apt/public` com esse repositório.
+- O script `scripts/apt-pages.sh` sincroniza `/mnt/disco/doors/apt/public` com esse repositório.
   - Ele recusa a publicação se encontrar material de chave privada.
   - Os commits usam uma identidade neutra: "Doors OS Project".
 - **Validado:**
