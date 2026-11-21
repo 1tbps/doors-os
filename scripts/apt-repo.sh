@@ -22,7 +22,12 @@ echo "outdir $PUB" > "$B/conf/options"
 R() { reprepro --basedir "$B" --outdir "$PUB" "$@"; }
 case "${1:-}" in
   publish)
-    for d in /doors/apt/incoming/*.deb; do R includedeb trixie "$d"; done
+    for d in /doors/apt/incoming/*.deb; do
+      # versão já publicada não muda (o reprepro recusa bytes diferentes para a mesma versão)
+      n=$(dpkg-deb -f "$d" Package); v=$(dpkg-deb -f "$d" Version)
+      if R list trixie "$n" | grep -q " $n $v\$"; then echo "já publicado: $n $v"; continue; fi
+      R includedeb trixie "$d"
+    done
     R export trixie
     cp /doors/keys/doors-archive-keyring.asc "$PUB/doors-archive-keyring.asc" ;;
   list) R list trixie ;;

@@ -1,3 +1,15 @@
+doors-os (0.3) trixie; urgency=medium
+
+  * Versão 0.3 do Doors OS:
+    - ISO única com KDE Plasma, Cinnamon e XFCE; ambiente escolhido no
+      menu de boot (live) e no instalador;
+    - visual igual nos 3 ambientes: ícones elementary-xfce, tema "Doors"
+      com contorno colorido na janela ativa, painel no estilo Mint;
+    - papel de parede principal "Porta Encantada";
+    - novos pacotes doors-kde-settings e doors-cinnamon-settings.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 01:00:00 -0300
+
 doors-os (0.3~dev7) trixie; urgency=medium
 
   * "Porta Encantada" em 2560x1440 (antes 1376x768).
