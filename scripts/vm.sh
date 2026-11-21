@@ -2,6 +2,7 @@
 # VM de teste interativa (host). Uso:
 #  vm.sh create <nome> <iso>   | shot <nome> [arquivo]  | keys <nome> KEY_A KEY_B ... | type <nome> "texto"
 #  vm.sh destroy <nome>        (remove VM, NVRAM e disco do pool doors)
+#  type: teclado ABNT2 da VM (letras, números, espaço e - . / = _ | :)
 set -euo pipefail
 C=qemu:///system; cmd=$1; N=$2; shift 2
 case $cmd in
@@ -12,7 +13,7 @@ case $cmd in
  shot) F=${1:-/mnt/disco/doors/logs/$N-$(date +%H%M%S).png}; virsh -c $C screenshot "$N" /tmp/vm-$N.ppm >/dev/null
    python3 -I -c 'import sys;from PIL import Image;Image.open(sys.argv[1]).save(sys.argv[2])' /tmp/vm-$N.ppm "$F"; rm -f /tmp/vm-$N.ppm; echo "$F";;
  keys) for k in "$@"; do virsh -c $C send-key "$N" ${k//+/ } >/dev/null; sleep 0.3; done;;
- type) s=$1; for ((i=0;i<${#s};i++)); do k=${s:i:1}; case "$k" in " ") w=KEY_SPACE;; [a-z]) w=KEY_${k^^};; [A-Z]) w="KEY_LEFTSHIFT KEY_$k";; [0-9]) w=KEY_$k;; -) w=KEY_MINUS;; .) w=KEY_DOT;; *) continue;; esac; virsh -c $C send-key "$N" $w >/dev/null; sleep 0.12; done;;
+ type) s=$1; for ((i=0;i<${#s};i++)); do k=${s:i:1}; case "$k" in " ") w=KEY_SPACE;; [a-z]) w=KEY_${k^^};; [A-Z]) w="KEY_LEFTSHIFT KEY_$k";; [0-9]) w=KEY_$k;; -) w=KEY_MINUS;; .) w=KEY_DOT;; /) w=KEY_RO;; =) w=KEY_EQUAL;; _) w="KEY_LEFTSHIFT KEY_MINUS";; "|") w="KEY_LEFTSHIFT KEY_102ND";; :) w="KEY_LEFTSHIFT KEY_SLASH";; *) continue;; esac; virsh -c $C send-key "$N" $w >/dev/null; sleep 0.12; done;;
  click) # click <nome> X Y  (pixels numa tela 1280x800)
    X=$(( $1 * 32767 / 1280 )); Y=$(( $2 * 32767 / 800 ))
    virsh -c $C qemu-monitor-command "$N" "{\"execute\":\"input-send-event\",\"arguments\":{\"events\":[{\"type\":\"abs\",\"data\":{\"axis\":\"x\",\"value\":$X}},{\"type\":\"abs\",\"data\":{\"axis\":\"y\",\"value\":$Y}}]}}" >/dev/null

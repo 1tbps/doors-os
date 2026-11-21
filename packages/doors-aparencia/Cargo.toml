@@ -1,0 +1,15 @@
+[package]
+name = "doors-aparencia"
+version = "0.1.0"
+edition = "2021"
+description = "Doors Aparência: tema, cor de destaque, painel e papel de parede do Doors OS em um clique"
+license = "GPL-3.0-or-later"
+publish = false
+
+[dependencies]
+# só dependências empacotadas no Debian trixie (librust-gtk4-dev): o build é offline
+gtk = { package = "gtk4", version = "0.9" }
+
+[profile.release]
+lto = true
+codegen-units = 1

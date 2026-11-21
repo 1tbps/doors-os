@@ -1,0 +1,17 @@
+doors-aparencia (0.1.1) trixie; urgency=medium
+
+  * KDE: aplica o esquema sem --accent-color (o Plasma 6.3 recusa "#rrggbb");
+    a cor de destaque vai no esquema e em kdeglobals.
+  * XFCE: papel de parede gravado no monitor real (monitor<SAÍDA>/workspaceN).
+  * Atalho renomeado para org.doors.Aparencia.desktop (ícone certo no Wayland).
+  * Mensagem de resultado no topo; o app acompanha o modo claro/escuro.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 00:40:00 -0300
+
+doors-aparencia (0.1.0) trixie; urgency=medium
+
+  * Primeira versão: tema claro/escuro, 6 cores de destaque, painel embaixo
+    ou em cima e papel de parede da coleção Doors (mais a imagem do dia no
+    KDE), para KDE Plasma, Cinnamon e XFCE.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 00:20:00 -0300

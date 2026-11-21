@@ -19,9 +19,10 @@ rsync -a "$R/config/common/" config/ --exclude lb-config.args
 if [ "$ED" != base ]; then rsync -a "$R/config/desktop-common/" config/; rsync -a "$R/config/editions/$ED/" config/; fi
 # pacotes Doors publicados no repositório (doors-release, doors-archive-keyring; doors-artwork só nas edições desktop)
 mkdir -p config/packages.chroot
-for d in /doors/apt/public/pool/main/d/doors-os/*.deb; do
+for d in /doors/apt/public/pool/main/d/*/*.deb; do
   case "$d" in
-    *doors-artwork_*) [ "$ED" = base ] && continue;;
+    *-dbgsym_*) continue;;
+    *doors-artwork_*|*doors-aparencia_*) [ "$ED" = base ] && continue;;
     *doors-*-settings_*) [ "$ED" = desktop ] || case "$d" in *doors-"$ED"-settings_*) ;; *) continue;; esac;;
   esac
   cp "$d" config/packages.chroot/

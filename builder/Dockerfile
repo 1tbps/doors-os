@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates git rsync cpio xz-utils zstd \
       dpkg-dev debhelper fakeroot reprepro gnupg \
       librsvg2-bin fonts-noto-core python3 python3-pil \
+      cargo rustc librust-gtk4-dev libgtk-4-dev pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /work

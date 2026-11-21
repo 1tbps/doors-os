@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Aparência do Doors
+GenericName=Aparência
+Comment=Tema claro ou escuro, cor de destaque, painel e papel de parede em um clique
+Exec=doors-aparencia
+Icon=doors-logo
+Terminal=false
+Categories=Settings;DesktopSettings;GTK;
+Keywords=tema;cores;escuro;claro;papel de parede;painel;aparência;
+StartupNotify=true

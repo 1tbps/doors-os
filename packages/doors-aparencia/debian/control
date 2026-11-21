@@ -1,0 +1,16 @@
+Source: doors-aparencia
+Section: x11
+Priority: optional
+Maintainer: Doors OS Project <noreply@doors-os.invalid>
+Build-Depends: debhelper-compat (= 13), cargo, rustc, librust-gtk4-dev, libgtk-4-dev, pkg-config
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: doors-aparencia
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, doors-artwork, libglib2.0-bin
+Recommends: greybird-gtk-theme
+Description: Doors Aparência: personalização do Doors OS em um clique
+ Aplicativo (Rust + GTK4) para escolher tema claro ou escuro, cor de
+ destaque, posição do painel e papel de parede no KDE Plasma, no Cinnamon
+ e no XFCE. Cada clique aplica na hora.
