@@ -123,7 +123,7 @@
 - **Não validado ainda:** BIOS legado; Secure Boot da ISO 0.3; particionamento manual/dual boot.
 - **Conhecido:** a tela "Ambiente gráfico" não pré-seleciona o KDE (o widget do Calamares 3.3 ignora `packageChoice`/`selected`; só a versão QML aplica); a escolha é obrigatória, então não há risco. O resumo do instalador não mostra o ambiente escolhido.
 - **Lições:** no Plasma 6 os grupos `Colors:Header` mandam na cor da barra de título (removidos do "Doors Claro"); o Cinnamon 6 desenha bordas pelo CSS GTK (`.ssd decoration`), não pelo metacity; atalho `c` é reservado no GRUB.
-- Edições antigas (`config/editions/{kde,cinnamon,xfce}`) e `build/{kde,cinnamon,xfce}` ficaram sem uso.
+- Edições antigas (`config/editions/{kde,cinnamon,xfce}` e `build/{kde,cinnamon,xfce}`, ~28 GB) removidas em 2026-11-21; ficam só as edições `desktop` (ISO única) e `base`. As ISOs 0.2 continuam em `isos/`.
 
 ## Doors Aparência (app em Rust) — 2026-11-21
 

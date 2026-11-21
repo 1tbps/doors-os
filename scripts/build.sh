@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Build de uma edição Doors OS. Roda DENTRO do container (/doors = /mnt/disco/doors).
-# Uso: build.sh <base|xfce|kde|cinnamon>
-# Camadas: config/common  +  config/editions/<edição> (se não for "base").
+# Uso: build.sh <desktop|base>
+#   desktop: ISO única com KDE Plasma, Cinnamon e XFCE (doors-<versão>-amd64.hybrid.iso)
+#   base:    sistema sem ambiente gráfico (validação da camada comum)
+# Camadas: config/common  +  config/desktop-common + config/editions/desktop (só na "desktop").
 set -euo pipefail
 ED=${1:?edição}; . /doors/repo/config/doors.env; VER=$DOORS_VERSION
 R=/doors/repo; W=/doors/build/$ED; CACHE=/doors/cache/lb-trixie
@@ -17,13 +19,12 @@ eval lb config $(grep -v '^#' "$R/config/common/lb-config.args" | tr '\n' ' ') \
   --iso-application "\"Doors OS\"" --iso-volume "DOORS_${ED^^}" --image-name "$NAME"
 rsync -a "$R/config/common/" config/ --exclude lb-config.args
 if [ "$ED" != base ]; then rsync -a "$R/config/desktop-common/" config/; rsync -a "$R/config/editions/$ED/" config/; fi
-# pacotes Doors publicados no repositório (doors-release, doors-archive-keyring; doors-artwork só nas edições desktop)
+# pacotes Doors publicados no repositório (na "base" só doors-release e doors-archive-keyring)
 mkdir -p config/packages.chroot
 for d in /doors/apt/public/pool/main/d/*/*.deb; do
   case "$d" in
     *-dbgsym_*) continue;;
-    *doors-artwork_*|*doors-aparencia_*) [ "$ED" = base ] && continue;;
-    *doors-*-settings_*) [ "$ED" = desktop ] || case "$d" in *doors-"$ED"-settings_*) ;; *) continue;; esac;;
+    *doors-artwork_*|*doors-aparencia_*|*doors-*-settings_*) [ "$ED" = base ] && continue;;
   esac
   cp "$d" config/packages.chroot/
 done
