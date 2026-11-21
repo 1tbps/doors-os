@@ -167,4 +167,4 @@ ISO `doors-0.4-dev-amd64.hybrid.iso` em VM UEFI:
 Implementado: X11 padrão no KDE (Wayland do Cinnamon/XFCE escondido); ç de fábrica (doors-release); Chromium no lugar do Firefox; sem LibreOffice; **GNOME** como 4º ambiente (Dash to Panel + ArcMenu, X11, doors-gnome-settings); opção "Codecs e drivers" no instalador (codecs + NVIDIA, contrib/non-free, precisa de internet); **Doors Digitação** (doors-digitacao 0.1.1); Doors Aparência 0.3 com GNOME; logos do sistema (vendor-logos) do Doors.
 
 Validado em VM (UEFI): GNOME live; instalação GNOME com "Codecs e drivers" (codecs instalados, contrib/non-free, só GNOME, X11, Chromium, Digitação, ~/.XCompose); login do GDM com o logo do Doors; Digitação (lição, teclado na tela, jogo). Não testado: driver NVIDIA (VM sem placa), instalação KDE/Cinnamon/XFCE desta ISO, teclado internacional na VM.
-Pendente de teste: padrões do Dash to Panel via dconf (sem aviso em inglês e sem visão geral ao entrar), já no código, não compilado.
+Padrões do Dash to Panel via dconf validados na ISO final (0.4~dev5): sem aviso em inglês, sem visão geral ao entrar, sem botão de grade. Commit 808a949.
