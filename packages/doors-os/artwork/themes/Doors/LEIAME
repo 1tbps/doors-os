@@ -1,0 +1,5 @@
+Tema "Doors" do Doors OS: bordas de janela (xfwm4, metacity-1) e camada GTK3.
+Derivado do Greybird 3.23.3 (pacote greybird-gtk-theme do Debian), licença GPL-2+/CC-BY-SA-3.0.
+Única mudança: a borda/contorno da janela ativa usa o azul do logo do Doors OS (#2f78b5).
+gtk-3.0/gtk.css importa o Greybird e só troca o contorno (o Cinnamon 6 desenha as bordas por ele);
+gtk-2.0 e gtk-4.0 são links para o Greybird.

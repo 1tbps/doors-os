@@ -2,10 +2,10 @@
     "KPlugin": {
         "Id": "DoorsOSLockscreen",
         "Name": "Doors OS",
-        "License": "Pexels License",
+        "License": "Doors OS",
         "Authors": [
             {
-                "Name": "lich (Pexels)"
+                "Name": "Doors OS Project"
             }
         ]
     }

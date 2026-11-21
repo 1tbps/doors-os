@@ -9,17 +9,25 @@ NAME="doors-test-$(basename "$ISO" .iso)-$(date +%H%M%S)"
 TS=$(date +%Y%m%d-%H%M%S)
 SHOT=/mnt/disco/doors/logs/boot-$(basename "$ISO" .iso)-sb$SB-$TS.png
 DISK=/mnt/disco/doors/vms/$NAME.qcow2
-qemu-img create -q -f qcow2 "$DISK" 20G
+qemu-img create -q -f qcow2 "$DISK" 40G
 FW="uefi"; [ "$SB" = 1 ] && FW="uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=yes,firmware.feature1.name=enrolled-keys,firmware.feature1.enabled=yes"
 virt-install --connect $C --name "$NAME" --transient --noautoconsole \
   --memory 4096 --vcpus 2 --osinfo debian13 \
   --boot "$FW" --cdrom "$ISO" --disk "path=$DISK,bus=virtio" \
   --network network=default --graphics vnc --video virtio >/dev/null
-sleep 20
-virsh -c $C send-key "$NAME" KEY_ENTER >/dev/null  # seleciona a 1ª entrada do menu
+# MENU_TECLA=k|n|x: atalho da entrada do menu de boot (ISO única: k=KDE, n=Cinnamon, x=XFCE; "c" e "e" são do GRUB).
+# Repetido enquanto o GRUB aparece; depois do boot a tecla não tem efeito.
+if [ -n "${MENU_TECLA:-}" ]; then
+  for i in $(seq 1 12); do sleep 2; virsh -c $C send-key "$NAME" "KEY_${MENU_TECLA^^}" >/dev/null; done
+else
+  sleep 20
+  virsh -c $C send-key "$NAME" KEY_ENTER >/dev/null  # seleciona a 1ª entrada do menu
+fi
 sleep "$WAIT"
 # Comandos opcionais (env CMDS, separados por ':'; só letras/números/espaço por causa do teclado ABNT2)
 type_line(){ local w k; for ((i=0;i<${#1};i++)); do k=${1:i:1}; case "$k" in " ") w=KEY_SPACE;; [a-z]) w=KEY_${k^^};; [0-9]) w=KEY_$k;; -) w=KEY_MINUS;; *) continue;; esac; virsh -c $C send-key "$NAME" $w >/dev/null; done; virsh -c $C send-key "$NAME" KEY_ENTER >/dev/null; }
+# ABRIR_TERMINAL=1: Ctrl+Alt+T antes da captura (mostra uma janela ativa e suas bordas)
+if [ -n "${ABRIR_TERMINAL:-}" ]; then virsh -c $C send-key "$NAME" KEY_LEFTCTRL KEY_LEFTALT KEY_T >/dev/null; sleep 10; fi
 if [ -n "${CMDS:-}" ]; then IFS=: read -ra L <<<"$CMDS"; for c in "${L[@]}"; do type_line "$c"; sleep 3; done; fi
 virsh -c $C screenshot "$NAME" /tmp/claude-shot.ppm >/dev/null
 python3 -I -c 'import sys;from PIL import Image;Image.open(sys.argv[1]).save(sys.argv[2])' /tmp/claude-shot.ppm "$SHOT" 2>/dev/null || cp /tmp/claude-shot.ppm "${SHOT%.png}.ppm"

@@ -35,7 +35,13 @@ FOTOS = {
     "numero45":  ("pexels-malcolnphoto-28452846.jpg", "Número 45", "malcolnphoto", 28452846, (0.5, 0.55)),
     "arco":      ("pexels-shantumsingh-41109588.jpg", "Arco", "Shantum Singh", 41109588, (0.5, 0.62)),
 }
-PADRAO = "lavanda"
+# Ilustrações originais do projeto (renderizadas por renderizar.sh a partir de branding/gerar-papel-de-parede.py)
+# (arquivo em branding/fontes, nome exibido, autor, origem)
+ILUSTRACOES = {
+    "portaencantada": ("porta-encantada.png", "Porta Encantada", "Doors OS Project", "arte criada pelo autor do projeto (2560x1440)"),
+    "portaazul": ("porta-azul.png", "Porta Azul", "Doors OS Project", "ilustração original (branding/gerar-papel-de-parede.py)"),
+}
+PADRAO = "portaencantada"
 
 
 def put(path, data, mode="w"):
@@ -45,6 +51,9 @@ def put(path, data, mode="w"):
 
 
 def foto(key, w, h):
+    if key in ILUSTRACOES:
+        im = Image.open(f"{R}/branding/fontes/{ILUSTRACOES[key][0]}").convert("RGB")
+        return ImageOps.fit(im, (w, h), Image.LANCZOS, centering=(0.5, 0.5))
     arq, _, _, _, c = FOTOS[key]
     im = ImageOps.exif_transpose(Image.open(f"{SRC}/{arq}")).convert("RGB")
     return ImageOps.fit(im, (w, h), Image.LANCZOS, centering=c)
@@ -115,7 +124,8 @@ for w, h in WP[:2]:
 put(f"{TH}/lockscreen/gnome-background.xml", bg_xml([((w, h), f"{T}/lockscreen/contents/images/{w}x{h}.jpg") for w, h in WP[:2]]))
 for k in ("wallpaper", "lockscreen"):
     put(f"{TH}/{k}/metadata.json", json.dumps({"KPlugin": {"Id": "DoorsOS" + ("" if k == "wallpaper" else "Lockscreen"),
-        "Name": "Doors OS", "License": "Pexels License", "Authors": [{"Name": FOTOS[PADRAO][2] + " (Pexels)"}]}},
+        "Name": "Doors OS", "License": "Doors OS" if PADRAO in ILUSTRACOES else "Pexels License",
+        "Authors": [{"Name": "Doors OS Project" if PADRAO in ILUSTRACOES else FOTOS[PADRAO][2] + " (Pexels)"}]}},
         ensure_ascii=False, indent=4) + "\n")
 
 # login (LightDM/slick-greeter: background.svg; SDDM: background-nologo.svg)
@@ -132,11 +142,13 @@ escurecer(foto(PADRAO, 1280, 1024), 0.45).save(f"{TH}/grub/grub-4x3.png")
 # ---------------------------------------------------------------- coleção (todas as fotos)
 links = ["usr/share/desktop-base/doors-theme/wallpaper/contents/images/2560x1440.jpg usr/share/backgrounds/xfce/xfce-x.svg"]
 xml = ['<?xml version="1.0"?>', '<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">', "<wallpapers>"]
-for key, (arq, nome, autor, pid, _) in FOTOS.items():
+COLECAO = [(k, (a, n, autor, None, None)) for k, (a, n, autor, _) in ILUSTRACOES.items()] + list(FOTOS.items())
+for key, (arq, nome, autor, pid, _) in COLECAO:
     jpg(foto(key, 2560, 1440), f"{ART}/backgrounds/doors/{key}.jpg", 86)
     kid = "Doors" + key.capitalize()
     put(f"{ART}/wallpapers/{kid}/metadata.json", json.dumps({"KPlugin": {"Id": kid, "Name": f"Doors — {nome}",
-        "License": "Pexels License", "Authors": [{"Name": f"{autor} (Pexels)"}]}}, ensure_ascii=False, indent=2) + "\n")
+        "License": "Pexels License" if pid else "Doors OS", "Authors": [{"Name": f"{autor} (Pexels)" if pid else autor}]}},
+        ensure_ascii=False, indent=2) + "\n")
     links.append(f"usr/share/backgrounds/doors/{key}.jpg usr/share/wallpapers/{kid}/contents/images/2560x1440.jpg")
     xml += ['  <wallpaper deleted="false">', f"    <name>Doors — {nome}</name>",
             f"    <filename>/usr/share/backgrounds/doors/{key}.jpg</filename>", "    <options>zoom</options>", "  </wallpaper>"]
@@ -150,6 +162,8 @@ cred = ["# Créditos das fotos", "",
         "Licença Pexels (https://www.pexels.com/license/): uso e modificação livres, crédito opcional;",
         "não redistribuir as fotos em outros bancos de imagens ou plataformas de papéis de parede.", "",
         "| Papel de parede | Fotógrafo | Origem |", "|---|---|---|"]
+for key, (arq, nome, autor, origem) in ILUSTRACOES.items():
+    cred.append(f"| {nome}{' (padrão)' if key == PADRAO else ''} | {autor} | {origem} |")
 for key, (arq, nome, autor, pid, _) in FOTOS.items():
     cred.append(f"| {nome}{' (padrão)' if key == PADRAO else ''} | {autor} | https://www.pexels.com/photo/{pid}/ |")
 put(f"{R}/branding/fotos/CREDITOS.md", "\n".join(cred) + "\n")
@@ -195,7 +209,7 @@ def banner(key, titulo, sub, out):
     im.save(out)
 
 
-banner("lavanda", "Simples. Aberto. Seu.", "Bem-vindo ao Doors OS", f"{CAL}/welcome.png")
+banner(PADRAO, "Simples. Aberto. Seu.", "Bem-vindo ao Doors OS", f"{CAL}/welcome.png")
 banner("azulejos", "Instalação em poucos minutos", "Siga as etapas — o resto é automático", f"{CAL}/slide1.png")
 banner("colonial", "Seguro desde o início", "Secure Boot, atualizações assinadas e base Debian", f"{CAL}/slide2.png")
 banner("casarao", "Tudo pronto para usar", "Navegador, escritório, multimídia e loja de apps", f"{CAL}/slide3.png")

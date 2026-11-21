@@ -5,7 +5,7 @@
 set -euo pipefail
 C=qemu:///system; cmd=$1; N=$2; shift 2
 case $cmd in
- create) ISO=$(realpath "$1"); qemu-img create -q -f qcow2 /mnt/disco/doors/vms/$N.qcow2 25G
+ create) ISO=$(realpath "$1"); qemu-img create -q -f qcow2 /mnt/disco/doors/vms/$N.qcow2 40G
    virt-install --connect $C --name "$N" --noautoconsole --memory 4096 --vcpus 4 --osinfo debian13 \
      --boot uefi --cdrom "$ISO" --disk path=/mnt/disco/doors/vms/$N.qcow2,bus=virtio \
      --network network=default --graphics vnc --video virtio >/dev/null; echo created;;

@@ -12,4 +12,8 @@ if [ "$1" = configure ]; then
     update-grub >/dev/null 2>&1 || true
   fi
 fi
+if [ "$1" = configure ] || [ "$1" = triggered ]; then
+  /usr/lib/doors/atualizar-papeis-de-parede || true
+  gtk-update-icon-cache -q -f /usr/share/icons/Doors 2>/dev/null || true
+fi
 #DEBHELPER#

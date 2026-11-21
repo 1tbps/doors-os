@@ -1,0 +1,5 @@
+kde/xdg/kdeglobals etc/xdg/
+kde/xdg/kwinrc etc/xdg/
+kde/xdg/plasmarc etc/xdg/
+kde/color-schemes/DoorsClaro.colors usr/share/color-schemes/
+kde/look-and-feel/org.doors.desktop usr/share/plasma/look-and-feel/

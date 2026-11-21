@@ -13,6 +13,9 @@ for s in 16 22 24 32 48 64 128 256 512; do
 done
 mkdir -p "$IC/scalable/apps"; cp "$LOGO" "$IC/scalable/apps/doors-logo.svg"; ln -s doors-logo.svg "$IC/scalable/apps/doors-install.svg"
 rsvg-convert -w 256 -h 256 "$LOGO" -o "$R/config/desktop-common/includes.chroot/etc/calamares/branding/doors/doors-logo.png"
+# papel de parede principal (ilustração original) -> branding/fontes/porta-azul.png
+python3 -I "$R/branding/gerar-papel-de-parede.py" "$F/porta-azul.svg"
+rsvg-convert -w 3840 -h 2160 "$F/porta-azul.svg" -o "$F/porta-azul.png"
 python3 -I "$R/branding/gerar-arte.py" "$R"
 mkdir -p "$R/packages/doors-os/artwork/skel"
 rsvg-convert -w 256 -h 256 "$F/face.svg" -o "$R/packages/doors-os/artwork/skel/.face"

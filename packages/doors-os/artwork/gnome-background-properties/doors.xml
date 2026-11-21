@@ -2,6 +2,16 @@
 <!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
 <wallpapers>
   <wallpaper deleted="false">
+    <name>Doors — Porta Encantada</name>
+    <filename>/usr/share/backgrounds/doors/portaencantada.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Porta Azul</name>
+    <filename>/usr/share/backgrounds/doors/portaazul.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
     <name>Doors — Lavanda</name>
     <filename>/usr/share/backgrounds/doors/lavanda.jpg</filename>
     <options>zoom</options>

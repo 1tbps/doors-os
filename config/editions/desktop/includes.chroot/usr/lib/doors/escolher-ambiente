@@ -1,0 +1,28 @@
+#!/bin/sh
+# Doors OS — roda no sistema INSTALADO (chroot do Calamares).
+# Mantém só o ambiente escolhido: remove os outros dois e acerta o gerenciador de login.
+# Uso: escolher-ambiente <kde|cinnamon|xfce>
+set -euf  # -f: os padrões ?name(...) do apt não podem virar glob do shell
+export DEBIAN_FRONTEND=noninteractive
+KDE="task-kde-desktop doors-kde-settings kde-standard kde-plasma-desktop plasma-desktop plasma-workspace kwin-x11 kwin-wayland sddm ?name(^sddm-theme)"
+CIN="task-cinnamon-desktop doors-cinnamon-settings cinnamon cinnamon-core cinnamon-desktop-environment cinnamon-session muffin nemo slick-greeter"
+XFC="task-xfce-desktop doors-xfce-settings xfce4 xfce4-session xfwm4 xfdesktop4 xfce4-panel thunar"
+# lightdm-gtk-greeter fica no Cinnamon e no XFCE (é a tela de login do LightDM nos dois);
+# sem ele o apt tentaria baixar outra (slick-greeter) e a instalação offline falharia.
+case "${1:-}" in
+  kde)      REMOVER="$CIN $XFC lightdm ?name(^lightdm-)"; DM=sddm;   BIN=/usr/bin/sddm ;;
+  cinnamon) REMOVER="$KDE $XFC";                          DM=lightdm; BIN=/usr/sbin/lightdm ;;
+  xfce)     REMOVER="$KDE $CIN";                          DM=lightdm; BIN=/usr/sbin/lightdm ;;
+  *) echo "uso: $0 kde|cinnamon|xfce" >&2; exit 1 ;;
+esac
+# shellcheck disable=SC2086
+apt-get -y --no-download purge $REMOVER  # offline: nunca baixar nada
+apt-get -y autoremove --purge
+echo "$BIN" > /etc/X11/default-display-manager
+ln -sf /usr/lib/systemd/system/$DM.service /etc/systemd/system/display-manager.service
+# sessão padrão do LightDM = o ambiente escolhido
+if [ "$DM" = lightdm ]; then
+  mkdir -p /etc/lightdm/lightdm.conf.d
+  printf '[Seat:*]\nuser-session=%s\n' "$1" > /etc/lightdm/lightdm.conf.d/60-doors-ambiente.conf
+fi
+echo "Doors OS: ambiente $1 mantido"

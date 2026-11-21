@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Doors
+Comment=Bordas de janela do Doors OS: Greybird com contorno azul na janela ativa
+
+[X-GNOME-Metatheme]
+GtkTheme=Doors
+MetacityTheme=Doors
+IconTheme=Doors

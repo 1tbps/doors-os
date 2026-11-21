@@ -6,7 +6,9 @@ não redistribuir as fotos em outros bancos de imagens ou plataformas de papéis
 
 | Papel de parede | Fotógrafo | Origem |
 |---|---|---|
-| Lavanda (padrão) | lich | https://www.pexels.com/photo/13403615/ |
+| Porta Encantada (padrão) | Doors OS Project | arte criada pelo autor do projeto (2560x1440) |
+| Porta Azul | Doors OS Project | ilustração original (branding/gerar-papel-de-parede.py) |
+| Lavanda | lich | https://www.pexels.com/photo/13403615/ |
 | Azulejos | Lucas Carlini | https://www.pexels.com/photo/38904535/ |
 | Casarão | Bruno Vieira | https://www.pexels.com/photo/18556523/ |
 | Colonial | Giovanna Prado | https://www.pexels.com/photo/30190296/ |

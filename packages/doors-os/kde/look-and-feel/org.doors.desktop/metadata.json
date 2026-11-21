@@ -1,0 +1,12 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [ { "Name": "Doors OS Project" } ],
+        "Category": "",
+        "Description": "Aparência padrão do Doors OS: painel embaixo no estilo Mint, janelas claras com destaque azul e ícones elementary-xfce",
+        "Id": "org.doors.desktop",
+        "License": "GPLv2+",
+        "Name": "Doors OS",
+        "Website": "https://github.com/1tbps/doors-os"
+    }
+}

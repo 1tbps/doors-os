@@ -1,0 +1,8 @@
+# Doors OS: bordas visíveis (na cor da barra de título: azul na janela ativa)
+[org.kde.kdecoration2]
+library=org.kde.breeze
+theme=Breeze
+BorderSize=Normal
+BorderSizeAuto=false
+ButtonsOnLeft=M
+ButtonsOnRight=IAX

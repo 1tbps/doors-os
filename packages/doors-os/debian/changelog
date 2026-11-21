@@ -1,3 +1,60 @@
+doors-os (0.3~dev7) trixie; urgency=medium
+
+  * "Porta Encantada" em 2560x1440 (antes 1376x768).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Fri, 20 Nov 2026 23:45:00 -0300
+
+doors-os (0.3~dev6) trixie; urgency=medium
+
+  * Papel de parede principal: "Porta Encantada" (arte do autor do projeto,
+    versão original sem logo),
+    no lugar da "Porta Azul", que continua na coleção.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Fri, 20 Nov 2026 23:35:00 -0300
+
+doors-os (0.3~dev4) trixie; urgency=medium
+
+  * Papel de parede principal novo: "Porta Azul", ilustração original no
+    estilo do ícone (porta azul entreaberta com luz dourada, céu azul).
+    Vale para área de trabalho, bloqueio, login, GRUB, menu de boot e
+    instalador. A foto "Lavanda" continua na coleção, só não é mais a padrão.
+  * Instalador: tela "Ambiente gráfico" com prévia de cada ambiente e KDE
+    pré-selecionado.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Fri, 20 Nov 2026 23:00:00 -0300
+
+doors-os (0.3~dev3) trixie; urgency=medium
+
+  * Tema "Doors" ganha camada GTK3 (importa o Greybird): contorno azul de
+    2px na janela ativa. O Cinnamon 6 desenha as bordas pelo CSS do GTK,
+    não pelo tema metacity; o Cinnamon passa a usar o tema GTK "Doors".
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Fri, 20 Nov 2026 22:30:00 -0300
+
+doors-os (0.3~dev2) trixie; urgency=medium
+
+  * doors-kde-settings: esquema "Doors Claro" sem os grupos Header, para o
+    KWin usar a cor [WM] (barra de título azul na janela ativa).
+  * ISO única (edição "desktop"): os 3 ambientes, escolha no instalador.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Fri, 20 Nov 2026 22:00:00 -0300
+
+doors-os (0.3~dev1) trixie; urgency=medium
+
+  * Visual igual nas três edições (XFCE, KDE, Cinnamon):
+    - novo tema de ícones "Doors" (elementary-xfce, os do Xubuntu) em todas;
+    - novo tema de bordas "Doors": Greybird com contorno azul (#2f78b5) na
+      janela ativa (XFCE e Cinnamon);
+    - coleções de papéis de parede do KDE e do GNOME em todas as edições,
+      listadas também no seletor do Cinnamon (gatilho do dpkg).
+  * Novo pacote doors-kde-settings: painel embaixo no estilo Mint, esquema de
+    cores "Doors Claro" com barra de título e bordas azuis na janela ativa,
+    painel escuro e aparência global "Doors OS".
+  * Novo pacote doors-cinnamon-settings: Greybird, bordas Doors, ícones Doors
+    e fontes Noto.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Fri, 20 Nov 2026 21:45:00 -0300
+
 doors-os (0.2) trixie; urgency=medium
 
   * Versão 0.2 do Doors OS:

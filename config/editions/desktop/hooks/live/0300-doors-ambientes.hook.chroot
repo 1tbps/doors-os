@@ -1,0 +1,25 @@
+#!/bin/sh
+# ISO única: a live usa o SDDM para abrir qualquer um dos 3 ambientes (escolhido no menu de boot)
+set -e
+echo /usr/bin/sddm > /etc/X11/default-display-manager
+ln -sf /usr/lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service
+# Calamares: tela de escolha do ambiente e remoção dos outros
+S=/etc/calamares/settings.conf
+grep -q 'packagechooser@ambiente' $S || python3 - "$S" <<'PY'
+import sys
+p=sys.argv[1]; s=open(p).read()
+inst = """instances:
+- id: ambiente
+  module: packagechooser
+  config: packagechooser-ambiente.conf
+- id: ambiente
+  module: contextualprocess
+  config: contextualprocess-ambiente.conf
+
+"""
+s = s.replace("sequence:", inst + "sequence:", 1)
+s = s.replace("  - keyboard\n  - partition\n", "  - keyboard\n  - packagechooser@ambiente\n  - partition\n", 1)
+s = s.replace("  - users\n  - displaymanager\n", "  - users\n  - contextualprocess@ambiente\n  - displaymanager\n", 1)
+open(p,"w").write(s)
+PY
+grep -q 'packagechooser@ambiente' $S && grep -q 'contextualprocess@ambiente' $S

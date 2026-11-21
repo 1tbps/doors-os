@@ -1,0 +1,25 @@
+#!/bin/sh
+# Doors OS: lista os papéis de parede no formato do KDE (/usr/share/wallpapers)
+# para os seletores do Cinnamon/GNOME/MATE. Roda pelo gatilho do dpkg.
+set -e
+SAIDA=/usr/share/gnome-background-properties/doors-colecao-kde.xml
+TMP=$(mktemp)
+{
+  echo '<?xml version="1.0"?>'
+  echo '<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">'
+  echo '<wallpapers>'
+  for d in /usr/share/wallpapers/*/; do
+    nome=$(basename "$d")
+    case "$nome" in Doors*|DebianTheme|*LockScreen*) continue;; esac
+    # maior imagem do pacote (pelo nome LARGURAxALTURA)
+    img=$(ls "$d"contents/images/ 2>/dev/null | grep -E '^[0-9]+x[0-9]+\.(jpg|jpeg|png|webp)$' \
+          | sort -t x -k1,1n | tail -1)
+    [ -n "$img" ] || continue
+    printf '  <wallpaper deleted="false">\n    <name>%s</name>\n    <filename>%s</filename>\n    <options>zoom</options>\n  </wallpaper>\n' \
+      "$nome" "${d}contents/images/$img"
+  done
+  echo '</wallpapers>'
+} > "$TMP"
+mkdir -p "$(dirname "$SAIDA")"
+install -m 644 "$TMP" "$SAIDA"; rm -f "$TMP"
+[ -d /usr/share/cinnamon-background-properties ] && ln -sf "$SAIDA" /usr/share/cinnamon-background-properties/doors-colecao-kde.xml || true

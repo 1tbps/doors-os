@@ -8,3 +8,6 @@ artwork/gnome-background-properties/doors.xml usr/share/gnome-background-propert
 artwork/cinnamon-background-properties/doors.xml usr/share/cinnamon-background-properties/
 artwork/mate-background-properties/doors.xml usr/share/mate-background-properties/
 artwork/skel/.face etc/skel/
+artwork/icons/Doors usr/share/icons/
+scripts/atualizar-papeis-de-parede usr/lib/doors/
+artwork/themes/Doors usr/share/themes/

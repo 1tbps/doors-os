@@ -12,7 +12,7 @@ mkdir -p "$CACHE"
 if [ -d "$W/chroot" ]; then (cd "$W" && lb clean --purge >/dev/null 2>&1 || true); fi
 rm -rf "$W"; mkdir -p "$W"; cd "$W"
 ln -s "$CACHE" cache
-NAME="doors-$VER-$ED"
+NAME="doors-$VER-$ED"; [ "$ED" = desktop ] && NAME="doors-$VER"  # ISO única
 eval lb config $(grep -v '^#' "$R/config/common/lb-config.args" | tr '\n' ' ') \
   --iso-application "\"Doors OS\"" --iso-volume "DOORS_${ED^^}" --image-name "$NAME"
 rsync -a "$R/config/common/" config/ --exclude lb-config.args
@@ -22,7 +22,7 @@ mkdir -p config/packages.chroot
 for d in /doors/apt/public/pool/main/d/doors-os/*.deb; do
   case "$d" in
     *doors-artwork_*) [ "$ED" = base ] && continue;;
-    *doors-xfce-settings_*) [ "$ED" = xfce ] || continue;;
+    *doors-*-settings_*) [ "$ED" = desktop ] || case "$d" in *doors-"$ED"-settings_*) ;; *) continue;; esac;;
   esac
   cp "$d" config/packages.chroot/
 done

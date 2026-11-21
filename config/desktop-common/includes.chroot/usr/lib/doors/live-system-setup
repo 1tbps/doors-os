@@ -30,3 +30,13 @@ for H in /home/*; do
     mkdir -p "$D"; cp "$APP" "$D/"; chmod +x "$D/calamares-install-debian.desktop"; chown -R "$U:" "$D"
   fi
 done
+# ISO única (edição "desktop"): ambiente da live escolhido no menu de boot (doors.ambiente=…; padrão KDE)
+if [ -x /usr/lib/doors/escolher-ambiente ] && [ -f /etc/sddm.conf ]; then
+  case "$(sed -n 's/.*doors\.ambiente=\([a-z]*\).*/\1/p' /proc/cmdline)" in
+    cinnamon) S=cinnamon.desktop ;;
+    xfce)     S=xfce.desktop ;;
+    *)        S=plasma.desktop ;;
+  esac
+  if grep -q '^Session=' /etc/sddm.conf; then sed -i "s/^Session=.*/Session=$S/" /etc/sddm.conf
+  else printf 'Session=%s\n' "$S" >> /etc/sddm.conf; fi
+fi

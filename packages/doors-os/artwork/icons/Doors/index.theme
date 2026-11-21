@@ -1,0 +1,6 @@
+[Icon Theme]
+Name=Doors
+Comment=Ícones do Doors OS (elementary-xfce, os mesmos do Xubuntu)
+Inherits=elementary-xfce-dark,breeze,Adwaita,hicolor
+Directories=
+Example=folder
