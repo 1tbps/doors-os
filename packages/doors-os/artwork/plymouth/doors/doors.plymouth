@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Doors OS
+Description=Tela de inicialização do Doors OS
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/doors
+ScriptFile=/usr/share/plymouth/themes/doors/doors.script

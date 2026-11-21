@@ -2,53 +2,63 @@
 <!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
 <wallpapers>
   <wallpaper deleted="false">
-    <name>Doors — Porta Encantada</name>
+    <name>Doors — Colina ensolarada</name>
+    <filename>/usr/share/backgrounds/doors/colina.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Biblioteca mágica (dia)</name>
+    <filename>/usr/share/backgrounds/doors/bibliotecadia.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Biblioteca mágica (noite)</name>
+    <filename>/usr/share/backgrounds/doors/bibliotecanoite.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Cidade futurista chuvosa</name>
+    <filename>/usr/share/backgrounds/doors/cidadefuturista.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Dunas do deserto ao pôr do sol</name>
+    <filename>/usr/share/backgrounds/doors/dunas.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Floresta nevada com aurora boreal</name>
+    <filename>/usr/share/backgrounds/doors/aurora.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Fundo do oceano</name>
+    <filename>/usr/share/backgrounds/doors/oceano.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Green Line</name>
+    <filename>/usr/share/backgrounds/doors/greenline.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Ilha flutuante no espaço sideral</name>
+    <filename>/usr/share/backgrounds/doors/ilhaflutuante.jpg</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Doors — Portal na floresta</name>
     <filename>/usr/share/backgrounds/doors/portaencantada.jpg</filename>
     <options>zoom</options>
   </wallpaper>
   <wallpaper deleted="false">
-    <name>Doors — Porta Azul</name>
-    <filename>/usr/share/backgrounds/doors/portaazul.jpg</filename>
+    <name>Doors — Portal no Inferno</name>
+    <filename>/usr/share/backgrounds/doors/portalinferno.jpg</filename>
     <options>zoom</options>
   </wallpaper>
   <wallpaper deleted="false">
-    <name>Doors — Lavanda</name>
-    <filename>/usr/share/backgrounds/doors/lavanda.jpg</filename>
-    <options>zoom</options>
-  </wallpaper>
-  <wallpaper deleted="false">
-    <name>Doors — Azulejos</name>
-    <filename>/usr/share/backgrounds/doors/azulejos.jpg</filename>
-    <options>zoom</options>
-  </wallpaper>
-  <wallpaper deleted="false">
-    <name>Doors — Casarão</name>
-    <filename>/usr/share/backgrounds/doors/casarao.jpg</filename>
-    <options>zoom</options>
-  </wallpaper>
-  <wallpaper deleted="false">
-    <name>Doors — Colonial</name>
-    <filename>/usr/share/backgrounds/doors/colonial.jpg</filename>
-    <options>zoom</options>
-  </wallpaper>
-  <wallpaper deleted="false">
-    <name>Doors — Laranja</name>
-    <filename>/usr/share/backgrounds/doors/laranja.jpg</filename>
-    <options>zoom</options>
-  </wallpaper>
-  <wallpaper deleted="false">
-    <name>Doors — Grade vermelha</name>
-    <filename>/usr/share/backgrounds/doors/grade.jpg</filename>
-    <options>zoom</options>
-  </wallpaper>
-  <wallpaper deleted="false">
-    <name>Doors — Número 45</name>
-    <filename>/usr/share/backgrounds/doors/numero45.jpg</filename>
-    <options>zoom</options>
-  </wallpaper>
-  <wallpaper deleted="false">
-    <name>Doors — Arco</name>
-    <filename>/usr/share/backgrounds/doors/arco.jpg</filename>
+    <name>Doors — Túnel subterrâneo antigo</name>
+    <filename>/usr/share/backgrounds/doors/tunel.jpg</filename>
     <options>zoom</options>
   </wallpaper>
 </wallpapers>

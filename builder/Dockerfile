@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       dpkg-dev debhelper fakeroot reprepro gnupg \
       librsvg2-bin fonts-noto-core python3 python3-pil \
       cargo rustc librust-gtk4-dev libgtk-4-dev pkg-config \
+      cmake g++ extra-cmake-modules gettext kwin-dev qt6-base-dev qt6-base-private-dev qt6-base-dev-tools \
+      libkf6kcmutils-dev libkf6configwidgets-dev libkf6i18n-dev libepoxy-dev libxcb1-dev libdrm-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /work

@@ -4,7 +4,7 @@
 # Uso: escolher-ambiente <kde|cinnamon|xfce>
 set -euf  # -f: os padrões ?name(...) do apt não podem virar glob do shell
 export DEBIAN_FRONTEND=noninteractive
-KDE="task-kde-desktop doors-kde-settings kde-standard kde-plasma-desktop plasma-desktop plasma-workspace kwin-x11 kwin-wayland sddm ?name(^sddm-theme)"
+KDE="task-kde-desktop doors-kde-settings doors-kwin-cantos kde-standard kde-plasma-desktop plasma-desktop plasma-workspace kwin-x11 kwin-wayland sddm ?name(^sddm-theme)"
 CIN="task-cinnamon-desktop doors-cinnamon-settings cinnamon cinnamon-core cinnamon-desktop-environment cinnamon-session muffin nemo slick-greeter"
 XFC="task-xfce-desktop doors-xfce-settings xfce4 xfce4-session xfwm4 xfdesktop4 xfce4-panel thunar"
 # lightdm-gtk-greeter fica no Cinnamon e no XFCE (é a tela de login do LightDM nos dois);

@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsCidadefuturista",
+    "Name": "Doors — Cidade futurista chuvosa",
+    "License": "Doors OS",
+    "Authors": [
+      {
+        "Name": "Doors OS Project"
+      }
+    ]
+  }
+}

@@ -29,6 +29,13 @@
 | 2026-11-21 | **Doors Aparência** (app próprio em Rust + GTK4, pacote `doors-aparencia`, fonte em `repo/packages/doors-aparencia`): tema claro/escuro, 6 cores de destaque, painel embaixo/em cima, papel de parede (+ imagem do dia no KDE), nos 3 ambientes | Pedido do usuário |
 | 2026-11-21 | Fechar como **0.3** (não publicar como 0.3-dev); tag v0.3 (commit e64a297) | Escolha do usuário |
 | 2026-11-21 | Repositório de código **github.com/1tbps/doors-os tornado PÚBLICO** (antes privado; histórico verificado sem segredos) e release v0.3 com a ISO em 2 partes (limite de 2 GB por arquivo do GitHub) | Escolha do usuário |
+| 2026-11-21 | Papéis de parede: saem as fotos do Pexels e a "Porta Azul"; entram 12 ilustrações de portas do autor do projeto (`branding/fontes/papeis/`). Padrão: **"Colina ensolarada"** ("Portal na floresta" é a antiga Porta Encantada) | Pedido do usuário |
+| 2026-11-21 | Tela de inicialização (Plymouth) própria, tema `doors`, no lugar da Ceratopsian do Debian 13 (live e instalado) | Pedido do usuário |
+| 2026-11-21 | Janelas com cantos arredondados nos 4 cantos e contorno colorido com brilho, como no COSMIC. KDE: efeito KDE-Rounded-Corners 0.11.0 (GPL-3, github.com/matinlotfali/KDE-Rounded-Corners) empacotado como `doors-kwin-cantos`; Cinnamon: CSS; XFCE: peças do xfwm4 | Aprovado pelo usuário (download do código autorizado) |
+| 2026-11-21 | Doors Aparência 0.2 no estilo do Zorin Appearance: menu lateral (Tema, Fundo, Layout, Fontes) e cartões com prévia | Pedido do usuário |
+| 2026-11-21 | Versão em desenvolvimento: **0.4-dev**. Incluir o **GNOME** como 4º ambiente fica para a próxima compilação | Pedido do usuário |
+| 2026-11-21 | Próxima compilação: tirar o **LibreOffice** da instalação principal; trocar o Firefox pelo **Chrome** só se for possível (o Chrome não pode vir embutido na ISO: opções = repositório do Google com instalação online, ou Chromium do Debian) | Pedido do usuário — escolhido: **Chromium** no lugar do Firefox (Chrome continua instalável depois pelo .deb do Google; avaliar atalho "Instalar Google Chrome") |
+| 2026-11-21 | Próxima compilação: opção no instalador "Instalar software de terceiros" (codecs + drivers como NVIDIA, de contrib/non-free; detecta a placa; precisa de internet) | Pedido do usuário |
 
 ## Etapas
 
@@ -142,3 +149,12 @@
 | Release | https://github.com/1tbps/doors-os/releases/tag/v0.3 (parte1 + parte2 + .sha256; arquivos em `isos/release-0.3/`) |
 | Repositório de atualizações | publicado em 2026-11-21 04:04Z: doors-* 0.3 e doors-aparencia 0.1.1; assinatura conferida com gpgv |
 | Validação | ISO 0.3 final (2026-11-21, VM UEFI, disco 40 GB, "Formatar o disco"): instalação completa + 1º boot + login nos 3 ambientes. KDE: só KDE/SDDM, doors-kde-settings e doors-aparencia; Cinnamon: só Cinnamon/LightDM, doors-cinnamon-settings e doors-aparencia; XFCE: só XFCE/LightDM, doors-xfce-settings e doors-aparencia. Os 3 com "Doors OS 0.3" e a Porta Encantada no login |
+
+## Doors OS 0.4-dev — validação (2026-11-21)
+
+ISO `doors-0.4-dev-amd64.hybrid.iso` em VM UEFI:
+- Live KDE, Cinnamon e XFCE: papel de parede padrão "Colina ensolarada"; coleção com as 12 ilustrações; Doors Aparência 0.2 (Tema, Fundo, Layout, Fontes) aplicando cor/escuro nos 3 ambientes.
+- Tela de inicialização Doors (Plymouth `doors`) no live (entradas com `quiet splash`) e no sistema instalado; nenhuma imagem do Debian 13.
+- Instalação KDE ("Formatar o disco"): GRUB, Plymouth e login com a arte nova; só KDE instalado; `doors-kwin-cantos` ativo (4 cantos arredondados + contorno na cor de destaque).
+- Bordas: KDE completo; XFCE com cantos de baixo arredondados (claro e escuro); Cinnamon com contorno arredondado, mas o conteúdo da janela continua com canto reto por dentro (o muffin não recorta a janela).
+- Não testado nesta rodada: instalação de Cinnamon/XFCE, BIOS, hardware físico.

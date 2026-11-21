@@ -1,0 +1,6 @@
+#!/bin/sh
+# Tela de inicialização do Doors no live e no sistema instalado (o initramfs é refeito depois, no chroot_hacks).
+set -e
+if [ -x /usr/sbin/plymouth-set-default-theme ] && [ -d /usr/share/plymouth/themes/doors ]; then
+  /usr/sbin/plymouth-set-default-theme doors
+fi

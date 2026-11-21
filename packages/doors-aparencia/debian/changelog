@@ -1,3 +1,15 @@
+doors-aparencia (0.2.0) trixie; urgency=medium
+
+  * Novo visual no estilo do Zorin Appearance: menu lateral com as páginas
+    Tema, Fundo, Layout e Fontes, e cartões com prévia desenhada.
+  * Fundo: nomes vindos da coleção, opção de usar uma imagem própria.
+  * Fontes: tamanho do texto (90%, 100%, 115%, 130%).
+  * Cor de destaque também no contorno arredondado com brilho das janelas
+    (KDE: efeito do doors-kwin-cantos; Cinnamon: CSS; XFCE: bordas do xfwm4
+    com cantos de baixo arredondados, também no modo escuro).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 15:00:00 -0300
+
 doors-aparencia (0.1.1) trixie; urgency=medium
 
   * KDE: aplica o esquema sem --accent-color (o Plasma 6.3 recusa "#rrggbb");

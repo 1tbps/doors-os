@@ -12,6 +12,16 @@ if [ "$1" = configure ]; then
     update-grub >/dev/null 2>&1 || true
   fi
 fi
+# tela de inicialização (Plymouth): troca o tema do Debian pelo do Doors, uma vez
+if [ "$1" = configure ] && [ -x /usr/sbin/plymouth-set-default-theme ]; then
+  atual=$(/usr/sbin/plymouth-set-default-theme 2>/dev/null || true)
+  case "$atual" in
+    ""|ceratopsian|debian-theme|emerald|homeworld|futureprototype|moonlight|softwaves|joy|lines|spacefun)
+      if /usr/sbin/plymouth-set-default-theme doors 2>/dev/null && [ -x /usr/sbin/update-initramfs ] && ls /boot/initrd.img-* >/dev/null 2>&1; then
+        update-initramfs -u -k all >/dev/null 2>&1 || true
+      fi;;
+  esac
+fi
 if [ "$1" = configure ] || [ "$1" = triggered ]; then
   /usr/lib/doors/atualizar-papeis-de-parede || true
   gtk-update-icon-cache -q -f /usr/share/icons/Doors 2>/dev/null || true

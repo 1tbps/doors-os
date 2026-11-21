@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Gera a arte do Doors OS a partir das fotos de portas (Pexels) + logo vetorial.
+"""Gera a arte do Doors OS a partir das ilustrações do projeto + logo vetorial.
 Roda DENTRO do container de build (PIL + fontes Noto): branding/renderizar.sh
 Uso: python3 -I branding/gerar-arte.py /caminho/do/repo
 
-Fotos: branding/fotos/originais/ — licença Pexels (uso e modificação livres; ver branding/fotos/CREDITOS.md)
+Ilustrações: branding/fontes/papeis/*.jpg (arte do autor do projeto, 2560x1440) 
 Saídas:
   packages/doors-os/artwork/doors-theme/   tema do desktop-base (papel de parede, bloqueio, login, GRUB)
-  packages/doors-os/artwork/backgrounds/   coleção de papéis de parede (todas as fotos)
+  packages/doors-os/artwork/backgrounds/   coleção de papéis de parede
   packages/doors-os/artwork/wallpapers/    pacotes de papel de parede do KDE (links para backgrounds/)
+  packages/doors-os/artwork/plymouth/doors tela de inicialização (Plymouth)
   packages/doors-os/debian/doors-artwork.links (gerado)
   config/common/bootloaders/splash.svg     menu de boot da ISO live
   config/desktop-common/.../calamares/branding/doors/{welcome,slide1..3}.png
@@ -18,30 +19,29 @@ from PIL import Image, ImageOps, ImageDraw, ImageFont, ImageEnhance
 R = sys.argv[1]
 ART = f"{R}/packages/doors-os/artwork"
 TH = f"{ART}/doors-theme"
-SRC = f"{R}/branding/fotos/originais"
+PAP = f"{R}/branding/fontes/papeis"
 CAL = f"{R}/config/desktop-common/includes.chroot/etc/calamares/branding/doors"
 FONT = "Noto Sans, DejaVu Sans, sans-serif"
 NOTO = "/usr/share/fonts/truetype/noto"
 AMBER, GOLD = "#ffb84c", "#ffd27a"
 
-# chave: (arquivo, nome exibido, fotógrafo, id Pexels, centro do recorte (x, y))
-FOTOS = {
-    "lavanda":   ("pexels-lich-13403615.jpg", "Lavanda", "lich", 13403615, (0.5, 0.88)),
-    "azulejos":  ("pexels-lucaspcarlini-38904535.jpg", "Azulejos", "Lucas Carlini", 38904535, (0.5, 0.5)),
-    "casarao":   ("pexels-bruno-vieira-694029667-18556523.jpg", "Casarão", "Bruno Vieira", 18556523, (0.5, 0.5)),
-    "colonial":  ("pexels-giovanna-prado-2148616234-30190296.jpg", "Colonial", "Giovanna Prado", 30190296, (0.5, 0.6)),
-    "laranja":   ("pexels-jan-van-der-wolf-11680885-40840715.jpg", "Laranja", "Jan van der Wolf", 40840715, (0.5, 0.5)),
-    "grade":     ("pexels-furkanakt-31928394.jpg", "Grade vermelha", "Furkan Aktaş", 31928394, (0.5, 0.5)),
-    "numero45":  ("pexels-malcolnphoto-28452846.jpg", "Número 45", "malcolnphoto", 28452846, (0.5, 0.55)),
-    "arco":      ("pexels-shantumsingh-41109588.jpg", "Arco", "Shantum Singh", 41109588, (0.5, 0.62)),
-}
-# Ilustrações originais do projeto (renderizadas por renderizar.sh a partir de branding/gerar-papel-de-parede.py)
-# (arquivo em branding/fontes, nome exibido, autor, origem)
+# chave: (arquivo relativo a branding/fontes, nome exibido); a ordem é a da coleção
+AUTOR = "Doors OS Project"
 ILUSTRACOES = {
-    "portaencantada": ("porta-encantada.png", "Porta Encantada", "Doors OS Project", "arte criada pelo autor do projeto (2560x1440)"),
-    "portaazul": ("porta-azul.png", "Porta Azul", "Doors OS Project", "ilustração original (branding/gerar-papel-de-parede.py)"),
+    "colina": ("papeis/colina.jpg", "Colina ensolarada"),
+    "bibliotecadia": ("papeis/bibliotecadia.jpg", "Biblioteca mágica (dia)"),
+    "bibliotecanoite": ("papeis/bibliotecanoite.jpg", "Biblioteca mágica (noite)"),
+    "cidadefuturista": ("papeis/cidadefuturista.jpg", "Cidade futurista chuvosa"),
+    "dunas": ("papeis/dunas.jpg", "Dunas do deserto ao pôr do sol"),
+    "aurora": ("papeis/aurora.jpg", "Floresta nevada com aurora boreal"),
+    "oceano": ("papeis/oceano.jpg", "Fundo do oceano"),
+    "greenline": ("papeis/greenline.jpg", "Green Line"),
+    "ilhaflutuante": ("papeis/ilhaflutuante.jpg", "Ilha flutuante no espaço sideral"),
+    "portaencantada": ("papeis/portaencantada.jpg", "Portal na floresta"),
+    "portalinferno": ("papeis/portalinferno.jpg", "Portal no Inferno"),
+    "tunel": ("papeis/tunel.jpg", "Túnel subterrâneo antigo"),
 }
-PADRAO = "portaencantada"
+PADRAO = "colina"
 
 
 def put(path, data, mode="w"):
@@ -51,12 +51,8 @@ def put(path, data, mode="w"):
 
 
 def foto(key, w, h):
-    if key in ILUSTRACOES:
-        im = Image.open(f"{R}/branding/fontes/{ILUSTRACOES[key][0]}").convert("RGB")
-        return ImageOps.fit(im, (w, h), Image.LANCZOS, centering=(0.5, 0.5))
-    arq, _, _, _, c = FOTOS[key]
-    im = ImageOps.exif_transpose(Image.open(f"{SRC}/{arq}")).convert("RGB")
-    return ImageOps.fit(im, (w, h), Image.LANCZOS, centering=c)
+    im = Image.open(f"{R}/branding/fontes/{ILUSTRACOES[key][0]}").convert("RGB")
+    return ImageOps.fit(im, (w, h), Image.LANCZOS, centering=(0.5, 0.5))
 
 
 def escurecer(im, f):
@@ -124,8 +120,7 @@ for w, h in WP[:2]:
 put(f"{TH}/lockscreen/gnome-background.xml", bg_xml([((w, h), f"{T}/lockscreen/contents/images/{w}x{h}.jpg") for w, h in WP[:2]]))
 for k in ("wallpaper", "lockscreen"):
     put(f"{TH}/{k}/metadata.json", json.dumps({"KPlugin": {"Id": "DoorsOS" + ("" if k == "wallpaper" else "Lockscreen"),
-        "Name": "Doors OS", "License": "Doors OS" if PADRAO in ILUSTRACOES else "Pexels License",
-        "Authors": [{"Name": "Doors OS Project" if PADRAO in ILUSTRACOES else FOTOS[PADRAO][2] + " (Pexels)"}]}},
+        "Name": "Doors OS", "License": "Doors OS", "Authors": [{"Name": AUTOR}]}},
         ensure_ascii=False, indent=4) + "\n")
 
 # login (LightDM/slick-greeter: background.svg; SDDM: background-nologo.svg)
@@ -142,12 +137,11 @@ escurecer(foto(PADRAO, 1280, 1024), 0.45).save(f"{TH}/grub/grub-4x3.png")
 # ---------------------------------------------------------------- coleção (todas as fotos)
 links = ["usr/share/desktop-base/doors-theme/wallpaper/contents/images/2560x1440.jpg usr/share/backgrounds/xfce/xfce-x.svg"]
 xml = ['<?xml version="1.0"?>', '<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">', "<wallpapers>"]
-COLECAO = [(k, (a, n, autor, None, None)) for k, (a, n, autor, _) in ILUSTRACOES.items()] + list(FOTOS.items())
-for key, (arq, nome, autor, pid, _) in COLECAO:
+for key, (arq, nome) in ILUSTRACOES.items():
     jpg(foto(key, 2560, 1440), f"{ART}/backgrounds/doors/{key}.jpg", 86)
     kid = "Doors" + key.capitalize()
     put(f"{ART}/wallpapers/{kid}/metadata.json", json.dumps({"KPlugin": {"Id": kid, "Name": f"Doors — {nome}",
-        "License": "Pexels License" if pid else "Doors OS", "Authors": [{"Name": f"{autor} (Pexels)" if pid else autor}]}},
+        "License": "Doors OS", "Authors": [{"Name": AUTOR}]}},
         ensure_ascii=False, indent=2) + "\n")
     links.append(f"usr/share/backgrounds/doors/{key}.jpg usr/share/wallpapers/{kid}/contents/images/2560x1440.jpg")
     xml += ['  <wallpaper deleted="false">', f"    <name>Doors — {nome}</name>",
@@ -157,16 +151,12 @@ for d in ("gnome-background-properties", "cinnamon-background-properties", "mate
     put(f"{ART}/{d}/doors.xml", "\n".join(xml) + "\n")
 put(f"{R}/packages/doors-os/debian/doors-artwork.links", "\n".join(links) + "\n")
 
-cred = ["# Créditos das fotos", "",
-        "Fotos de portas usadas nos papéis de parede, login, GRUB, menu de boot e instalador do Doors OS.",
-        "Licença Pexels (https://www.pexels.com/license/): uso e modificação livres, crédito opcional;",
-        "não redistribuir as fotos em outros bancos de imagens ou plataformas de papéis de parede.", "",
-        "| Papel de parede | Fotógrafo | Origem |", "|---|---|---|"]
-for key, (arq, nome, autor, origem) in ILUSTRACOES.items():
-    cred.append(f"| {nome}{' (padrão)' if key == PADRAO else ''} | {autor} | {origem} |")
-for key, (arq, nome, autor, pid, _) in FOTOS.items():
-    cred.append(f"| {nome}{' (padrão)' if key == PADRAO else ''} | {autor} | https://www.pexels.com/photo/{pid}/ |")
-put(f"{R}/branding/fotos/CREDITOS.md", "\n".join(cred) + "\n")
+cred = ["# Créditos dos papéis de parede", "",
+        "Ilustrações usadas nos papéis de parede, login, GRUB, tela de inicialização, menu de boot e",
+        "instalador do Doors OS. Todas são arte original do projeto.", "",
+        "| Papel de parede | Autor |", "|---|---|"]
+for key, (arq, nome) in ILUSTRACOES.items():
+    cred.append(f"| {nome}{' (padrão)' if key == PADRAO else ''} | {AUTOR} |")
 put(f"{ART}/CREDITOS.md", "\n".join(cred) + "\n")
 
 # ---------------------------------------------------------------- avatar padrão
@@ -210,7 +200,22 @@ def banner(key, titulo, sub, out):
 
 
 banner(PADRAO, "Simples. Aberto. Seu.", "Bem-vindo ao Doors OS", f"{CAL}/welcome.png")
-banner("azulejos", "Instalação em poucos minutos", "Siga as etapas — o resto é automático", f"{CAL}/slide1.png")
-banner("colonial", "Seguro desde o início", "Secure Boot, atualizações assinadas e base Debian", f"{CAL}/slide2.png")
-banner("casarao", "Tudo pronto para usar", "Navegador, escritório, multimídia e loja de apps", f"{CAL}/slide3.png")
+banner("bibliotecadia", "Instalação em poucos minutos", "Siga as etapas — o resto é automático", f"{CAL}/slide1.png")
+banner("aurora", "Seguro desde o início", "Secure Boot, atualizações assinadas e base Debian", f"{CAL}/slide2.png")
+banner("cidadefuturista", "Tudo pronto para usar", "Navegador, escritório, multimídia e loja de apps", f"{CAL}/slide3.png")
+
+# ---------------------------------------------------------------- tela de inicialização (Plymouth, tema "doors")
+PLY = f"{ART}/plymouth/doors"
+os.makedirs(PLY, exist_ok=True)   # doors.plymouth e doors.script são fixos (não gerados)
+escurecer(foto(PADRAO, 1920, 1080), 0.35).save(f"{PLY}/fundo.png")
+marca = Image.new("RGBA", (520, 140), (0, 0, 0, 0))
+if os.path.exists(LOGO_PNG):
+    lg = Image.open(LOGO_PNG).convert("RGBA").resize((120, 120), Image.LANCZOS)
+    marca.paste(lg, (0, 10), lg)
+ImageDraw.Draw(marca).text((140, 30), "Doors OS", font=fonte("Bold", 64), fill=(240, 244, 248, 255))
+marca = marca.crop(marca.getbbox()); marca.save(f"{PLY}/marca.png")
+for nome_, tam in (("ponto", 14),):
+    pt = Image.new("RGBA", (tam * 4, tam * 4), (0, 0, 0, 0))
+    ImageDraw.Draw(pt).ellipse((0, 0, tam * 4 - 1, tam * 4 - 1), fill=(255, 210, 122, 255))
+    pt.resize((tam, tam), Image.LANCZOS).save(f"{PLY}/{nome_}.png")
 print("arte gerada")

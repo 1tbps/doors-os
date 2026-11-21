@@ -1,0 +1,19 @@
+Source: doors-kwin-cantos
+Section: kde
+Priority: optional
+Maintainer: Doors OS Project <noreply@doors-os.invalid>
+Build-Depends: debhelper-compat (= 13), cmake, extra-cmake-modules, gettext, kwin-dev,
+ qt6-base-dev, qt6-base-private-dev, qt6-base-dev-tools, libkf6kcmutils-dev,
+ libkf6configwidgets-dev, libkf6i18n-dev, libepoxy-dev, libxcb1-dev, libdrm-dev
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://github.com/matinlotfali/KDE-Rounded-Corners
+
+Package: doors-kwin-cantos
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, kwin-common (>= 4:6.3), kwin-common (<< 4:6.4)
+Description: cantos arredondados e contorno colorido nas janelas do KDE (Doors OS)
+ Efeito do KWin "Rounded Corners" (KDE-Rounded-Corners 0.11.0, de Matin
+ Lotfaliei e colaboradores), compilado para o KDE Plasma 6.3 do Doors OS.
+ Arredonda os quatro cantos das janelas e desenha um contorno na cor de
+ destaque, com brilho, na janela ativa.

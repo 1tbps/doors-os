@@ -11,6 +11,6 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, doors-artwork, libglib2.0-bin
 Recommends: greybird-gtk-theme
 Description: Doors Aparência: personalização do Doors OS em um clique
- Aplicativo (Rust + GTK4) para escolher tema claro ou escuro, cor de
- destaque, posição do painel e papel de parede no KDE Plasma, no Cinnamon
- e no XFCE. Cada clique aplica na hora.
+ Aplicativo (Rust + GTK4), no estilo do Zorin Appearance, para escolher
+ tema claro ou escuro, cor de destaque, papel de parede, layout do painel e
+ tamanho do texto no KDE Plasma, no Cinnamon e no XFCE. Aplica na hora.

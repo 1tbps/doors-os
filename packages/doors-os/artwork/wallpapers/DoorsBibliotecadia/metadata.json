@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsBibliotecadia",
+    "Name": "Doors — Biblioteca mágica (dia)",
+    "License": "Doors OS",
+    "Authors": [
+      {
+        "Name": "Doors OS Project"
+      }
+    ]
+  }
+}

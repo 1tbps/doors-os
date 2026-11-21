@@ -5,6 +5,9 @@ if [ "$1" = remove ] || [ "$1" = abort-install ] || [ "$1" = disappear ]; then
     --divert /usr/share/backgrounds/xfce/xfce-x.svg.debian /usr/share/backgrounds/xfce/xfce-x.svg
   dpkg-divert --package doors-artwork --remove --rename --divert /etc/skel/.face.debian /etc/skel/.face
 fi
+if [ "$1" = remove ] && [ -x /usr/sbin/plymouth-set-default-theme ] && [ "$(/usr/sbin/plymouth-set-default-theme 2>/dev/null)" = doors ]; then
+  /usr/sbin/plymouth-set-default-theme -r 2>/dev/null || true
+fi
 if [ "$1" = remove ] || [ "$1" = purge ]; then
   rm -f /usr/share/gnome-background-properties/doors-colecao-kde.xml \
         /usr/share/cinnamon-background-properties/doors-colecao-kde.xml

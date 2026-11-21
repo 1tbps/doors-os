@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsPortalinferno",
+    "Name": "Doors — Portal no Inferno",
+    "License": "Doors OS",
+    "Authors": [
+      {
+        "Name": "Doors OS Project"
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsTunel",
+    "Name": "Doors — Túnel subterrâneo antigo",
+    "License": "Doors OS",
+    "Authors": [
+      {
+        "Name": "Doors OS Project"
+      }
+    ]
+  }
+}

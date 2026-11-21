@@ -1,0 +1,12 @@
+{
+  "KPlugin": {
+    "Id": "DoorsColina",
+    "Name": "Doors — Colina ensolarada",
+    "License": "Doors OS",
+    "Authors": [
+      {
+        "Name": "Doors OS Project"
+      }
+    ]
+  }
+}

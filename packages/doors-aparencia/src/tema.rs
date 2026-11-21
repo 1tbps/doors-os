@@ -139,20 +139,106 @@ pub fn esquema_kde(base: &str, cor: &Cor, nome_id: &str, nome: &str) -> String {
 
 // ------------------------------------------------------------------ GTK / xfwm4
 
-/// CSS do tema GTK3 pessoal: importa o Greybird (claro ou escuro) e pinta o
-/// contorno da janela ativa (o Cinnamon 6 desenha as bordas por este CSS).
+/// CSS do tema GTK3 pessoal: importa o Greybird (claro ou escuro), arredonda os
+/// quatro cantos e pinta o contorno da janela ativa com brilho, como no COSMIC
+/// (o Cinnamon 6 desenha as bordas das janelas por este CSS).
 pub fn css_gtk3(base_tema: &str, cor: &Cor) -> String {
     let h = cor.hex();
+    let (r, g, b) = cor.rgb;
     format!(
         "/* Gerado pelo Doors Aparência. Base: {base_tema}. */\n\
 @import url(\"/usr/share/themes/{base_tema}/gtk-3.0/gtk.css\");\n\n\
-.ssd decoration {{ box-shadow: 0 0 0 2px {h}; }}\n\
-.ssd decoration:backdrop {{ box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.23); }}\n\
-decoration {{ box-shadow: 0 3px 9px 1px rgba(0, 0, 0, 0.5), 0 0 0 2px {h}; }}\n\
-decoration:backdrop {{ box-shadow: 0 3px 9px 1px transparent, 0 2px 6px 2px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.18); }}\n\
-.maximized decoration, .fullscreen decoration, .tiled decoration, .popup decoration,\n\
-tooltip decoration, .csd.popup decoration {{ box-shadow: none; }}\n"
+.ssd decoration {{ border-radius: 8px; box-shadow: 0 0 0 2px {h}, 0 0 10px 2px rgba({r}, {g}, {b}, 0.55); }}\n\
+.ssd decoration:backdrop {{ border-radius: 8px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.23), 0 2px 6px 1px rgba(0, 0, 0, 0.2); }}\n\
+decoration {{ border-radius: 8px; box-shadow: 0 0 0 2px {h}, 0 0 10px 2px rgba({r}, {g}, {b}, 0.55), 0 3px 9px 1px rgba(0, 0, 0, 0.4); }}\n\
+decoration:backdrop {{ border-radius: 8px; box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.18); }}\n\
+.maximized decoration, .fullscreen decoration, .tiled decoration, .tiled-top decoration, .tiled-right decoration,\n\
+.tiled-bottom decoration, .tiled-left decoration {{ border-radius: 0; box-shadow: none; }}\n\
+.popup decoration, tooltip decoration, .csd.popup decoration {{ box-shadow: none; }}\n"
     )
+}
+
+/// Canto inferior esquerdo arredondado (6x6) das bordas do xfwm4: "." contorno, "@" fundo.
+const CANTO_XFWM4: [&str; 6] = [".@@@@@", " .@@@@", " .@@@@", "  .@@@", "   ..@", "     ."];
+
+/// Peças de baixo do xfwm4 com cantos arredondados (o xfwm4 recorta a janela pelo
+/// desenho das peças). `fundo` é a linha de cor do preenchimento, ex. "c #3B3E3F".
+/// Devolve (arquivo, conteúdo) para bottom-left, bottom-right e bottom.
+pub fn pecas_inferiores_xfwm4(estado: &str, borda: &str, fundo: &str) -> Vec<(String, String)> {
+    let xpm = |nome: &str, w: usize, linhas: Vec<String>| {
+        let mut t = format!(
+            "/* XPM */\nstatic char * {}_xpm[] = {{\n\"{w} 6 3 1\",\n\" \tc None\",\n\".\tc {borda}\",\n\"@\t{fundo}\",\n",
+            nome.replace('-', "_")
+        );
+        let corpo: Vec<String> = linhas.iter().map(|l| format!("\"{l}\"")).collect();
+        t.push_str(&corpo.join(",\n"));
+        t.push_str("};\n");
+        t
+    };
+    let esq: Vec<String> = CANTO_XFWM4.iter().map(|l| l.to_string()).collect();
+    let dir: Vec<String> = CANTO_XFWM4.iter().map(|l| l.chars().rev().collect()).collect();
+    let baixo: Vec<String> = ["@", "@", "@", "@", "@", "."].iter().map(|l| l.to_string()).collect();
+    vec![
+        (format!("bottom-left-{estado}.xpm"), xpm(&format!("bottom-left-{estado}"), 6, esq)),
+        (format!("bottom-right-{estado}.xpm"), xpm(&format!("bottom-right-{estado}"), 6, dir)),
+        (format!("bottom-{estado}.xpm"), xpm(&format!("bottom-{estado}"), 1, baixo)),
+    ]
+}
+
+/// Cor de preenchimento da barra de título num XPM do xfwm4 (a cor da última linha):
+/// devolve a definição da cor, ex. "c #3B3E3F" ou "c #DEDEDE s active_color_2".
+pub fn fundo_do_titulo_xpm(xpm: &str) -> Option<String> {
+    let linhas: Vec<&str> = xpm.lines().filter(|l| l.trim_start().starts_with('"')).collect();
+    let cab: Vec<usize> = linhas.first()?.trim().trim_matches(|c| c == '"' || c == ',').split_whitespace()
+        .filter_map(|n| n.parse().ok()).collect();
+    let (ncores, cpp) = (*cab.get(2)?, *cab.get(3)?);
+    let ultima = linhas.last()?.trim().trim_start_matches('"');
+    let ch = ultima.get(..cpp)?;
+    linhas.iter().skip(1).take(ncores).find_map(|l| {
+        let l = l.trim().trim_start_matches('"');
+        let resto = l.strip_prefix(ch)?;
+        let def = resto.trim_start_matches(['\t', ' ']).trim_end_matches([',', '"']).trim_end_matches('"');
+        def.starts_with("c ").then(|| def.to_string())
+    })
+}
+
+/// Pares (chave, valor) do grupo [Round-Corners] do kwinrc (efeito do pacote
+/// doors-kwin-cantos): contorno e brilho da janela ativa na cor de destaque.
+pub fn cantos_kde(cor: &Cor) -> Vec<(&'static str, String)> {
+    vec![
+        ("ActiveOutlineUsePalette", "false".into()),
+        ("ActiveOutlineUseCustom", "true".into()),
+        ("OutlineColor", cor.kde()),
+        ("ActiveShadowUsePalette", "false".into()),
+        ("ActiveShadowUseCustom", "true".into()),
+        ("ShadowColor", cor.kde()),
+    ]
+}
+
+/// Tamanhos de texto oferecidos (porcentagem).
+pub const TAMANHOS_TEXTO: [(u32, &str); 4] = [(90, "Pequeno"), (100, "Normal"), (115, "Grande"), (130, "Maior")];
+
+/// DPI equivalente a uma escala de texto (96 = 100%).
+pub fn dpi(escala: u32) -> u32 {
+    (96 * escala + 50) / 100
+}
+
+/// Nomes dos papéis de parede a partir do XML da coleção (gnome-background-properties):
+/// devolve (arquivo, nome) sem o prefixo "Doors — ".
+pub fn nomes_papeis(xml: &str) -> Vec<(String, String)> {
+    let mut v = Vec::new();
+    let mut nome: Option<String> = None;
+    for l in xml.lines() {
+        let l = l.trim();
+        if let Some(n) = l.strip_prefix("<name>").and_then(|r| r.strip_suffix("</name>")) {
+            nome = Some(n.trim_start_matches("Doors — ").to_string());
+        } else if let Some(f) = l.strip_prefix("<filename>").and_then(|r| r.strip_suffix("</filename>")) {
+            if let Some(n) = nome.take() {
+                v.push((f.to_string(), n));
+            }
+        }
+    }
+    v
 }
 
 /// Cor da borda num XPM de 1 pixel do xfwm4 (ex.: left-active.xpm do Greybird).
@@ -276,6 +362,38 @@ inactiveBackground=239,240,241\n";
         let css = css_gtk3("Greybird-dark", &cor_por_id("laranja").unwrap());
         assert!(css.contains("/usr/share/themes/Greybird-dark/gtk-3.0/gtk.css"));
         assert!(css.contains("0 0 0 2px #ce6c20"));
+        assert!(css.contains("rgba(206, 108, 32, 0.55)"));
+        assert!(css.contains("border-radius: 8px"));
+    }
+
+    #[test]
+    fn pecas_xfwm4_arredondadas() {
+        let p = pecas_inferiores_xfwm4("active", "#7d54b2", "c #3B3E3F");
+        assert_eq!(p.len(), 3);
+        assert_eq!(p[0].0, "bottom-left-active.xpm");
+        assert!(p[0].1.contains("\"6 6 3 1\""));
+        assert!(p[0].1.contains("\".\tc #7d54b2\""));
+        assert!(p[0].1.contains("\"@\tc #3B3E3F\""));
+        assert!(p[1].1.contains("\"@@@@@.\""));
+        assert!(p[2].1.contains("\"1 6 3 1\""));
+    }
+
+    #[test]
+    fn fundo_do_titulo() {
+        let xpm = "/* XPM */\nstatic char * t[] = {\n\"2 3 3 1\",\n\" \tc #1D1F1F\",\n\".\tc #414343\",\n\"+\tc #3B3E3F\",\n\"  \",\n\"..\",\n\"++\"};\n";
+        assert_eq!(fundo_do_titulo_xpm(xpm).as_deref(), Some("c #3B3E3F"));
+        let sim = "\"2 2 2 1\",\n\".\tc #2f78b5\",\n\"@\tc #DEDEDE s active_color_2\",\n\"..\",\n\"@@\"};";
+        assert_eq!(fundo_do_titulo_xpm(sim).as_deref(), Some("c #DEDEDE s active_color_2"));
+    }
+
+    #[test]
+    fn papeis_do_xml() {
+        let xml = "<wallpapers>\n  <wallpaper deleted=\"false\">\n    <name>Doors — Colina ensolarada</name>\n    <filename>/usr/share/backgrounds/doors/colina.jpg</filename>\n  </wallpaper>\n</wallpapers>\n";
+        assert_eq!(nomes_papeis(xml), vec![("/usr/share/backgrounds/doors/colina.jpg".to_string(), "Colina ensolarada".to_string())]);
+        assert_eq!(dpi(100), 96);
+        assert_eq!(dpi(130), 125);
+        let k = cantos_kde(&cor_por_id("verde").unwrap());
+        assert!(k.contains(&("OutlineColor", "39,138,92".to_string())));
     }
 
     #[test]

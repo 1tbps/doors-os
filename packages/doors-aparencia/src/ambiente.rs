@@ -124,6 +124,30 @@ impl Ambiente {
         }
     }
 
+    /// Tamanho do texto (porcentagem: 100 = normal).
+    pub fn aplicar_texto(self, escala: u32) -> Result<(), String> {
+        match self {
+            Ambiente::Kde => {
+                // o KDE aplica o DPI das fontes a partir do próximo login
+                if escala == 100 {
+                    executar("kwriteconfig6", &["--file", "kcmfonts", "--group", "General", "--key", "forceFontDPI", "--delete"])
+                } else {
+                    executar("kwriteconfig6", &["--file", "kcmfonts", "--group", "General", "--key", "forceFontDPI", &tema::dpi(escala).to_string()])
+                }
+            }
+            Ambiente::Cinnamon => gsettings(
+                "org.cinnamon.desktop.interface",
+                "text-scaling-factor",
+                &format!("{:.2}", escala as f64 / 100.0),
+            ),
+            Ambiente::Xfce => executar(
+                "xfconf-query",
+                &["-c", "xsettings", "-p", "/Xft/DPI", "-n", "-t", "int", "-s", &tema::dpi(escala).to_string()],
+            ),
+            Ambiente::Outro => Err(nao_suportado()),
+        }
+    }
+
     /// "Imagem do dia" (só no KDE: plugin org.kde.potd, fonte Bing).
     pub fn aplicar_imagem_do_dia(self) -> Result<(), String> {
         if self != Ambiente::Kde {
@@ -161,7 +185,17 @@ fn kde_tema(e: &Estado) -> Result<(), String> {
     // a cor de destaque já vai no esquema; grava também a do KDE (o padrão do Doors fica em /etc/xdg).
     // Não usar "plasma-apply-colorscheme --accent-color": o Plasma 6.3 recusa "#rrggbb" ("Cor de destaque inválida").
     let _ = executar("kwriteconfig6", &["--file", "kdeglobals", "--group", "General", "--key", "AccentColor", &e.cor.kde()]);
-    executar("plasma-apply-colorscheme", &[&nome_id])
+    executar("plasma-apply-colorscheme", &[&nome_id])?;
+    // contorno e brilho da janela ativa (efeito "Rounded Corners", pacote doors-kwin-cantos)
+    for (chave, valor) in tema::cantos_kde(&e.cor) {
+        let _ = executar("kwriteconfig6", &["--file", "kwinrc", "--group", "Round-Corners", "--key", chave, &valor]);
+    }
+    let _ = executar(
+        "gdbus",
+        &["call", "--session", "--dest", "org.kde.KWin", "--object-path", "/Effects",
+          "--method", "org.kde.kwin.Effects.reconfigureEffect", "kwin4_effect_shapecorners"],
+    );
+    Ok(())
 }
 
 fn plasma_script(js: &str) -> Result<(), String> {
@@ -202,14 +236,16 @@ fn gtk_tema_pessoal(e: &Estado) -> Result<String, String> {
             let _ = std::os::unix::fs::symlink(origem.join(sub), destino.join(sub));
         }
     }
-    // xfwm4: copia o do Greybird e troca a cor do contorno das peças ativas
-    let xf_origem = origem.join("xfwm4");
+    // xfwm4: no modo claro copia o do tema Doors (cantos de baixo já arredondados);
+    // no escuro, o do Greybird-dark com as peças de baixo refeitas arredondadas.
+    // Nos dois, o contorno das peças ativas ganha a cor de destaque.
+    let doors_xf = Path::new("/usr/share/themes/Doors/xfwm4");
+    let xf_origem = if e.modo == Modo::Claro && doors_xf.is_dir() { doors_xf.to_path_buf() } else { origem.join("xfwm4") };
     if xf_origem.is_dir() {
         let xf = destino.join("xfwm4");
         fs::create_dir_all(&xf).map_err(|err| err.to_string())?;
-        let borda = fs::read_to_string(xf_origem.join("left-active.xpm"))
-            .ok()
-            .and_then(|t| tema::cor_da_borda_xpm(&t));
+        let ler = |arq: &str| fs::read_to_string(xf_origem.join(arq)).ok();
+        let borda = ler("left-active.xpm").and_then(|t| tema::cor_da_borda_xpm(&t));
         for entrada in fs::read_dir(&xf_origem).map_err(|err| err.to_string())?.flatten() {
             let caminho = entrada.path();
             let nome_arq = entrada.file_name().to_string_lossy().to_string();
@@ -221,6 +257,19 @@ fn gtk_tema_pessoal(e: &Estado) -> Result<String, String> {
                 }
                 _ => {
                     fs::copy(&caminho, &alvo).map_err(|err| err.to_string())?;
+                }
+            }
+        }
+        if xf_origem != doors_xf {
+            for (estado, borda_cor) in [
+                ("active", Some(e.cor.hex())),
+                ("inactive", ler("left-inactive.xpm").and_then(|t| tema::cor_da_borda_xpm(&t))),
+            ] {
+                let fundo = ler(&format!("title-1-{estado}.xpm")).and_then(|t| tema::fundo_do_titulo_xpm(&t));
+                if let (Some(bc), Some(f)) = (borda_cor, fundo) {
+                    for (arq, conteudo) in tema::pecas_inferiores_xfwm4(estado, &bc, &f) {
+                        fs::write(xf.join(arq), conteudo).map_err(|err| err.to_string())?;
+                    }
                 }
             }
         }

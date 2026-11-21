@@ -15,8 +15,9 @@ O Doors OS é uma distribuição baseada no Debian 13 "trixie". Desde a 0.3 há 
 - `config/doors.env`: versão da distribuição e URL do repositório de atualizações.
 - `config/common/`, `config/desktop-common/` e `config/editions/desktop/`: camadas do live-build (a "desktop" é a ISO única).
 - `packages/doors-os/`: fonte dos pacotes `doors-archive-keyring`, `doors-release`, `doors-artwork` e `doors-{kde,cinnamon,xfce}-settings`.
-- `packages/doors-aparencia/`: Doors Aparência, app de personalização em Rust + GTK4.
-- `branding/`: gerador da arte (logo, papéis de parede, login, GRUB, instalador).
+- `packages/doors-aparencia/`: Doors Aparência, app de personalização em Rust + GTK4 (estilo Zorin Appearance).
+- `packages/doors-kwin-cantos/`: efeito do KWin KDE-Rounded-Corners 0.11.0 (GPL-3, código de terceiros sem alterações + `debian/`): cantos arredondados e contorno colorido nas janelas do KDE.
+- `branding/`: gerador da arte (logo, papéis de parede, login, GRUB, tela de inicialização, instalador). As ilustrações ficam em `branding/fontes/papeis/`.
 - `docs/`:
   - decisões arquiteturais (`decisoes/`);
   - notas de versão;

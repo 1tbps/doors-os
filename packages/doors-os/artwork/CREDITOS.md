@@ -1,18 +1,19 @@
-# Créditos das fotos
+# Créditos dos papéis de parede
 
-Fotos de portas usadas nos papéis de parede, login, GRUB, menu de boot e instalador do Doors OS.
-Licença Pexels (https://www.pexels.com/license/): uso e modificação livres, crédito opcional;
-não redistribuir as fotos em outros bancos de imagens ou plataformas de papéis de parede.
+Ilustrações usadas nos papéis de parede, login, GRUB, tela de inicialização, menu de boot e
+instalador do Doors OS. Todas são arte original do projeto.
 
-| Papel de parede | Fotógrafo | Origem |
-|---|---|---|
-| Porta Encantada (padrão) | Doors OS Project | arte criada pelo autor do projeto (2560x1440) |
-| Porta Azul | Doors OS Project | ilustração original (branding/gerar-papel-de-parede.py) |
-| Lavanda | lich | https://www.pexels.com/photo/13403615/ |
-| Azulejos | Lucas Carlini | https://www.pexels.com/photo/38904535/ |
-| Casarão | Bruno Vieira | https://www.pexels.com/photo/18556523/ |
-| Colonial | Giovanna Prado | https://www.pexels.com/photo/30190296/ |
-| Laranja | Jan van der Wolf | https://www.pexels.com/photo/40840715/ |
-| Grade vermelha | Furkan Aktaş | https://www.pexels.com/photo/31928394/ |
-| Número 45 | malcolnphoto | https://www.pexels.com/photo/28452846/ |
-| Arco | Shantum Singh | https://www.pexels.com/photo/41109588/ |
+| Papel de parede | Autor |
+|---|---|
+| Colina ensolarada (padrão) | Doors OS Project |
+| Biblioteca mágica (dia) | Doors OS Project |
+| Biblioteca mágica (noite) | Doors OS Project |
+| Cidade futurista chuvosa | Doors OS Project |
+| Dunas do deserto ao pôr do sol | Doors OS Project |
+| Floresta nevada com aurora boreal | Doors OS Project |
+| Fundo do oceano | Doors OS Project |
+| Green Line | Doors OS Project |
+| Ilha flutuante no espaço sideral | Doors OS Project |
+| Portal na floresta | Doors OS Project |
+| Portal no Inferno | Doors OS Project |
+| Túnel subterrâneo antigo | Doors OS Project |

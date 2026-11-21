@@ -1,0 +1,15 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: KDE-Rounded-Corners
+Source: https://github.com/matinlotfali/KDE-Rounded-Corners (v0.11.0, sha256 do tarball f271a9595732ae0b5fb45898a120b6b773400e8b67b53e8ad4801d90bbb064e8)
+
+Files: *
+Copyright: Matin Lotfaliei, Rob e colaboradores do KDE-Rounded-Corners
+License: GPL-3+
+
+Files: debian/*
+Copyright: 2026 Doors OS Project
+License: GPL-3+
+
+License: GPL-3+
+ On Debian systems, the full text of the GNU General Public License version 3
+ can be found in /usr/share/common-licenses/GPL-3.

@@ -1,3 +1,17 @@
+doors-os (0.4~dev1) trixie; urgency=medium
+
+  * doors-artwork: papéis de parede novos (12 ilustrações de portas, arte do
+    autor do projeto); padrão "Colina ensolarada". Saem as fotos do Pexels e
+    a ilustração "Porta Azul".
+  * doors-artwork: tela de inicialização (Plymouth) do Doors no lugar da do
+    Debian 13.
+  * doors-artwork: tema Doors com cantos arredondados embaixo (xfwm4) e
+    contorno com brilho (Cinnamon).
+  * doors-kde-settings: janelas sem borda grossa, cantos arredondados e
+    contorno colorido com brilho (efeito do novo pacote doors-kwin-cantos).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 15:00:00 -0300
+
 doors-os (0.3) trixie; urgency=medium
 
   * Versão 0.3 do Doors OS:

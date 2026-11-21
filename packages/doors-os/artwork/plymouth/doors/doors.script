@@ -1,0 +1,80 @@
+# Tela de inicialização do Doors OS (Plymouth, módulo script).
+# Fundo: papel de parede padrão escurecido; logo + nome; pontos animados; senha (LUKS).
+
+W = Window.GetWidth(); H = Window.GetHeight();
+Window.SetBackgroundTopColor(0.04, 0.08, 0.13);
+Window.SetBackgroundBottomColor(0.04, 0.08, 0.13);
+
+# fundo cobrindo a tela inteira (corta o excesso, mantém a proporção)
+fundo_img = Image("fundo.png");
+esc = Math.Max(W / fundo_img.GetWidth(), H / fundo_img.GetHeight());
+fundo_img = fundo_img.Scale(Math.Int(fundo_img.GetWidth() * esc + 1), Math.Int(fundo_img.GetHeight() * esc + 1));
+fundo = Sprite(fundo_img);
+fundo.SetPosition(Math.Int((W - fundo_img.GetWidth()) / 2), Math.Int((H - fundo_img.GetHeight()) / 2), -10);
+
+# logo + "Doors OS" na parte de baixo (a porta do papel de parede fica no centro)
+marca_img = Image("marca.png");
+lim = W * 0.32;
+if (marca_img.GetWidth() > lim)
+  marca_img = marca_img.Scale(Math.Int(lim), Math.Int(marca_img.GetHeight() * lim / marca_img.GetWidth()));
+marca = Sprite(marca_img);
+marca_y = Math.Int(H * 0.76);
+marca.SetPosition(Math.Int((W - marca_img.GetWidth()) / 2), marca_y, 10);
+
+# 5 pontos que acendem em sequência
+ponto_img = Image("ponto.png");
+N = 5; esp = ponto_img.GetWidth() * 2;
+x0 = Math.Int(W / 2 - (N * esp - ponto_img.GetWidth() + esp) / 2 + esp / 2);
+py = marca_y + marca_img.GetHeight() + Math.Int(H * 0.04);
+for (i = 0; i < N; i++) {
+  pontos[i] = Sprite(ponto_img);
+  pontos[i].SetPosition(x0 + i * esp, py, 10);
+  pontos[i].SetOpacity(0.25);
+}
+t = 0; senha = 0;
+fun refresh_callback() {
+  t++;
+  if (global.senha) return;
+  for (i = 0; i < N; i++) {
+    fase = (t / 6 - i) % N;
+    if (fase < 0) fase += N;
+    o = 1 - fase / 2.2;
+    if (o < 0.25) o = 0.25;
+    pontos[i].SetOpacity(o);
+  }
+}
+Plymouth.SetRefreshFunction(refresh_callback);
+
+# ---- senha (disco criptografado)
+fun mostrar_pontos(v) { for (i = 0; i < N; i++) pontos[i].SetOpacity(v); }
+fun display_normal_callback() {
+  global.senha = 0;
+  global.pergunta.SetOpacity(0);
+  for (i = 0; i < 64; i++) if (global.bolas[i]) global.bolas[i].SetOpacity(0);
+}
+fun display_password_callback(prompt, bullets) {
+  global.senha = 1;
+  global.pergunta = Sprite(Image.Text(prompt, 0.94, 0.96, 0.97));
+  global.pergunta.SetPosition(Math.Int((W - global.pergunta.GetImage().GetWidth()) / 2), py - 4, 20);
+  global.pergunta.SetOpacity(1);
+  for (i = 0; i < 64; i++) if (global.bolas[i]) global.bolas[i].SetOpacity(0);
+  bx = Math.Int(W / 2 - bullets * esp / 2);
+  for (i = 0; i < bullets && i < 64; i++) {
+    if (!global.bolas[i]) global.bolas[i] = Sprite(ponto_img);
+    global.bolas[i].SetPosition(bx + i * esp, py + 28, 20);
+    global.bolas[i].SetOpacity(1);
+  }
+  mostrar_pontos(0);
+}
+Plymouth.SetDisplayNormalFunction(display_normal_callback);
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+
+# ---- mensagens (ex.: verificação de disco)
+msg = Sprite();
+fun message_callback(texto) {
+  msg.SetImage(Image.Text(texto, 0.94, 0.96, 0.97));
+  msg.SetPosition(Math.Int((W - msg.GetImage().GetWidth()) / 2), H - 40, 20);
+}
+Plymouth.SetMessageFunction(message_callback);
+fun quit_callback() { for (i = 0; i < N; i++) pontos[i].SetOpacity(0); }
+Plymouth.SetQuitFunction(quit_callback);

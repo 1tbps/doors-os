@@ -11,3 +11,4 @@ artwork/skel/.face etc/skel/
 artwork/icons/Doors usr/share/icons/
 scripts/atualizar-papeis-de-parede usr/lib/doors/
 artwork/themes/Doors usr/share/themes/
+artwork/plymouth/doors usr/share/plymouth/themes/
