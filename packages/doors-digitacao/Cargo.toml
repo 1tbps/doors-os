@@ -1,0 +1,15 @@
+[package]
+name = "doors-digitacao"
+version = "0.1.1"
+edition = "2021"
+description = "Doors Digitação: curso de digitação em português, com lições, testes, jogo e evolução"
+license = "GPL-3.0-or-later"
+publish = false
+
+[dependencies]
+# só dependências empacotadas no Debian trixie (librust-gtk4-dev): o build é offline
+gtk = { package = "gtk4", version = "0.9", features = ["v4_10"] }
+
+[profile.release]
+lto = true
+codegen-units = 1

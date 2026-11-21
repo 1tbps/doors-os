@@ -218,4 +218,43 @@ for nome_, tam in (("ponto", 14),):
     pt = Image.new("RGBA", (tam * 4, tam * 4), (0, 0, 0, 0))
     ImageDraw.Draw(pt).ellipse((0, 0, tam * 4 - 1, tam * 4 - 1), fill=(255, 210, 122, 255))
     pt.resize((tam, tam), Image.LANCZOS).save(f"{PLY}/{nome_}.png")
+
+# ---------------------------------------------------------------- instalador: prévia da opção "software de terceiros"
+AMB = f"{R}/config/editions/desktop/includes.chroot/usr/share/doors/ambientes"
+if os.path.isdir(AMB):
+    w, h = 640, 400
+    im = escurecer(foto(PADRAO, w, h), 0.55)
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle((40, 40, w - 40, h - 40), 18, fill=(14, 24, 38), outline=(47, 120, 181), width=3)
+    d.text((72, 74), "Software de terceiros", font=fonte("Bold", 30), fill=(240, 244, 248))
+    itens = [("1", "Codecs de áudio e vídeo", "MP3, H.264, HEVC e outros formatos"),
+             ("2", "Driver da NVIDIA", "instalado só se houver placa NVIDIA"),
+             ("3", "Precisa de internet", "vem dos repositórios contrib e non-free do Debian")]
+    for i, (ic, t1, t2) in enumerate(itens):
+        y = 140 + i * 70
+        d.ellipse((72, y, 116, y + 44), fill=(47, 120, 181))
+        d.text((94, y + 22), ic, font=fonte("Bold", 24), fill=(255, 255, 255), anchor="mm")
+        d.text((134, y + 1), t1, font=fonte("Bold", 21), fill=(240, 244, 248))
+        d.text((134, y + 27), t2, font=fonte("Regular", 16), fill=(255, 210, 122))
+    im.resize((560, 350), Image.LANCZOS).save(f"{AMB}/terceiros.png")
+
+# ---------------------------------------------------------------- logos do sistema (alternativa "vendor-logos" do desktop-base;
+# usados pela tela de login do GNOME/GDM e outros). Mesmos nomes de arquivo do debian-logos.
+VL = f"{ART}/doors-logos"
+shutil.rmtree(VL, ignore_errors=True); os.makedirs(VL)
+if os.path.exists(LOGO_PNG):
+    base = Image.open(LOGO_PNG).convert("RGBA")
+    for t in (64, 128, 256):
+        base.resize((t, t), Image.LANCZOS).save(f"{VL}/logo-{t}.png")
+        lg = base.resize((t, t), Image.LANCZOS)
+        f = fonte("Bold", int(t * 0.55))
+        larg = int(ImageDraw.Draw(Image.new("RGBA", (1, 1))).textlength("Doors OS", font=f))
+        im = Image.new("RGBA", (t + int(t * 0.18) + larg + 4, t), (0, 0, 0, 0))
+        im.paste(lg, (0, 0), lg)
+        ImageDraw.Draw(im).text((t + int(t * 0.18), t // 2), "Doors OS", font=f, fill=(240, 244, 248, 255), anchor="lm")
+        for nome in ("logo-text", "logo-text-version"):
+            im.save(f"{VL}/{nome}-{t}.png")
+shutil.copy(f"{R}/branding/fontes/icone-porta-arco.svg", f"{VL}/logo.svg")
+for nome in ("logo-text.svg", "logo-text-version.svg"):
+    shutil.copy(f"{TH}/login/logo-text.svg", f"{VL}/{nome}")
 print("arte gerada")

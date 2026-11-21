@@ -1,0 +1,26 @@
+#!/bin/sh
+# Doors OS — instala codecs de mídia e, se houver placa NVIDIA, o driver da NVIDIA
+# (seções contrib e non-free do Debian). Precisa de internet. Uso: sudo /usr/lib/doors/instalar-terceiros
+set -u
+export DEBIAN_FRONTEND=noninteractive
+[ "$(id -u)" = 0 ] || { echo "rode com sudo"; exit 1; }
+log(){ echo "doors-terceiros: $*"; }
+# 1. habilita contrib e non-free nos repositórios do Debian
+if [ -f /etc/apt/sources.list ]; then
+  sed -i -E '/^deb(-src)? .*(debian|debian-security)/ { / contrib( |$)/! s/ main( |$)/ main contrib\1/ }
+             /^deb(-src)? .*(debian|debian-security)/ { / non-free( |$)/! s/ non-free-firmware/ non-free non-free-firmware/ }' /etc/apt/sources.list
+fi
+for f in /etc/apt/sources.list.d/debian.sources; do
+  [ -f "$f" ] && sed -i -E '/^Components:/ { / contrib( |$)/! s/ main( |$)/ main contrib\1/; / non-free( |$)/! s/ non-free-firmware/ non-free non-free-firmware/ }' "$f"
+done
+if ! apt-get update; then log "sem acesso aos repositórios (internet?): nada foi instalado"; exit 0; fi
+# 2. codecs
+PK="gstreamer1.0-plugins-ugly gstreamer1.0-plugins-bad gstreamer1.0-libav libavcodec-extra"
+# 3. NVIDIA (fabricante 10de); o módulo é compilado pelo DKMS para o kernel mais novo
+if lspci -nn 2>/dev/null | grep -E -i '(VGA|3D|Display).*\[10de:' >/dev/null; then
+  log "placa NVIDIA encontrada: instalando o driver"
+  PK="$PK nvidia-driver firmware-misc-nonfree linux-image-amd64 linux-headers-amd64"
+fi
+# shellcheck disable=SC2086
+if apt-get -y install $PK; then log "instalado: $PK"; else log "falha ao instalar ($PK)"; fi
+exit 0

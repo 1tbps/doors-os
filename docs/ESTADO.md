@@ -36,7 +36,9 @@
 | 2026-11-21 | Versão em desenvolvimento: **0.4-dev**. Incluir o **GNOME** como 4º ambiente fica para a próxima compilação | Pedido do usuário |
 | 2026-11-21 | Próxima compilação: tirar o **LibreOffice** da instalação principal; trocar o Firefox pelo **Chrome** só se for possível (o Chrome não pode vir embutido na ISO: opções = repositório do Google com instalação online, ou Chromium do Debian) | Pedido do usuário — escolhido: **Chromium** no lugar do Firefox (Chrome continua instalável depois pelo .deb do Google; avaliar atalho "Instalar Google Chrome") |
 | 2026-11-21 | Próxima compilação: opção no instalador "Instalar software de terceiros" (codecs + drivers como NVIDIA, de contrib/non-free; detecta a placa; precisa de internet) | Pedido do usuário |
-| 2026-11-21 | Próxima compilação: **curso de digitação próprio**, todo em português do Brasil (telas, lições, testes e jogos), com evolução por níveis, pontuação, velocidade (PPM) e precisão, no teclado ABNT2. Inspirado na ideia de typing.com e TypingClub, mas com conteúdo e visual originais | Pedido do usuário |
+| 2026-11-21 | Próxima compilação: **curso de digitação próprio**, todo em português do Brasil (telas, lições, testes e jogos), com evolução por níveis, pontuação, velocidade (PPM) e precisão, no teclado ABNT2. Inspirado na ideia de typing.com e TypingClub, mas com conteúdo e visual originais. Deve detectar o layout do teclado (ABNT2, inglês internacional com teclas mortas etc.) e permitir trocar; lições adaptadas ao layout (ex.: ç = ABNT2 tecla própria; US-intl = ' + c) | Pedido do usuário |
+| 2026-11-21 | Usuário usa acesso remoto (AnyDesk, RustDesk), que não funciona (ou funciona mal) no Wayland: proposta de KDE iniciar em **X11** por padrão (Wayland disponível no menu de sessão) e esconder as sessões Wayland experimentais do Cinnamon e do XFCE | Aguardando decisão do usuário |
+| 2026-11-21 | A testar/corrigir no Doors: teclado inglês internacional com teclas mortas deve gerar **ç com ' + c** (no Kubuntu do usuário sai ć e o ç só com Alt+,). Correção prevista: tabela Compose do Doors (dead_acute + c = ç) valendo para apps GTK e Qt nos 3 ambientes. ~/.XCompose com `include "%L"` + `<dead_acute> <c> : "ç"` validado pelo usuário no Kubuntu (Kate) em 2026-11-21. **Implementado** no doors-release 0.4~dev2 (/etc/skel/.XCompose + XCOMPOSEFILE para KDE e sessões X11); testar na próxima ISO, inclusive Chromium no Wayland | Pedido do usuário |
 
 ## Etapas
 
@@ -159,3 +161,10 @@ ISO `doors-0.4-dev-amd64.hybrid.iso` em VM UEFI:
 - Instalação KDE ("Formatar o disco"): GRUB, Plymouth e login com a arte nova; só KDE instalado; `doors-kwin-cantos` ativo (4 cantos arredondados + contorno na cor de destaque).
 - Bordas: KDE completo; XFCE com cantos de baixo arredondados (claro e escuro); Cinnamon com contorno arredondado, mas o conteúdo da janela continua com canto reto por dentro (o muffin não recorta a janela).
 - Não testado nesta rodada: instalação de Cinnamon/XFCE, BIOS, hardware físico.
+
+### 0.4-dev — segunda rodada (2026-11-21, tarde)
+
+Implementado: X11 padrão no KDE (Wayland do Cinnamon/XFCE escondido); ç de fábrica (doors-release); Chromium no lugar do Firefox; sem LibreOffice; **GNOME** como 4º ambiente (Dash to Panel + ArcMenu, X11, doors-gnome-settings); opção "Codecs e drivers" no instalador (codecs + NVIDIA, contrib/non-free, precisa de internet); **Doors Digitação** (doors-digitacao 0.1.1); Doors Aparência 0.3 com GNOME; logos do sistema (vendor-logos) do Doors.
+
+Validado em VM (UEFI): GNOME live; instalação GNOME com "Codecs e drivers" (codecs instalados, contrib/non-free, só GNOME, X11, Chromium, Digitação, ~/.XCompose); login do GDM com o logo do Doors; Digitação (lição, teclado na tela, jogo). Não testado: driver NVIDIA (VM sem placa), instalação KDE/Cinnamon/XFCE desta ISO, teclado internacional na VM.
+Pendente de teste: padrões do Dash to Panel via dconf (sem aviso em inglês e sem visão geral ao entrar), já no código, não compilado.

@@ -35,7 +35,8 @@ if [ -x /usr/lib/doors/escolher-ambiente ] && [ -f /etc/sddm.conf ]; then
   case "$(sed -n 's/.*doors\.ambiente=\([a-z]*\).*/\1/p' /proc/cmdline)" in
     cinnamon) S=cinnamon.desktop ;;
     xfce)     S=xfce.desktop ;;
-    *)        S=plasma.desktop ;;
+    gnome)    S=gnome-xorg.desktop ;;
+    *)        S=plasmax11.desktop ;;  # X11: acesso remoto (AnyDesk, RustDesk) funciona
   esac
   if grep -q '^Session=' /etc/sddm.conf; then sed -i "s/^Session=.*/Session=$S/" /etc/sddm.conf
   else printf 'Session=%s\n' "$S" >> /etc/sddm.conf; fi

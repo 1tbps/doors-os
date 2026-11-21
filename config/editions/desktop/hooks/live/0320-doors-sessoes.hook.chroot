@@ -1,0 +1,9 @@
+#!/bin/sh
+# Esconde do menu de sessão as sessões Wayland experimentais do Cinnamon e do XFCE
+# (faltam recursos e o acesso remoto não funciona). O Wayland do KDE continua disponível.
+# dpkg-divert: o arquivo some do menu e continua escondido após atualizações do pacote.
+set -e
+for s in cinnamon-wayland xfce-wayland; do
+  f=/usr/share/wayland-sessions/$s.desktop
+  dpkg-divert --package doors-os --add --rename --divert "$f.doors-oculto" "$f"
+done

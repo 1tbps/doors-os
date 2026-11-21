@@ -2,7 +2,7 @@
 Type=Application
 Name=Aparência do Doors
 GenericName=Aparência
-Comment=Tema claro ou escuro, cor de destaque, painel e papel de parede em um clique
+Comment=Tema claro ou escuro, cor de destaque, papel de parede, painel e fontes em um clique
 Exec=doors-aparencia
 Icon=doors-logo
 Terminal=false

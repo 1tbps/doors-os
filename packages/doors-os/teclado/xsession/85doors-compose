@@ -1,0 +1,6 @@
+# Doors OS (sessões X11: Cinnamon, XFCE): ' + c = ç no teclado internacional.
+# Usuários sem ~/.XCompose próprio usam a tabela do Doors.
+if [ -z "${XCOMPOSEFILE:-}" ] && [ ! -e "$HOME/.XCompose" ]; then
+  XCOMPOSEFILE=/usr/share/doors/XCompose
+  export XCOMPOSEFILE
+fi

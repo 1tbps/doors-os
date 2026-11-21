@@ -1,4 +1,4 @@
-//! Doors Aparência — personalização do Doors OS em um clique (KDE Plasma, Cinnamon e XFCE).
+//! Doors Aparência — personalização do Doors OS em um clique (KDE Plasma, Cinnamon, XFCE e GNOME).
 //! Organização em páginas com menu lateral (Tema, Fundo, Layout, Fontes), com prévias
 //! desenhadas de cada opção.
 
@@ -300,6 +300,7 @@ fn pagina_tema(app: &Rc<App>) -> gtk::Box {
     p.append(&rotulo(
         match app.ambiente {
             Ambiente::Kde => "A cor aparece no contorno arredondado da janela ativa, na barra de título, nas seleções e nos destaques.",
+            Ambiente::Gnome => "A cor aparece nos botões, seleções e destaques do GNOME (cor mais próxima entre as do GNOME).",
             _ => "A cor aparece no contorno arredondado da janela ativa.",
         },
         "dim-label",
@@ -524,7 +525,7 @@ fn montar(gapp: &gtk::Application) {
     direita.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
     aviso.add_css_class("rodape");
     if ambiente == Ambiente::Outro {
-        aviso.set_text("Este ambiente gráfico não é suportado. O Doors Aparência funciona no KDE Plasma, Cinnamon e XFCE.");
+        aviso.set_text("Este ambiente gráfico não é suportado. O Doors Aparência funciona no KDE Plasma, Cinnamon, XFCE e GNOME.");
     } else {
         aviso.set_text("Cada escolha é aplicada na hora.");
     }

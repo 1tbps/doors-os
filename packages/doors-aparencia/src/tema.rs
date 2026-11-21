@@ -215,6 +215,33 @@ pub fn cantos_kde(cor: &Cor) -> Vec<(&'static str, String)> {
     ]
 }
 
+/// Cor de destaque do GNOME 47+ (org.gnome.desktop.interface accent-color) mais próxima.
+pub fn destaque_gnome(cor: &Cor) -> &'static str {
+    match cor.id {
+        "verde" => "green",
+        "roxo" => "purple",
+        "laranja" => "orange",
+        "vermelho" => "red",
+        "grafite" => "slate",
+        _ => "blue",
+    }
+}
+
+/// Dash to Panel: troca TOP/BOTTOM em `panel-positions` (JSON por monitor, ex. '{"0":"BOTTOM"}').
+/// Sem monitores listados, usa o monitor 0.
+pub fn posicoes_dash_to_panel(valor: &str, painel: Painel) -> String {
+    let alvo = if painel == Painel::EmCima { "TOP" } else { "BOTTOM" };
+    let v = valor.trim().trim_matches('\'');
+    if v.contains("\"BOTTOM\"") || v.contains("\"TOP\"") || v.contains("\"LEFT\"") || v.contains("\"RIGHT\"") {
+        v.replace("\"BOTTOM\"", &format!("\"{alvo}\""))
+            .replace("\"TOP\"", &format!("\"{alvo}\""))
+            .replace("\"LEFT\"", &format!("\"{alvo}\""))
+            .replace("\"RIGHT\"", &format!("\"{alvo}\""))
+    } else {
+        format!("{{\"0\":\"{alvo}\"}}")
+    }
+}
+
 /// Tamanhos de texto oferecidos (porcentagem).
 pub const TAMANHOS_TEXTO: [(u32, &str); 4] = [(90, "Pequeno"), (100, "Normal"), (115, "Grande"), (130, "Maior")];
 
@@ -394,6 +421,15 @@ inactiveBackground=239,240,241\n";
         assert_eq!(dpi(130), 125);
         let k = cantos_kde(&cor_por_id("verde").unwrap());
         assert!(k.contains(&("OutlineColor", "39,138,92".to_string())));
+    }
+
+    #[test]
+    fn gnome() {
+        assert_eq!(destaque_gnome(&cor_por_id("grafite").unwrap()), "slate");
+        assert_eq!(destaque_gnome(&cor_por_id("azul").unwrap()), "blue");
+        assert_eq!(posicoes_dash_to_panel("'{\"0\":\"BOTTOM\",\"1\":\"BOTTOM\"}'", Painel::EmCima), "{\"0\":\"TOP\",\"1\":\"TOP\"}");
+        assert_eq!(posicoes_dash_to_panel("'{}'", Painel::EmCima), "{\"0\":\"TOP\"}");
+        assert_eq!(posicoes_dash_to_panel("'{\"GSM-1\":\"TOP\"}'", Painel::Embaixo), "{\"GSM-1\":\"BOTTOM\"}");
     }
 
     #[test]

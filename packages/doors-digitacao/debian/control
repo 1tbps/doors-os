@@ -1,0 +1,19 @@
+Source: doors-digitacao
+Section: education
+Priority: optional
+Maintainer: Doors OS Project <noreply@doors-os.invalid>
+Build-Depends: debhelper-compat (= 13), cargo, rustc, librust-gtk4-dev, libgtk-4-dev, pkg-config
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: doors-digitacao
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, fonts-noto-core
+Recommends: x11-xkb-utils
+Description: Doors Digitação: curso de digitação em português
+ Aplicativo do Doors OS (Rust + GTK4) para aprender a digitar, todo em
+ português do Brasil: lições em sequência (fileira do meio, de cima, de baixo,
+ maiúsculas, acentos, números e pontuação), teclado na tela mostrando o dedo
+ certo, teste de velocidade (PPM e precisão), jogo de palavras caindo,
+ estrelas, pontos e níveis. Detecta o layout do teclado (ABNT2, inglês
+ internacional com teclas mortas ou inglês dos EUA) e permite trocar.

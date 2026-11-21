@@ -1,3 +1,22 @@
+doors-os (0.4~dev5) trixie; urgency=medium
+
+  * doors-release: teclado internacional com teclas mortas gera ç com ' + c
+    (como no Windows), em vez de ć: tabela de composição do Doors em
+    /etc/skel/.XCompose e XCOMPOSEFILE para quem não tem ~/.XCompose
+    (KDE X11/Wayland e sessões X11 do Cinnamon e XFCE).
+  * Novo pacote doors-gnome-settings: GNOME com painel embaixo no estilo
+    Mint (Dash to Panel + ArcMenu com o logo do Doors), ícones Doors,
+    fontes Noto, botões minimizar/maximizar e destaque azul.
+  * doors-kde-settings e doors-cinnamon-settings: Chromium no lugar do
+    Firefox nos atalhos do painel.
+  * doors-artwork: logos do sistema (vendor-logos) do Doors; a tela de login
+    do GNOME mostra o Doors OS em vez de "debian 13".
+  * doors-gnome-settings: ArcMenu com o logo do Doors (padrão via dconf),
+    sem avisos em inglês das extensões; botão de grade e visão geral
+    ajustados no primeiro login.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 16:00:00 -0300
+
 doors-os (0.4~dev1) trixie; urgency=medium
 
   * doors-artwork: papéis de parede novos (12 ilustrações de portas, arte do

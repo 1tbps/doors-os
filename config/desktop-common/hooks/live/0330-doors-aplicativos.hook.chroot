@@ -1,0 +1,13 @@
+#!/bin/sh
+# Aplicativos padrão do Doors: sem LibreOffice; navegador Chromium no lugar do Firefox.
+# (Os dois vêm como "recomendados" pelos pacotes task-*; nenhum pacote depende deles.)
+set -e
+export DEBIAN_FRONTEND=noninteractive
+apt-get -y purge '?name(^libreoffice)' '?name(^firefox-esr)' || true
+apt-get -y autoremove --purge
+# Cinnamon: atalhos fixos do painel apontam para o Chromium (padrão do Cinnamon: firefox.desktop)
+for f in /usr/share/cinnamon/applets/grouped-window-list@cinnamon.org/settings-schema.json \
+         /usr/share/cinnamon/applets/panel-launchers@cinnamon.org/settings-schema.json; do
+  [ -f "$f" ] && sed -i 's/"firefox\.desktop"/"chromium.desktop"/g' "$f"
+done
+! dpkg -l | grep -E '^ii +(libreoffice|firefox)'

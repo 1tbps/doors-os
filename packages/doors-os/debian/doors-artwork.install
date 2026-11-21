@@ -12,3 +12,4 @@ artwork/icons/Doors usr/share/icons/
 scripts/atualizar-papeis-de-parede usr/lib/doors/
 artwork/themes/Doors usr/share/themes/
 artwork/plymouth/doors usr/share/plymouth/themes/
+artwork/doors-logos usr/share/desktop-base/

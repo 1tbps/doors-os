@@ -1,1 +1,5 @@
 release/os-release usr/lib/
+teclado/XCompose usr/share/doors/
+teclado/skel/.XCompose etc/skel/
+teclado/plasma-env/doors-compose.sh etc/xdg/plasma-workspace/env/
+teclado/xsession/85doors-compose etc/X11/Xsession.d/

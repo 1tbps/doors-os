@@ -1,3 +1,10 @@
+doors-aparencia (0.3.0) trixie; urgency=medium
+
+  * Suporte ao GNOME: claro/escuro, cor de destaque (accent-color do GNOME),
+    papel de parede, painel do Dash to Panel embaixo/em cima e tamanho do texto.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 17:00:00 -0300
+
 doors-aparencia (0.2.0) trixie; urgency=medium
 
   * Novo visual no estilo do Zorin Appearance: menu lateral com as páginas

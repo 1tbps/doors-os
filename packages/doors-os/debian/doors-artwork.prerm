@@ -2,5 +2,6 @@
 set -e
 if [ "$1" = remove ]; then
   update-alternatives --remove desktop-theme /usr/share/desktop-base/doors-theme
+  update-alternatives --remove vendor-logos /usr/share/desktop-base/doors-logos
 fi
 #DEBHELPER#

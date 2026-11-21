@@ -1,0 +1,8 @@
+# Doors OS: tabela de composição do teclado.
+# Mantém todas as combinações padrão do idioma e corrige o cedilha no teclado
+# "Inglês (EUA) internacional com teclas mortas": ' + c = ç (o padrão do Linux é ć),
+# como no Windows. Para mudar, edite ~/.XCompose (este arquivo vale para quem não tem um).
+include "%L"
+
+<dead_acute> <c> : "ç" ccedilla
+<dead_acute> <C> : "Ç" Ccedilla

@@ -5,14 +5,16 @@ calamares-settings-debian
 # idioma
 task-brazilian-portuguese
 task-brazilian-portuguese-desktop
-firefox-esr-l10n-pt-br
+chromium-l10n
 # áudio / multimídia
 pipewire-audio
 # fontes
 fonts-noto-core
 fonts-noto-color-emoji
-# aplicações básicas
-firefox-esr
+# aplicações básicas (navegador: Chromium; o Google Chrome pode ser instalado depois pelo .deb do Google)
+chromium
 # VM (testes em QEMU/KVM)
 spice-vdagent
 qemu-guest-agent
+# detecção de placa NVIDIA (software de terceiros)
+pciutils

@@ -1,7 +1,9 @@
-# Doors OS — ISO única: os 3 ambientes; o instalador remove os que não forem escolhidos
+# Doors OS — ISO única: os 4 ambientes; o instalador remove os que não forem escolhidos
 task-kde-desktop
 task-cinnamon-desktop
 task-xfce-desktop
 sddm
 lightdm
 lightdm-gtk-greeter
+task-gnome-desktop
+gdm3

@@ -3,7 +3,7 @@
 set -e
 echo /usr/bin/sddm > /etc/X11/default-display-manager
 ln -sf /usr/lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service
-# Calamares: tela de escolha do ambiente e remoção dos outros
+# Calamares: tela de escolha do ambiente e remoção dos outros; opção de software de terceiros
 S=/etc/calamares/settings.conf
 grep -q 'packagechooser@ambiente' $S || python3 - "$S" <<'PY'
 import sys
@@ -15,11 +15,20 @@ inst = """instances:
 - id: ambiente
   module: contextualprocess
   config: contextualprocess-ambiente.conf
+- id: terceiros
+  module: packagechooser
+  config: packagechooser-terceiros.conf
+- id: terceiros
+  module: contextualprocess
+  config: contextualprocess-terceiros.conf
 
 """
 s = s.replace("sequence:", inst + "sequence:", 1)
-s = s.replace("  - keyboard\n  - partition\n", "  - keyboard\n  - packagechooser@ambiente\n  - partition\n", 1)
+s = s.replace("  - keyboard\n  - partition\n", "  - keyboard\n  - packagechooser@ambiente\n  - packagechooser@terceiros\n  - partition\n", 1)
 s = s.replace("  - users\n  - displaymanager\n", "  - users\n  - contextualprocess@ambiente\n  - displaymanager\n", 1)
+# software de terceiros: depois que o sources.list final existe (sources-final), antes de desmontar
+s = s.replace("  - sources-final\n  - umount\n", "  - sources-final\n  - contextualprocess@terceiros\n  - umount\n", 1)
 open(p,"w").write(s)
 PY
-grep -q 'packagechooser@ambiente' $S && grep -q 'contextualprocess@ambiente' $S
+grep -q 'packagechooser@ambiente' $S && grep -q 'contextualprocess@ambiente' $S \
+  && grep -q 'packagechooser@terceiros' $S && grep -q 'contextualprocess@terceiros' $S

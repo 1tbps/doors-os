@@ -1,19 +1,21 @@
 #!/bin/sh
 # Doors OS — roda no sistema INSTALADO (chroot do Calamares).
-# Mantém só o ambiente escolhido: remove os outros dois e acerta o gerenciador de login.
-# Uso: escolher-ambiente <kde|cinnamon|xfce>
+# Mantém só o ambiente escolhido: remove os outros três e acerta o gerenciador de login.
+# Uso: escolher-ambiente <kde|cinnamon|xfce|gnome>
 set -euf  # -f: os padrões ?name(...) do apt não podem virar glob do shell
 export DEBIAN_FRONTEND=noninteractive
 KDE="task-kde-desktop doors-kde-settings doors-kwin-cantos kde-standard kde-plasma-desktop plasma-desktop plasma-workspace kwin-x11 kwin-wayland sddm ?name(^sddm-theme)"
 CIN="task-cinnamon-desktop doors-cinnamon-settings cinnamon cinnamon-core cinnamon-desktop-environment cinnamon-session muffin nemo slick-greeter"
 XFC="task-xfce-desktop doors-xfce-settings xfce4 xfce4-session xfwm4 xfdesktop4 xfce4-panel thunar"
+GNO="task-gnome-desktop doors-gnome-settings gnome-core gnome-shell gnome-session gdm3 ?name(^gnome-shell-extension)"
 # lightdm-gtk-greeter fica no Cinnamon e no XFCE (é a tela de login do LightDM nos dois);
 # sem ele o apt tentaria baixar outra (slick-greeter) e a instalação offline falharia.
 case "${1:-}" in
-  kde)      REMOVER="$CIN $XFC lightdm ?name(^lightdm-)"; DM=sddm;   BIN=/usr/bin/sddm ;;
-  cinnamon) REMOVER="$KDE $XFC";                          DM=lightdm; BIN=/usr/sbin/lightdm ;;
-  xfce)     REMOVER="$KDE $CIN";                          DM=lightdm; BIN=/usr/sbin/lightdm ;;
-  *) echo "uso: $0 kde|cinnamon|xfce" >&2; exit 1 ;;
+  kde)      REMOVER="$CIN $XFC $GNO lightdm ?name(^lightdm-)"; DM=sddm;    BIN=/usr/bin/sddm ;;
+  cinnamon) REMOVER="$KDE $XFC $GNO";                          DM=lightdm; BIN=/usr/sbin/lightdm ;;
+  xfce)     REMOVER="$KDE $CIN $GNO";                          DM=lightdm; BIN=/usr/sbin/lightdm ;;
+  gnome)    REMOVER="$KDE $CIN $XFC lightdm ?name(^lightdm-)"; DM=gdm;     BIN=/usr/sbin/gdm3 ;;
+  *) echo "uso: $0 kde|cinnamon|xfce|gnome" >&2; exit 1 ;;
 esac
 # shellcheck disable=SC2086
 apt-get -y --no-download purge $REMOVER  # offline: nunca baixar nada
@@ -24,5 +26,20 @@ ln -sf /usr/lib/systemd/system/$DM.service /etc/systemd/system/display-manager.s
 if [ "$DM" = lightdm ]; then
   mkdir -p /etc/lightdm/lightdm.conf.d
   printf '[Seat:*]\nuser-session=%s\n' "$1" > /etc/lightdm/lightdm.conf.d/60-doors-ambiente.conf
+fi
+# KDE: sessão padrão Plasma (X11) — acesso remoto (AnyDesk, RustDesk) não funciona bem no Wayland.
+# O SDDM abre a última sessão usada; "Plasma (Wayland)" continua no menu de sessão.
+if [ "$DM" = sddm ]; then
+  mkdir -p /var/lib/sddm
+  printf '[Last]\nSession=/usr/share/xsessions/plasmax11.desktop\n' > /var/lib/sddm/state.conf
+  chown -R sddm:sddm /var/lib/sddm 2>/dev/null || true
+fi
+# GNOME: sessão X11 ("GNOME no Xorg") — acesso remoto (AnyDesk, RustDesk) não funciona bem no Wayland
+if [ "$DM" = gdm ] && [ -f /etc/gdm3/daemon.conf ]; then
+  if grep -q '^#\?WaylandEnable=' /etc/gdm3/daemon.conf; then
+    sed -i 's/^#\?WaylandEnable=.*/WaylandEnable=false/' /etc/gdm3/daemon.conf
+  else
+    sed -i 's/^\[daemon\]/[daemon]\nWaylandEnable=false/' /etc/gdm3/daemon.conf
+  fi
 fi
 echo "Doors OS: ambiente $1 mantido"

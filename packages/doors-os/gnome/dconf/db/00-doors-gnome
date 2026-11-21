@@ -1,0 +1,14 @@
+# Doors OS (GNOME): padrões das extensões. O ArcMenu e o Dash to Panel usam o esquema que vem
+# dentro da extensão, então os padrões do Doors vão pelo dconf (perfil "user" + banco "local").
+
+[org/gnome/shell/extensions/arcmenu]
+menu-button-icon='Custom_Icon'
+custom-menu-button-icon='/usr/share/icons/hicolor/scalable/apps/doors-logo.svg'
+custom-menu-button-icon-size=28.0
+update-notifier-enabled=false
+
+[org/gnome/shell/extensions/dash-to-panel]
+# não abrir a visão geral ao entrar
+hide-overview-on-startup=true
+# sem o aviso "Dash to Panel has been updated" (o pacote do Debian se identifica como versão 9999)
+extension-version=9999

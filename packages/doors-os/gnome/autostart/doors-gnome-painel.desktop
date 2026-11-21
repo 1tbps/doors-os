@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Doors: painel do GNOME
+Exec=/usr/lib/doors/doors-gnome-painel
+OnlyShowIn=GNOME;
+NoDisplay=true
+X-GNOME-Autostart-Phase=Applications

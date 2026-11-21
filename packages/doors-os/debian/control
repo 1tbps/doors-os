@@ -60,3 +60,15 @@ Description: aparência padrão do Doors OS para o Cinnamon
  Janelas Greybird (estilo Xubuntu/MX Linux) com o contorno da janela ativa
  em azul, ícones elementary-xfce e fontes Noto Sans. O painel embaixo no
  estilo do Linux Mint é o padrão do Cinnamon. Vale para novos usuários.
+
+Package: doors-gnome-settings
+Architecture: all
+Depends: ${misc:Depends}, doors-artwork, gnome-shell, gnome-shell-extension-dash-to-panel,
+ gnome-shell-extension-arc-menu, gnome-shell-extension-appindicator, dconf-cli,
+ elementary-xfce-icon-theme, fonts-noto-core
+Recommends: gnome-backgrounds
+Description: aparência padrão do Doors OS para o GNOME
+ Painel único na parte de baixo no estilo do Linux Mint (Dash to Panel e
+ menu ArcMenu com o logo do Doors), ícones elementary-xfce (os mesmos do
+ Xubuntu), fontes Noto Sans, botões minimizar/maximizar/fechar e cor de
+ destaque azul. Vale para novos usuários.

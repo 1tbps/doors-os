@@ -12,6 +12,7 @@ pub enum Ambiente {
     Kde,
     Cinnamon,
     Xfce,
+    Gnome,
     Outro,
 }
 
@@ -24,6 +25,8 @@ impl Ambiente {
             Ambiente::Cinnamon
         } else if d.contains("XFCE") {
             Ambiente::Xfce
+        } else if d.contains("GNOME") {
+            Ambiente::Gnome
         } else {
             Ambiente::Outro
         }
@@ -34,6 +37,7 @@ impl Ambiente {
             Ambiente::Kde => "KDE Plasma",
             Ambiente::Cinnamon => "Cinnamon",
             Ambiente::Xfce => "XFCE",
+            Ambiente::Gnome => "GNOME",
             Ambiente::Outro => "ambiente não suportado",
         }
     }
@@ -54,6 +58,12 @@ impl Ambiente {
                 xfconf("xfwm4", "/general/theme", &nome)?;
                 preferencia_escura(e.modo);
                 Ok(())
+            }
+            Ambiente::Gnome => {
+                let escuro = e.modo == Modo::Escuro;
+                gsettings("org.gnome.desktop.interface", "color-scheme", if escuro { "'prefer-dark'" } else { "'default'" })?;
+                gsettings("org.gnome.desktop.interface", "gtk-theme", if escuro { "'Adwaita-dark'" } else { "'Adwaita'" })?;
+                gsettings("org.gnome.desktop.interface", "accent-color", &format!("'{}'", tema::destaque_gnome(&e.cor)))
             }
             Ambiente::Outro => Err(nao_suportado()),
         }
@@ -78,6 +88,14 @@ impl Ambiente {
                 }
                 if algum { Ok(()) } else { Err("nenhum painel do XFCE encontrado".into()) }
             }
+            Ambiente::Gnome => {
+                let esquema = "org.gnome.shell.extensions.dash-to-panel";
+                let atual = saida("gsettings", &["get", esquema, "panel-positions"]).unwrap_or_default();
+                let novo = tema::posicoes_dash_to_panel(&atual, painel);
+                gsettings(esquema, "panel-positions", &novo)?;
+                let _ = gsettings(esquema, "panel-position", if painel == Painel::EmCima { "'TOP'" } else { "'BOTTOM'" });
+                Ok(())
+            }
             Ambiente::Outro => Err(nao_suportado()),
         }
     }
@@ -90,6 +108,11 @@ impl Ambiente {
                 "picture-uri",
                 &format!("'file://{arquivo}'"),
             ),
+            Ambiente::Gnome => {
+                let uri = format!("'file://{arquivo}'");
+                gsettings("org.gnome.desktop.background", "picture-uri", &uri)?;
+                gsettings("org.gnome.desktop.background", "picture-uri-dark", &uri)
+            }
             Ambiente::Xfce => {
                 // O XFCE 4.20 usa /backdrop/screen0/monitor<SAÍDA>/workspace<N>/last-image
                 // (ex.: monitorVirtual-1, monitorHDMI-1). Propriedades com outros nomes
@@ -144,6 +167,11 @@ impl Ambiente {
                 "xfconf-query",
                 &["-c", "xsettings", "-p", "/Xft/DPI", "-n", "-t", "int", "-s", &tema::dpi(escala).to_string()],
             ),
+            Ambiente::Gnome => gsettings(
+                "org.gnome.desktop.interface",
+                "text-scaling-factor",
+                &format!("{:.2}", escala as f64 / 100.0),
+            ),
             Ambiente::Outro => Err(nao_suportado()),
         }
     }
@@ -162,7 +190,7 @@ impl Ambiente {
 }
 
 fn nao_suportado() -> String {
-    "este ambiente gráfico não é suportado (use KDE Plasma, Cinnamon ou XFCE)".into()
+    "este ambiente gráfico não é suportado (use KDE Plasma, Cinnamon, XFCE ou GNOME)".into()
 }
 
 // ------------------------------------------------------------------ KDE

@@ -13,4 +13,4 @@ Recommends: greybird-gtk-theme
 Description: Doors Aparência: personalização do Doors OS em um clique
  Aplicativo (Rust + GTK4), no estilo do Zorin Appearance, para escolher
  tema claro ou escuro, cor de destaque, papel de parede, layout do painel e
- tamanho do texto no KDE Plasma, no Cinnamon e no XFCE. Aplica na hora.
+ tamanho do texto no KDE Plasma, no Cinnamon, no XFCE e no GNOME.

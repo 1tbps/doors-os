@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+# Build offline: as dependências Rust vêm dos pacotes librust-*-dev do Debian.
+export CARGO_HOME = $(CURDIR)/debian/cargo_home
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	mkdir -p $(CARGO_HOME)
+	printf '[source.crates-io]\nreplace-with = "debian"\n[source.debian]\ndirectory = "/usr/share/cargo/registry"\n[net]\noffline = true\n' > $(CARGO_HOME)/config.toml
+
+override_dh_auto_build:
+	cargo build --release
+
+override_dh_auto_test:
+	cargo test --release
+
+override_dh_auto_install:
+	install -D -m 755 target/release/doors-digitacao debian/doors-digitacao/usr/bin/doors-digitacao
+	install -D -m 644 data/org.doors.Digitacao.desktop debian/doors-digitacao/usr/share/applications/org.doors.Digitacao.desktop
+
+override_dh_auto_clean:
+	rm -rf target $(CARGO_HOME) Cargo.lock

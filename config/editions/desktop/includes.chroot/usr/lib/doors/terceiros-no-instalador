@@ -1,0 +1,11 @@
+#!/bin/sh
+# Doors OS — roda na LIVE (Calamares, dontChroot): executa instalar-terceiros dentro do sistema
+# instalado, com o DNS da live. Nunca faz a instalação falhar.
+T=$(mount | grep proc | grep calamares | awk '{print $3}' | sed -e "s#/proc##g" | head -1)
+[ -n "$T" ] && [ -x "$T/usr/lib/doors/instalar-terceiros" ] || { echo "doors: sistema instalado não encontrado"; exit 0; }
+R="$T/etc/resolv.conf"; B=""
+if [ -e "$R" ] || [ -L "$R" ]; then B="$T/etc/resolv.conf.doors-original"; mv "$R" "$B"; fi
+cp -L /etc/resolv.conf "$R" 2>/dev/null || true
+chroot "$T" /usr/lib/doors/instalar-terceiros 2>&1 | tee -a "$T/var/log/doors-terceiros.log"
+rm -f "$R"; [ -n "$B" ] && mv "$B" "$R"
+exit 0

@@ -10,7 +10,7 @@ menu.writeConfig("icon", "doors-logo")
 
 var tasks = panel.addWidget("org.kde.plasma.icontasks")
 tasks.currentConfigGroup = ["General"]
-tasks.writeConfig("launchers", ["applications:firefox-esr.desktop",
+tasks.writeConfig("launchers", ["applications:chromium.desktop",
                                 "applications:org.kde.dolphin.desktop",
                                 "applications:org.kde.konsole.desktop"])
 
