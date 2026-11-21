@@ -1,6 +1,15 @@
 [Icon Theme]
 Name=Doors
 Comment=Ícones do Doors OS (elementary-xfce, os mesmos do Xubuntu)
-Inherits=elementary-xfce-dark,breeze,Adwaita,hicolor
-Directories=
+Inherits=elementary-xfce-dark,elementary-xfce,breeze,Adwaita,hicolor
+# Precisa de ao menos uma pasta própria: sem "Directories", o Qt (Plasma) considera o tema
+# inválido e cai direto no hicolor, e quase todos os ícones somem no KDE.
+Directories=scalable/apps
 Example=folder
+
+[scalable/apps]
+Size=48
+MinSize=8
+MaxSize=512
+Type=Scalable
+Context=Applications

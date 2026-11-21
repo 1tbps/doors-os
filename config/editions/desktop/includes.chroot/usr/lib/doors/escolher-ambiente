@@ -7,7 +7,7 @@ export DEBIAN_FRONTEND=noninteractive
 KDE="task-kde-desktop doors-kde-settings doors-kwin-cantos kde-standard kde-plasma-desktop plasma-desktop plasma-workspace kwin-x11 kwin-wayland sddm ?name(^sddm-theme)"
 CIN="task-cinnamon-desktop doors-cinnamon-settings cinnamon cinnamon-core cinnamon-desktop-environment cinnamon-session muffin nemo slick-greeter"
 XFC="task-xfce-desktop doors-xfce-settings xfce4 xfce4-session xfwm4 xfdesktop4 xfce4-panel thunar"
-GNO="task-gnome-desktop doors-gnome-settings gnome-core gnome-shell gnome-session gdm3 ?name(^gnome-shell-extension)"
+GNO="task-gnome-desktop doors-gnome-settings doors-gnome-cantos gnome-core gnome-shell gnome-session gdm3 ?name(^gnome-shell-extension)"
 # lightdm-gtk-greeter fica no Cinnamon e no XFCE (é a tela de login do LightDM nos dois);
 # sem ele o apt tentaria baixar outra (slick-greeter) e a instalação offline falharia.
 case "${1:-}" in

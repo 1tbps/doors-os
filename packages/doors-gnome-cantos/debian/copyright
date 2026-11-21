@@ -1,0 +1,17 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: rounded-window-corners
+Source: https://github.com/flexagoon/rounded-window-corners (tag 12, sha256 do tarball 1337f587635ed54cb4cc2352dff0a6f263cbd65bf8f57a0fcfffc9f629edbd7b)
+Comment: Alterações do Doors OS: borda colorida só na janela ativa
+ (src/effect/rounded_corners_effect.ts e src/manager/event_handlers.ts).
+
+Files: *
+Copyright: flexagoon, yilozt e colaboradores do Rounded Window Corners
+License: GPL-3+
+
+Files: debian/*
+Copyright: 2026 Doors OS Project
+License: GPL-3+
+
+License: GPL-3+
+ On Debian systems, the full text of the GNU General Public License version 3
+ can be found in /usr/share/common-licenses/GPL-3.

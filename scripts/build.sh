@@ -24,7 +24,7 @@ mkdir -p config/packages.chroot
 for d in /doors/apt/public/pool/main/d/*/*.deb; do
   case "$d" in
     *-dbgsym_*) continue;;
-    *doors-artwork_*|*doors-aparencia_*|*doors-digitacao_*|*doors-*-settings_*|*doors-kwin-cantos_*) [ "$ED" = base ] && continue;;
+    *doors-artwork_*|*doors-aparencia_*|*doors-digitacao_*|*doors-*-settings_*|*doors-kwin-cantos_*|*doors-gnome-cantos_*) [ "$ED" = base ] && continue;;
   esac
   cp "$d" config/packages.chroot/
 done

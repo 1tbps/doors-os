@@ -42,6 +42,11 @@ impl Ambiente {
         }
     }
 
+    /// O ambiente tem a página Layout (posição do painel)?
+    pub fn tem_layout(self) -> bool {
+        !matches!(self, Ambiente::Gnome | Ambiente::Outro)
+    }
+
     /// Tema claro/escuro + cor de destaque.
     pub fn aplicar_tema(self, e: &Estado) -> Result<(), String> {
         match self {
@@ -63,7 +68,17 @@ impl Ambiente {
                 let escuro = e.modo == Modo::Escuro;
                 gsettings("org.gnome.desktop.interface", "color-scheme", if escuro { "'prefer-dark'" } else { "'default'" })?;
                 gsettings("org.gnome.desktop.interface", "gtk-theme", if escuro { "'Adwaita-dark'" } else { "'Adwaita'" })?;
-                gsettings("org.gnome.desktop.interface", "accent-color", &format!("'{}'", tema::destaque_gnome(&e.cor)))
+                gsettings("org.gnome.desktop.interface", "accent-color", &format!("'{}'", tema::destaque_gnome(&e.cor)))?;
+                // borda da janela ativa (extensão de cantos arredondados, esquema dentro da extensão)
+                let dir = "/usr/share/gnome-shell/extensions/rounded-window-corners@fxgn/schemas";
+                if Path::new(dir).is_dir() {
+                    executar(
+                        "gsettings",
+                        &["--schemadir", dir, "set", "org.gnome.shell.extensions.rounded-window-corners-reborn",
+                          "global-rounded-corner-settings", &tema::cantos_gnome(&e.cor)],
+                    )?;
+                }
+                Ok(())
             }
             Ambiente::Outro => Err(nao_suportado()),
         }
@@ -88,14 +103,7 @@ impl Ambiente {
                 }
                 if algum { Ok(()) } else { Err("nenhum painel do XFCE encontrado".into()) }
             }
-            Ambiente::Gnome => {
-                let esquema = "org.gnome.shell.extensions.dash-to-panel";
-                let atual = saida("gsettings", &["get", esquema, "panel-positions"]).unwrap_or_default();
-                let novo = tema::posicoes_dash_to_panel(&atual, painel);
-                gsettings(esquema, "panel-positions", &novo)?;
-                let _ = gsettings(esquema, "panel-position", if painel == Painel::EmCima { "'TOP'" } else { "'BOTTOM'" });
-                Ok(())
-            }
+            Ambiente::Gnome => Err("no GNOME a barra fica no topo, do jeito do GNOME".into()),
             Ambiente::Outro => Err(nao_suportado()),
         }
     }

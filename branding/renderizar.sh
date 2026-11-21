@@ -12,6 +12,8 @@ for s in 16 22 24 32 48 64 128 256 512; do
   ln -s doors-logo.png "$IC/${s}x${s}/apps/doors-install.png"
 done
 mkdir -p "$IC/scalable/apps"; cp "$LOGO" "$IC/scalable/apps/doors-logo.svg"; ln -s doors-logo.svg "$IC/scalable/apps/doors-install.svg"
+# tema de ícones "Doors": o logo na pasta própria do tema (o Qt exige ao menos uma pasta)
+mkdir -p "$R/packages/doors-os/artwork/icons/Doors/scalable/apps"; cp "$LOGO" "$R/packages/doors-os/artwork/icons/Doors/scalable/apps/doors-logo.svg"
 rsvg-convert -w 256 -h 256 "$LOGO" -o "$R/config/desktop-common/includes.chroot/etc/calamares/branding/doors/doors-logo.png"
 python3 -I "$R/branding/gerar-arte.py" "$R"
 mkdir -p "$R/packages/doors-os/artwork/skel"

@@ -1,3 +1,16 @@
+doors-aparencia (0.3.2) trixie; urgency=medium
+
+  * GNOME: as prévias mostram a barra no topo.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 20:00:00 -0300
+
+doors-aparencia (0.3.1) trixie; urgency=medium
+
+  * GNOME do jeito do GNOME: sem a página Layout; a cor de destaque também
+    pinta a borda arredondada da janela ativa (doors-gnome-cantos).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 19:30:00 -0300
+
 doors-aparencia (0.3.0) trixie; urgency=medium
 
   * Suporte ao GNOME: claro/escuro, cor de destaque (accent-color do GNOME),

@@ -168,3 +168,11 @@ Implementado: X11 padrão no KDE (Wayland do Cinnamon/XFCE escondido); ç de fá
 
 Validado em VM (UEFI): GNOME live; instalação GNOME com "Codecs e drivers" (codecs instalados, contrib/non-free, só GNOME, X11, Chromium, Digitação, ~/.XCompose); login do GDM com o logo do Doors; Digitação (lição, teclado na tela, jogo). Não testado: driver NVIDIA (VM sem placa), instalação KDE/Cinnamon/XFCE desta ISO, teclado internacional na VM.
 Padrões do Dash to Panel via dconf validados na ISO final (0.4~dev5): sem aviso em inglês, sem visão geral ao entrar, sem botão de grade. Commit 808a949.
+
+### 0.4-dev — terceira rodada (2026-11-21, noite): testes do usuário em PC físico
+
+- GNOME refeito **do jeito do GNOME** (barra no topo, visão geral, dock, Adwaita): saem Dash to Panel e ArcMenu; ficam os papéis de parede do Doors e cantos arredondados com borda colorida só na janela ativa (novo pacote `doors-gnome-cantos` = Rounded Window Corners Reborn 12, GPL-3, com alteração do Doors para a cor por foco). Doors Aparência 0.3.2 sem página Layout no GNOME. Validado em VM (Aparência, Calculadora).
+- KDE: quase todos os ícones sumiam (menus, botões). Causa: tema "Doors" sem pasta própria → o Qt/Plasma o considerava inválido. Corrigido (pasta `scalable/apps`); validado no menu do KDE live.
+- XFCE: o seletor só mostrava 1 papel de parede (xfce-x.svg apontava para a pasta do tema). Agora aponta para /usr/share/backgrounds/doors.
+- Chromium: usa a barra de título e a borda do sistema (perfis novos), para ganhar os cantos arredondados e a borda colorida.
+- Em PCs já instalados: KDE → Ícones "elementary Xfce dark" ou Breeze; XFCE → pasta /usr/share/backgrounds/doors; Chromium → Aparência → "Usar a barra de título e as bordas do sistema".

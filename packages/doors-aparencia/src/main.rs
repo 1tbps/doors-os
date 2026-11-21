@@ -258,7 +258,9 @@ fn pagina_tema(app: &Rc<App>) -> gtk::Box {
         let a = app.clone();
         d.set_draw_func(move |_, cr, w, h| {
             let e = a.estado.borrow();
-            desenhar_desktop(cr, w as f64, h as f64, a.fundo.borrow().as_ref(), modo, &e.cor, e.painel);
+            // no GNOME a barra fica no topo
+            let painel = if a.ambiente == Ambiente::Gnome { Painel::EmCima } else { e.painel };
+            desenhar_desktop(cr, w as f64, h as f64, a.fundo.borrow().as_ref(), modo, &e.cor, painel);
         });
         app.previas.borrow_mut().push(d.clone());
         let b = cartao(nome, d, primeiro.as_ref());
@@ -300,7 +302,7 @@ fn pagina_tema(app: &Rc<App>) -> gtk::Box {
     p.append(&rotulo(
         match app.ambiente {
             Ambiente::Kde => "A cor aparece no contorno arredondado da janela ativa, na barra de título, nas seleções e nos destaques.",
-            Ambiente::Gnome => "A cor aparece nos botões, seleções e destaques do GNOME (cor mais próxima entre as do GNOME).",
+            Ambiente::Gnome => "A cor aparece na borda arredondada da janela ativa e nos botões, seleções e destaques do GNOME.",
             _ => "A cor aparece no contorno arredondado da janela ativa.",
         },
         "dim-label",
@@ -482,12 +484,15 @@ fn montar(gapp: &gtk::Application) {
 
     let pilha = gtk::Stack::new();
     pilha.set_transition_type(gtk::StackTransitionType::Crossfade);
-    let paginas: [(&str, &str, gtk::Box); 4] = [
+    let mut paginas: Vec<(&str, &str, gtk::Box)> = vec![
         ("tema", "Tema", pagina_tema(&app)),
         ("fundo", "Fundo", pagina_fundo(&app, &janela)),
-        ("layout", "Layout", pagina_layout(&app)),
-        ("fontes", "Fontes", pagina_fontes(&app)),
     ];
+    // no GNOME a barra fica no topo, do jeito do GNOME: sem a página Layout
+    if ambiente.tem_layout() {
+        paginas.push(("layout", "Layout", pagina_layout(&app)));
+    }
+    paginas.push(("fontes", "Fontes", pagina_fontes(&app)));
     for (id, nome, conteudo) in paginas {
         let rolagem = gtk::ScrolledWindow::new();
         rolagem.set_hscrollbar_policy(gtk::PolicyType::Never);

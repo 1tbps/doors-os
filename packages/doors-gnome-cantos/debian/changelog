@@ -1,0 +1,7 @@
+doors-gnome-cantos (12+doors2) trixie; urgency=medium
+
+  * Primeira versão: Rounded Window Corners Reborn 12 para o GNOME 48, com a
+    borda colorida só na janela ativa (alteração do Doors OS; 12+doors2:
+    também nas janelas X11).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 19:00:00 -0300

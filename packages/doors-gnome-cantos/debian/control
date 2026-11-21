@@ -1,0 +1,17 @@
+Source: doors-gnome-cantos
+Section: gnome
+Priority: optional
+Maintainer: Doors OS Project <noreply@doors-os.invalid>
+Build-Depends: debhelper-compat (= 13), esbuild, libglib2.0-bin, gettext
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://github.com/flexagoon/rounded-window-corners
+
+Package: doors-gnome-cantos
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>= 46), gnome-shell (<< 49)
+Description: cantos arredondados e borda colorida nas janelas do GNOME (Doors OS)
+ Extensão do GNOME Shell "Rounded Window Corners Reborn" (versão 12, de
+ flexagoon e colaboradores), compilada para o GNOME 48 do Doors OS.
+ Arredonda os quatro cantos de todas as janelas e desenha uma borda; no
+ Doors, a borda fica na cor de destaque só na janela ativa.

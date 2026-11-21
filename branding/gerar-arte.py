@@ -135,7 +135,9 @@ escurecer(foto(PADRAO, 1920, 1080), 0.45).save(f"{TH}/grub/grub-16x9.png")
 escurecer(foto(PADRAO, 1280, 1024), 0.45).save(f"{TH}/grub/grub-4x3.png")
 
 # ---------------------------------------------------------------- coleção (todas as fotos)
-links = ["usr/share/desktop-base/doors-theme/wallpaper/contents/images/2560x1440.jpg usr/share/backgrounds/xfce/xfce-x.svg"]
+# padrão do XFCE (xfce-x.svg) aponta para a coleção: o seletor do XFCE abre a pasta da imagem
+# atual, então assim ele mostra todos os papéis de parede do Doors (não só a imagem do tema)
+links = [f"usr/share/backgrounds/doors/{PADRAO}.jpg usr/share/backgrounds/xfce/xfce-x.svg"]
 xml = ['<?xml version="1.0"?>', '<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">', "<wallpapers>"]
 for key, (arq, nome) in ILUSTRACOES.items():
     jpg(foto(key, 2560, 1440), f"{ART}/backgrounds/doors/{key}.jpg", 86)

@@ -1,3 +1,21 @@
+doors-os (0.4~dev8) trixie; urgency=medium
+
+  * doors-artwork: tema de ícones "Doors" com uma pasta própria; sem ela o
+    Plasma considerava o tema inválido e quase todos os ícones sumiam no KDE.
+  * doors-artwork: o papel de parede padrão do XFCE aponta para a coleção,
+    e o seletor do XFCE mostra todos os papéis de parede do Doors.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 20:30:00 -0300
+
+doors-os (0.4~dev7) trixie; urgency=medium
+
+  * doors-gnome-settings: GNOME do jeito do GNOME (barra no topo, visão
+    geral e dock, tema Adwaita), sem Dash to Panel nem ArcMenu; só os papéis
+    de parede do Doors e as janelas com cantos arredondados e borda colorida
+    na janela ativa (novo pacote doors-gnome-cantos).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 19:30:00 -0300
+
 doors-os (0.4~dev5) trixie; urgency=medium
 
   * doors-release: teclado internacional com teclas mortas gera ç com ' + c

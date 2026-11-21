@@ -1,14 +1,12 @@
-# Doors OS (GNOME): padrões das extensões. O ArcMenu e o Dash to Panel usam o esquema que vem
-# dentro da extensão, então os padrões do Doors vão pelo dconf (perfil "user" + banco "local").
+# Doors OS (GNOME): padrões da extensão de cantos arredondados (doors-gnome-cantos).
+# O esquema dela fica dentro da extensão, então o padrão do Doors vai pelo dconf
+# (perfil "user" + banco "local"). O Doors Aparência troca a cor da borda.
 
-[org/gnome/shell/extensions/arcmenu]
-menu-button-icon='Custom_Icon'
-custom-menu-button-icon='/usr/share/icons/hicolor/scalable/apps/doors-logo.svg'
-custom-menu-button-icon-size=28.0
-update-notifier-enabled=false
-
-[org/gnome/shell/extensions/dash-to-panel]
-# não abrir a visão geral ao entrar
-hide-overview-on-startup=true
-# sem o aviso "Dash to Panel has been updated" (o pacote do Debian se identifica como versão 9999)
-extension-version=9999
+[org/gnome/shell/extensions/rounded-window-corners-reborn]
+# borda de 2 px; na janela ativa, na cor de destaque (azul do Doors)
+border-width=2
+# também nos apps do GNOME (libadwaita), para a borda colorida aparecer em todas as janelas
+skip-libadwaita-app=false
+global-rounded-corner-settings={'padding': <{'left': <uint32 1>, 'right': <uint32 1>, 'top': <uint32 1>, 'bottom': <uint32 1>}>, 'keepRoundedCorners': <{'maximized': <false>, 'fullscreen': <false>}>, 'borderRadius': <uint32 12>, 'smoothing': <0>, 'borderColor': <[0.184, 0.471, 0.710, 1.0]>, 'enabled': <true>}
+# sem a entrada "Rounded Corners Settings" no menu do botão direito da área de trabalho
+enable-preferences-entry=false

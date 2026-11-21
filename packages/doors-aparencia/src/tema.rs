@@ -227,19 +227,18 @@ pub fn destaque_gnome(cor: &Cor) -> &'static str {
     }
 }
 
-/// Dash to Panel: troca TOP/BOTTOM em `panel-positions` (JSON por monitor, ex. '{"0":"BOTTOM"}').
-/// Sem monitores listados, usa o monitor 0.
-pub fn posicoes_dash_to_panel(valor: &str, painel: Painel) -> String {
-    let alvo = if painel == Painel::EmCima { "TOP" } else { "BOTTOM" };
-    let v = valor.trim().trim_matches('\'');
-    if v.contains("\"BOTTOM\"") || v.contains("\"TOP\"") || v.contains("\"LEFT\"") || v.contains("\"RIGHT\"") {
-        v.replace("\"BOTTOM\"", &format!("\"{alvo}\""))
-            .replace("\"TOP\"", &format!("\"{alvo}\""))
-            .replace("\"LEFT\"", &format!("\"{alvo}\""))
-            .replace("\"RIGHT\"", &format!("\"{alvo}\""))
-    } else {
-        format!("{{\"0\":\"{alvo}\"}}")
-    }
+/// GNOME: valor de `global-rounded-corner-settings` da extensão de cantos arredondados
+/// (doors-gnome-cantos) com a borda na cor de destaque.
+pub fn cantos_gnome(cor: &Cor) -> String {
+    let (r, g, b) = cor.rgb;
+    format!(
+        "{{'padding': <{{'left': <uint32 1>, 'right': <uint32 1>, 'top': <uint32 1>, 'bottom': <uint32 1>}}>, \
+'keepRoundedCorners': <{{'maximized': <false>, 'fullscreen': <false>}}>, 'borderRadius': <uint32 12>, \
+'smoothing': <0>, 'borderColor': <[{:.3}, {:.3}, {:.3}, 1.0]>, 'enabled': <true>}}",
+        r as f64 / 255.0,
+        g as f64 / 255.0,
+        b as f64 / 255.0
+    )
 }
 
 /// Tamanhos de texto oferecidos (porcentagem).
@@ -427,9 +426,9 @@ inactiveBackground=239,240,241\n";
     fn gnome() {
         assert_eq!(destaque_gnome(&cor_por_id("grafite").unwrap()), "slate");
         assert_eq!(destaque_gnome(&cor_por_id("azul").unwrap()), "blue");
-        assert_eq!(posicoes_dash_to_panel("'{\"0\":\"BOTTOM\",\"1\":\"BOTTOM\"}'", Painel::EmCima), "{\"0\":\"TOP\",\"1\":\"TOP\"}");
-        assert_eq!(posicoes_dash_to_panel("'{}'", Painel::EmCima), "{\"0\":\"TOP\"}");
-        assert_eq!(posicoes_dash_to_panel("'{\"GSM-1\":\"TOP\"}'", Painel::Embaixo), "{\"GSM-1\":\"BOTTOM\"}");
+        let c = cantos_gnome(&cor_por_id("azul").unwrap());
+        assert!(c.contains("'borderColor': <[0.184, 0.471, 0.710, 1.0]>"), "{c}");
+        assert!(c.starts_with("{'padding'") && c.ends_with("<true>}"));
     }
 
     #[test]

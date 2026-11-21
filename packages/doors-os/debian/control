@@ -63,12 +63,10 @@ Description: aparência padrão do Doors OS para o Cinnamon
 
 Package: doors-gnome-settings
 Architecture: all
-Depends: ${misc:Depends}, doors-artwork, gnome-shell, gnome-shell-extension-dash-to-panel,
- gnome-shell-extension-arc-menu, gnome-shell-extension-appindicator, dconf-cli,
- elementary-xfce-icon-theme, fonts-noto-core
+Depends: ${misc:Depends}, doors-artwork, doors-gnome-cantos, gnome-shell, dconf-cli
 Recommends: gnome-backgrounds
 Description: aparência padrão do Doors OS para o GNOME
- Painel único na parte de baixo no estilo do Linux Mint (Dash to Panel e
- menu ArcMenu com o logo do Doors), ícones elementary-xfce (os mesmos do
- Xubuntu), fontes Noto Sans, botões minimizar/maximizar/fechar e cor de
- destaque azul. Vale para novos usuários.
+ O GNOME do jeito do GNOME (barra no topo, visão geral e dock), com os
+ papéis de parede do Doors e as janelas com cantos arredondados e borda
+ na cor de destaque na janela ativa (doors-gnome-cantos). Vale para
+ novos usuários.

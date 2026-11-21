@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+UUID = rounded-window-corners@fxgn
+B = _build
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# TypeScript -> JavaScript (só remove os tipos; sem empacotar módulos)
+	esbuild $$(find src -name '*.ts' ! -name '*.d.ts') --outdir=$(B) --outbase=src --format=esm --target=es2022 --log-level=warning
+	cp -r resources/* $(B)/
+	cd src && find . -type f ! -name '*.ts' ! -name 'README.md' -exec install -D -m 644 {} ../$(B)/{} \;
+	glib-compile-schemas $(B)/schemas
+	for f in po/*.po; do l=$$(basename $$f .po); mkdir -p $(B)/locale/$$l/LC_MESSAGES; msgfmt -o $(B)/locale/$$l/LC_MESSAGES/$(UUID).mo $$f; done
+
+override_dh_auto_test:
+	test -f $(B)/extension.js && test -f $(B)/metadata.json && test -f $(B)/schemas/gschemas.compiled
+	! grep -n "Meta.WindowActor | null" $(B)/effect/rounded_corners_effect.js
+	grep -q "get_parent" $(B)/effect/rounded_corners_effect.js
+
+override_dh_auto_install:
+	mkdir -p debian/doors-gnome-cantos/usr/share/gnome-shell/extensions/$(UUID)
+	cp -r $(B)/. debian/doors-gnome-cantos/usr/share/gnome-shell/extensions/$(UUID)/
+
+override_dh_auto_clean:
+	dh_auto_clean
+	find . -maxdepth 1 -name _build -type d -exec rm -r {} +
