@@ -36,6 +36,7 @@
 | 2026-11-21 | Versão em desenvolvimento: **0.4-dev**. Incluir o **GNOME** como 4º ambiente fica para a próxima compilação | Pedido do usuário |
 | 2026-11-21 | Próxima compilação: tirar o **LibreOffice** da instalação principal; trocar o Firefox pelo **Chrome** só se for possível (o Chrome não pode vir embutido na ISO: opções = repositório do Google com instalação online, ou Chromium do Debian) | Pedido do usuário — escolhido: **Chromium** no lugar do Firefox (Chrome continua instalável depois pelo .deb do Google; avaliar atalho "Instalar Google Chrome") |
 | 2026-11-21 | Próxima compilação: opção no instalador "Instalar software de terceiros" (codecs + drivers como NVIDIA, de contrib/non-free; detecta a placa; precisa de internet) | Pedido do usuário |
+| 2026-11-21 | Próxima compilação: **curso de digitação próprio**, todo em português do Brasil (telas, lições, testes e jogos), com evolução por níveis, pontuação, velocidade (PPM) e precisão, no teclado ABNT2. Inspirado na ideia de typing.com e TypingClub, mas com conteúdo e visual originais | Pedido do usuário |
 
 ## Etapas
 
