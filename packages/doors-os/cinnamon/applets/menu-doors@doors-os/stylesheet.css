@@ -1,0 +1,151 @@
+/* Estilos do menu novo do Cinnamon (6.6.0, data/theme/cinnamon-sass/widgets/_startmenu.scss e
+   partes compartilhadas), só os seletores "appmenu". Licença GPL-2+ (Cinnamon). */
+#appmenu-search-entry {
+  min-height: 22px;
+  border-radius: 8px;
+  padding: 6px 9px;
+  border: 1px solid #333333;
+  caret-color: white;
+  selected-color: black;
+  selection-background-color: #3584e4;
+  caret-size: 1px;
+}
+#appmenu-search-entry {
+  background-color: #393939;
+  color: white;
+}
+#appmenu-search-entry:focus {
+  background-color: #393939;
+  color: white;
+  border-color: #3584e4;
+}
+#appmenu-search-entry:insensitive {
+  background-color: #313131;
+  color: rgba(255, 255, 255, 0.5);
+}
+#appmenu-search-entry StLabel.hint-text {
+  color: rgba(255, 255, 255, 0.3);
+}
+#appmenu-search-entry .capslock-warning {
+  icon-size: 1.091em;
+}
+#appmenu-search-entry StIcon.peek-password {
+  icon-size: 16px;
+  color: white;
+}
+.appmenu-application-button-description {
+  font-weight: 400;
+  font-size: 0.818em;
+}
+.appmenu-category-button-greyed, .appmenu-category-button-selected, .appmenu-category-button, .appmenu-application-button-selected, .appmenu-application-button, .appmenu-sidebar-button {
+  padding: 6px;
+  spacing: 4px;
+  border-radius: 8px;
+}
+.appmenu-background .popup-menu-content {
+  padding: 0;
+}
+.appmenu-main-box {
+  spacing: 10px;
+}
+.appmenu-right-box {
+  spacing: 5px;
+  padding: 10px 10px;
+}
+.appmenu-categories-applications-box {
+  spacing: 15px;
+}
+.appmenu-categories-applications-box:top {
+  padding-top: 5px;
+}
+.appmenu-applications-box {
+  padding-right: 5px;
+}
+.appmenu-search-box {
+  spacing: 10px;
+}
+.appmenu-sidebar {
+  padding: 10px 0px;
+  background-color: #303030;
+  border-radius: 10px 0 0 10px;
+  border-right-width: 1px;
+  border-color: #333333;
+}
+.appmenu-sidebar .appmenu-system-button {
+  background-color: #4a4a4a;
+}
+.appmenu-sidebar .appmenu-system-button-lock:hover {
+  background-color: #565656;
+}
+.appmenu-sidebar .appmenu-system-button-logout:hover {
+  background-color: #565656;
+}
+.appmenu-sidebar .appmenu-system-button-shutdown {
+  background-color: #c01c28;
+}
+.appmenu-sidebar .appmenu-system-button-shutdown:hover {
+  background-color: #d61f2d;
+}
+.appmenu-system-box {
+  spacing: 10px;
+}
+.appmenu-sidebar-button {
+  padding: 3px 6px 3px 6px;
+  margin: 0 10px 0 10px;
+}
+.appmenu-sidebar-button:hover {
+  background-color: #454545;
+  border-color: #333333;
+}
+.appmenu-system-button {
+  padding: 8.4px;
+  border: 1px solid #333333;
+  border-radius: 9999px;
+  background-color: #3e3e3e;
+}
+.appmenu-system-button-shutdown {
+  background-color: #c01c28;
+}
+.appmenu-system-button-lock:hover {
+  background-color: #4a4a4a;
+}
+.appmenu-system-button-logout:hover {
+  background-color: #4a4a4a;
+}
+.appmenu-system-button-shutdown:hover {
+  background-color: #c01c28;
+}
+.appmenu-application-button-label {
+  padding: 0;
+}
+.appmenu-application-button-description {
+  color: #b2b2b2;
+}
+.appmenu-application-button:highlighted {
+  font-weight: bold;
+}
+.appmenu-application-button-selected {
+  background-color: #393939;
+}
+.appmenu-application-button-selected:highlighted {
+  font-weight: bold;
+}
+.appmenu-category-button-label {
+  padding: 0;
+}
+.appmenu-category-button:hover {
+  background-color: #454545;
+}
+.appmenu-category-button-selected {
+  background-color: #393939;
+}
+.appmenu-category-button-greyed {
+  color: #7c7c7c;
+  font-style: italic;
+}
+.appmenu-category-button-greyed StIcon {
+  opacity: 0.5;
+}
+.appmenu-search-entry-icon {
+  icon-size: 1.091em;
+}

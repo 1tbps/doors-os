@@ -1,3 +1,11 @@
+doors-os (0.4~dev10) trixie; urgency=medium
+
+  * doors-cinnamon-settings: menu novo (do Cinnamon 6.6, adaptado para o
+    6.4 do Debian) como menu padrão: usuário, pastas e favoritos na barra
+    lateral, busca no topo e categorias coloridas.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 23:00:00 -0300
+
 doors-os (0.4~dev9) trixie; urgency=medium
 
   * Instalador: instala o ambiente escolhido no menu de boot (sem perguntar

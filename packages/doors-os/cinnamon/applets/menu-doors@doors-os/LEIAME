@@ -1,0 +1,10 @@
+Menu do Doors OS para o Cinnamon: o menu novo do Cinnamon 6.6.0 (barra lateral com o
+usuário, pastas e favoritos), de github.com/linuxmint/cinnamon (tag 6.6.0, sha256 do tarball
+f28dcac950567c7b8b2c9c9fabc2a8ddb8d64bc7da32e70aecea26f28bf51b0b), licença GPL-2+.
+Adaptado para o Cinnamon 6.4 do Debian 13:
+- uuid "menu-doors@doors-os" (não substitui o menu do sistema);
+- atalho de teclado: usa addHotKey quando não existe addXletHotKey (API do 6.6);
+- ícones "xsi-*" do XApp trocados pelos nomes padrão (o Debian não tem os do XApp);
+- stylesheet.css: só os estilos "appmenu" do tema do Cinnamon 6.6.0 (compilado do
+  data/theme/cinnamon-sass), que o tema do 6.4 não tem;
+- padrões: logo do Doors no botão, busca no topo, categorias coloridas.

@@ -1,0 +1,7 @@
+{
+ "uuid": "menu-doors@doors-os",
+ "name": "Menu (Doors)",
+ "description": "Menu do Doors OS: o menu novo do Cinnamon 6.6 (barra lateral com usuário, pastas e favoritos)",
+ "icon": "doors-logo",
+ "max-instances": -1
+}

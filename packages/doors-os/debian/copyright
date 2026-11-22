@@ -6,3 +6,8 @@ Copyright: 2026 Doors OS Project
 License: GPL-2+
  On Debian systems, the complete text of the GNU General Public License
  version 2 can be found in /usr/share/common-licenses/GPL-2.
+
+Files: cinnamon/applets/menu-doors@doors-os/*
+Copyright: Linux Mint e colaboradores do Cinnamon
+License: GPL-2+
+Comment: Menu do Cinnamon 6.6.0 (github.com/linuxmint/cinnamon), adaptado; ver o LEIAME.
