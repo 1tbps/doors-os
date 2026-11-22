@@ -1,3 +1,13 @@
+doors-os (0.4~dev12) trixie; urgency=medium
+
+  * Contorno das janelas com 2 px em todos os ambientes (padrão do Doors):
+    XFCE passa de 1 para 2 px, com os quatro cantos arredondados (peças do
+    xfwm4 geradas por branding/gerar-bordas-xfwm4.py, sem as sobreposições
+    PNG de brilho do Greybird); GNOME volta a 2 px.
+  * Menu de boot em modo BIOS/legado (e Ventoy em Legacy) com os 4 ambientes.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sun, 22 Nov 2026 00:00:00 -0300
+
 doors-os (0.4~dev10) trixie; urgency=medium
 
   * doors-cinnamon-settings: menu novo (do Cinnamon 6.6, adaptado para o

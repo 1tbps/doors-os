@@ -1,0 +1,32 @@
+# Doors OS — ISO única (BIOS/legado e Ventoy em modo BIOS): o ambiente escolhido aqui
+# é o que o instalador instala (as mesmas entradas do menu UEFI, bootloaders/grub-pc/grub.cfg)
+label live-kde
+	menu label Doors OS - ^KDE Plasma (experimentar e instalar)
+	menu default
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@ quiet splash doors.ambiente=kde
+
+label live-cinnamon
+	menu label Doors OS - Ci^nnamon (experimentar e instalar)
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@ quiet splash doors.ambiente=cinnamon
+
+label live-xfce
+	menu label Doors OS - ^XFCE (experimentar e instalar)
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@ quiet splash doors.ambiente=xfce
+
+label live-gnome
+	menu label Doors OS - ^GNOME (experimentar e instalar)
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@ quiet splash doors.ambiente=gnome
+
+label live-@FLAVOUR@-failsafe
+	menu label Modo seguro - KDE (fail-safe)
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE_FAILSAFE@

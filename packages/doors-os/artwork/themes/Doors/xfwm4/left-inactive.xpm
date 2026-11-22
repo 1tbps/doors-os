@@ -1,5 +1,8 @@
 /* XPM */
-static char * left_active_xpm[] = {
-"1 1 1 1",
-" 	c #939393",
-" "};
+static char * left_inactive_xpm[] = {
+"2 1 4 1",
+" 	c None",
+".	c #a8a8a8",
+"+	c #FFFFFF",
+"@	c #DEDEDE s active_color_2",
+".."};

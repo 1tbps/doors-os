@@ -3,8 +3,8 @@
 # (perfil "user" + banco "local"). O Doors Aparência troca a cor da borda.
 
 [org/gnome/shell/extensions/rounded-window-corners-reborn]
-# borda de 3 px; na janela ativa, na cor de destaque (azul do Doors)
-border-width=3
+# borda de 2 px (padrão do Doors em todos os ambientes); na janela ativa, na cor de destaque (azul do Doors)
+border-width=2
 # também nos apps do GNOME (libadwaita), para a borda colorida aparecer em todas as janelas
 skip-libadwaita-app=false
 global-rounded-corner-settings={'padding': <{'left': <uint32 1>, 'right': <uint32 1>, 'top': <uint32 1>, 'bottom': <uint32 1>}>, 'keepRoundedCorners': <{'maximized': <false>, 'fullscreen': <false>}>, 'borderRadius': <uint32 12>, 'smoothing': <0>, 'borderColor': <[0.184, 0.471, 0.710, 1.0]>, 'enabled': <true>}

@@ -169,48 +169,15 @@ window.csd:backdrop{n} {{\n  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 2px 6p
     )
 }
 
-/// Canto inferior esquerdo arredondado (6x6) das bordas do xfwm4: "." contorno, "@" fundo.
-const CANTO_XFWM4: [&str; 6] = [".@@@@@", " .@@@@", " .@@@@", "  .@@@", "   ..@", "     ."];
-
-/// Peças de baixo do xfwm4 com cantos arredondados (o xfwm4 recorta a janela pelo
-/// desenho das peças). `fundo` é a linha de cor do preenchimento, ex. "c #3B3E3F".
-/// Devolve (arquivo, conteúdo) para bottom-left, bottom-right e bottom.
-pub fn pecas_inferiores_xfwm4(estado: &str, borda: &str, fundo: &str) -> Vec<(String, String)> {
-    let xpm = |nome: &str, w: usize, linhas: Vec<String>| {
-        let mut t = format!(
-            "/* XPM */\nstatic char * {}_xpm[] = {{\n\"{w} 6 3 1\",\n\" \tc None\",\n\".\tc {borda}\",\n\"@\t{fundo}\",\n",
-            nome.replace('-', "_")
-        );
-        let corpo: Vec<String> = linhas.iter().map(|l| format!("\"{l}\"")).collect();
-        t.push_str(&corpo.join(",\n"));
-        t.push_str("};\n");
-        t
-    };
-    let esq: Vec<String> = CANTO_XFWM4.iter().map(|l| l.to_string()).collect();
-    let dir: Vec<String> = CANTO_XFWM4.iter().map(|l| l.chars().rev().collect()).collect();
-    let baixo: Vec<String> = ["@", "@", "@", "@", "@", "."].iter().map(|l| l.to_string()).collect();
-    vec![
-        (format!("bottom-left-{estado}.xpm"), xpm(&format!("bottom-left-{estado}"), 6, esq)),
-        (format!("bottom-right-{estado}.xpm"), xpm(&format!("bottom-right-{estado}"), 6, dir)),
-        (format!("bottom-{estado}.xpm"), xpm(&format!("bottom-{estado}"), 1, baixo)),
-    ]
-}
-
-/// Cor de preenchimento da barra de título num XPM do xfwm4 (a cor da última linha):
-/// devolve a definição da cor, ex. "c #3B3E3F" ou "c #DEDEDE s active_color_2".
-pub fn fundo_do_titulo_xpm(xpm: &str) -> Option<String> {
-    let linhas: Vec<&str> = xpm.lines().filter(|l| l.trim_start().starts_with('"')).collect();
-    let cab: Vec<usize> = linhas.first()?.trim().trim_matches(|c| c == '"' || c == ',').split_whitespace()
-        .filter_map(|n| n.parse().ok()).collect();
-    let (ncores, cpp) = (*cab.get(2)?, *cab.get(3)?);
-    let ultima = linhas.last()?.trim().trim_start_matches('"');
-    let ch = ultima.get(..cpp)?;
-    linhas.iter().skip(1).take(ncores).find_map(|l| {
-        let l = l.trim().trim_start_matches('"');
-        let resto = l.strip_prefix(ch)?;
-        let def = resto.trim_start_matches(['\t', ' ']).trim_end_matches([',', '"']).trim_end_matches('"');
-        def.starts_with("c ").then(|| def.to_string())
-    })
+/// Bordas do xfwm4 do tema Doors no modo escuro: a linha de brilho da barra de título
+/// passa a usar a cor do fundo e o texto do título fica claro.
+pub fn xfwm4_escuro(texto: &str) -> String {
+    texto
+        .replace("\"+\tc #FFFFFF\"", "\"+\tc #DEDEDE s active_color_2\"")
+        .replace("active_text_color=#686868", "active_text_color=#e8e8e8")
+        .replace("inactive_text_color=#bbbbbb", "inactive_text_color=#9a9a9a")
+        .replace("active_text_shadow_color=#ececec", "active_text_shadow_color=#2a2a2a")
+        .replace("inactive_text_shadow_color=#ececec", "inactive_text_shadow_color=#2a2a2a")
 }
 
 /// Pares (chave, valor) do grupo [Round-Corners] do kwinrc (efeito do pacote
@@ -403,23 +370,11 @@ inactiveBackground=239,240,241\n";
     }
 
     #[test]
-    fn pecas_xfwm4_arredondadas() {
-        let p = pecas_inferiores_xfwm4("active", "#7d54b2", "c #3B3E3F");
-        assert_eq!(p.len(), 3);
-        assert_eq!(p[0].0, "bottom-left-active.xpm");
-        assert!(p[0].1.contains("\"6 6 3 1\""));
-        assert!(p[0].1.contains("\".\tc #7d54b2\""));
-        assert!(p[0].1.contains("\"@\tc #3B3E3F\""));
-        assert!(p[1].1.contains("\"@@@@@.\""));
-        assert!(p[2].1.contains("\"1 6 3 1\""));
-    }
-
-    #[test]
-    fn fundo_do_titulo() {
-        let xpm = "/* XPM */\nstatic char * t[] = {\n\"2 3 3 1\",\n\" \tc #1D1F1F\",\n\".\tc #414343\",\n\"+\tc #3B3E3F\",\n\"  \",\n\"..\",\n\"++\"};\n";
-        assert_eq!(fundo_do_titulo_xpm(xpm).as_deref(), Some("c #3B3E3F"));
-        let sim = "\"2 2 2 1\",\n\".\tc #2f78b5\",\n\"@\tc #DEDEDE s active_color_2\",\n\"..\",\n\"@@\"};";
-        assert_eq!(fundo_do_titulo_xpm(sim).as_deref(), Some("c #DEDEDE s active_color_2"));
+    fn xfwm4_no_escuro() {
+        let x = "\"+\tc #FFFFFF\",\nactive_text_color=#686868\n";
+        let e = xfwm4_escuro(x);
+        assert!(e.contains("\"+\tc #DEDEDE s active_color_2\""));
+        assert!(e.contains("active_text_color=#e8e8e8"));
     }
 
     #[test]

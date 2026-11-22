@@ -272,41 +272,33 @@ fn gtk_tema_pessoal(e: &Estado) -> Result<String, String> {
             let _ = std::os::unix::fs::symlink(origem.join(sub), destino.join(sub));
         }
     }
-    // xfwm4: no modo claro copia o do tema Doors (cantos de baixo já arredondados);
-    // no escuro, o do Greybird-dark com as peças de baixo refeitas arredondadas.
-    // Nos dois, o contorno das peças ativas ganha a cor de destaque.
+    // xfwm4: copia as bordas do tema Doors (contorno de 2 px, 4 cantos arredondados) e pinta o
+    // contorno das peças ativas na cor de destaque. O fundo das peças vem do tema GTK
+    // ("active_color_2"); no escuro, tira a linha de brilho branca e clareia o título.
     let doors_xf = Path::new("/usr/share/themes/Doors/xfwm4");
-    let xf_origem = if e.modo == Modo::Claro && doors_xf.is_dir() { doors_xf.to_path_buf() } else { origem.join("xfwm4") };
+    let xf_origem = if doors_xf.is_dir() { doors_xf.to_path_buf() } else { origem.join("xfwm4") };
     if xf_origem.is_dir() {
         let xf = destino.join("xfwm4");
         fs::create_dir_all(&xf).map_err(|err| err.to_string())?;
-        let ler = |arq: &str| fs::read_to_string(xf_origem.join(arq)).ok();
-        let borda = ler("left-active.xpm").and_then(|t| tema::cor_da_borda_xpm(&t));
+        let borda = fs::read_to_string(xf_origem.join("left-active.xpm"))
+            .ok()
+            .and_then(|t| tema::cor_da_borda_xpm(&t));
+        let escuro = e.modo == Modo::Escuro;
         for entrada in fs::read_dir(&xf_origem).map_err(|err| err.to_string())?.flatten() {
             let caminho = entrada.path();
             let nome_arq = entrada.file_name().to_string_lossy().to_string();
             let alvo = xf.join(&nome_arq);
-            match (&borda, nome_arq.ends_with("-active.xpm")) {
-                (Some(b), true) => {
-                    let t = fs::read_to_string(&caminho).map_err(|err| err.to_string())?;
-                    fs::write(&alvo, tema::recolorir_xpm(&t, b, &e.cor.hex())).map_err(|err| err.to_string())?;
+            if nome_arq.ends_with(".xpm") || nome_arq == "themerc" {
+                let mut t = fs::read_to_string(&caminho).map_err(|err| err.to_string())?;
+                if let (Some(b), true) = (&borda, nome_arq.ends_with("-active.xpm")) {
+                    t = tema::recolorir_xpm(&t, b, &e.cor.hex());
                 }
-                _ => {
-                    fs::copy(&caminho, &alvo).map_err(|err| err.to_string())?;
+                if escuro {
+                    t = tema::xfwm4_escuro(&t);
                 }
-            }
-        }
-        if xf_origem != doors_xf {
-            for (estado, borda_cor) in [
-                ("active", Some(e.cor.hex())),
-                ("inactive", ler("left-inactive.xpm").and_then(|t| tema::cor_da_borda_xpm(&t))),
-            ] {
-                let fundo = ler(&format!("title-1-{estado}.xpm")).and_then(|t| tema::fundo_do_titulo_xpm(&t));
-                if let (Some(bc), Some(f)) = (borda_cor, fundo) {
-                    for (arq, conteudo) in tema::pecas_inferiores_xfwm4(estado, &bc, &f) {
-                        fs::write(xf.join(arq), conteudo).map_err(|err| err.to_string())?;
-                    }
-                }
+                fs::write(&alvo, t).map_err(|err| err.to_string())?;
+            } else {
+                fs::copy(&caminho, &alvo).map_err(|err| err.to_string())?;
             }
         }
     }
