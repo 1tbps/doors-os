@@ -1,0 +1,218 @@
+#!/bin/bash
+# Doors OS — coloca este computador num domínio Windows (Active Directory) usando o winbind.
+#   doors-entrar-dominio           entra no domínio (pergunta tudo)
+#   doors-entrar-dominio --estado  mostra se está no domínio e se a ligação funciona
+#   doors-entrar-dominio --sair    sai do domínio e volta só para os usuários locais
+# Depois do ingresso: login com o usuário da rede (sem o domínio na frente), pasta pessoal
+# criada no primeiro login em /home/<DOMINIO>/<usuario>, login sem rede (cache) e,
+# se escolhidas, pastas da rede montadas no login em ~/Rede/<pasta>.
+set -eu
+
+if [ "$(id -u)" != 0 ]; then
+  exec sudo "$0" "$@"
+fi
+
+ORIG=.doors-orig   # cópia dos arquivos originais (para --sair)
+ARQUIVOS="/etc/samba/smb.conf /etc/krb5.conf /etc/security/pam_winbind.conf /etc/security/pam_mount.conf.xml"
+
+perguntar() {  # perguntar "texto" "padrão" -> resposta
+  local r
+  if [ -n "$2" ]; then
+    read -r -p "$1 [$2]: " r || true
+    echo "${r:-$2}"
+  else
+    read -r -p "$1: " r || true
+    echo "$r"
+  fi
+}
+
+pausa() {  # mantém o terminal aberto quando foi aberto pelo menu
+  read -r -p "Tecle Enter para fechar." _ || true
+}
+
+falha() {
+  echo
+  echo "ERRO: $*" >&2
+  pausa
+  exit 1
+}
+
+guardar_originais() {
+  for f in $ARQUIVOS; do
+    if [ -f "$f" ] && [ ! -f "$f$ORIG" ]; then cp -a "$f" "$f$ORIG"; fi
+  done
+}
+
+estado() {
+  if ! grep -qE '^passwd:.*winbind' /etc/nsswitch.conf; then
+    echo "Este computador não está em nenhum domínio."
+    return 0
+  fi
+  echo "Domínio: $(sed -n 's/^[[:space:]]*realm = //p' /etc/samba/smb.conf)"
+  if wbinfo -t >/dev/null 2>&1; then
+    echo "Ligação com o servidor: OK"
+  else
+    echo "Ligação com o servidor: FALHOU (sem rede? relógio errado?)"
+  fi
+  net ads info 2>/dev/null | grep -E '^(LDAP server name|Realm|Server time)' || true
+}
+
+sair() {
+  local admin
+  echo "== Sair do domínio =="
+  admin=$(perguntar "Usuário administrador do domínio (Enter para só desligar aqui)" "")
+  if [ -n "$admin" ]; then
+    net ads leave -U "$admin" || echo "Aviso: não consegui remover o computador do servidor; só desligando aqui."
+  fi
+  systemctl disable --now winbind.service 2>/dev/null || true
+  sed -i -E '/^(passwd|group|shadow):/s/ winbind//' /etc/nsswitch.conf
+  pam-auth-update --package --disable winbind mkhomedir
+  for f in $ARQUIVOS; do
+    if [ -f "$f$ORIG" ]; then mv -f "$f$ORIG" "$f"; fi
+  done
+  rm -f /etc/sudoers.d/doors-dominio /etc/systemd/timesyncd.conf.d/doors-dominio.conf
+  echo "Pronto: só os usuários locais entram neste computador."
+}
+
+entrar() {
+  local dominio realm grupo admin pasta sudo_grupo nome servidor caminho volumes=""
+  echo "== Entrar num domínio Windows (Active Directory) =="
+  echo "Antes: este computador precisa usar o servidor do domínio como DNS."
+  echo
+  dominio=$(perguntar "Domínio (ex.: empresa.local)" "")
+  dominio=$(echo "$dominio" | tr 'A-Z' 'a-z' | tr -d ' ')
+  [ -n "$dominio" ] || falha "domínio vazio"
+  realm=$(echo "$dominio" | tr 'a-z' 'A-Z')
+
+  echo "Procurando $dominio..."
+  getent ahosts "$dominio" >/dev/null 2>&1 ||
+    falha "não encontrei $dominio. Confira se o DNS deste computador é o servidor do domínio (Configurações de rede)."
+
+  grupo=$(perguntar "Nome NetBIOS do domínio (o que vem antes da barra em DOMINIO\\usuario)" "$(echo "${realm%%.*}" | cut -c1-15)")
+  grupo=$(echo "$grupo" | tr 'a-z' 'A-Z')
+
+  nome=$(hostname -s)
+  if [ "${#nome}" -gt 15 ]; then
+    falha "o nome deste computador ($nome) tem mais de 15 letras; o Windows não aceita. Troque com: sudo hostnamectl set-hostname NOVO-NOME"
+  fi
+
+  admin=$(perguntar "Usuário administrador do domínio (para o ingresso)" "administrador")
+
+  echo
+  echo "Pastas da rede para abrir em ~/Rede no login (ex.: //servidor/publico)."
+  while :; do
+    pasta=$(perguntar "Pasta (Enter para terminar)" "")
+    [ -n "$pasta" ] || break
+    pasta=$(echo "$pasta" | tr '\\' '/')
+    pasta="//${pasta#//}"
+    servidor=$(echo "$pasta" | cut -d/ -f3)
+    caminho=$(echo "$pasta" | cut -d/ -f4-)
+    if [ -z "$servidor" ] || [ -z "$caminho" ]; then
+      echo "  formato: //servidor/pasta"
+      continue
+    fi
+    volumes="$volumes<volume fstype=\"cifs\" server=\"$servidor\" path=\"$caminho\" mountpoint=\"~/Rede/$(basename "$caminho")\" options=\"vers=3.0,domain=$grupo,uid=%(USERUID),gid=%(USERGID),file_mode=0700,dir_mode=0700\" uid=\"10000-2147483647\" />
+"
+  done
+
+  sudo_grupo=$(perguntar "Grupo do domínio que pode administrar este computador (sudo; ex.: domain admins; Enter para nenhum)" "")
+
+  echo
+  echo "Configurando..."
+  guardar_originais
+
+  # relógio pelo servidor do domínio (Kerberos recusa diferença de mais de 5 minutos)
+  mkdir -p /etc/systemd/timesyncd.conf.d
+  printf '[Time]\nNTP=%s\n' "$dominio" > /etc/systemd/timesyncd.conf.d/doors-dominio.conf
+  timedatectl set-ntp true 2>/dev/null || true
+  systemctl restart systemd-timesyncd.service 2>/dev/null || true
+
+  cat > /etc/krb5.conf <<EOF
+# Doors OS (doors-entrar-dominio)
+[libdefaults]
+	default_realm = $realm
+	dns_lookup_realm = false
+	dns_lookup_kdc = true
+	rdns = false
+EOF
+
+  cat > /etc/samba/smb.conf <<EOF
+# Doors OS (doors-entrar-dominio): membro do domínio $realm pelo winbind
+[global]
+	workgroup = $grupo
+	realm = $realm
+	security = ads
+	kerberos method = secrets and keytab
+	dedicated keytab file = /etc/krb5.keytab
+	# mesmos UID/GID em todos os computadores (calculados do RID do AD)
+	idmap config * : backend = tdb
+	idmap config * : range = 3000-7999
+	idmap config $grupo : backend = rid
+	idmap config $grupo : range = 10000-999999
+	template shell = /bin/bash
+	template homedir = /home/%D/%U
+	winbind use default domain = yes
+	winbind offline logon = yes
+	winbind refresh tickets = yes
+	winbind enum users = no
+	winbind enum groups = no
+	client min protocol = SMB2
+	log file = /var/log/samba/log.%m
+	max log size = 1000
+EOF
+
+  cat > /etc/security/pam_winbind.conf <<'EOF'
+# Doors OS (doors-entrar-dominio)
+[global]
+	krb5_auth = yes
+	krb5_ccache_type = FILE
+	cached_login = yes
+EOF
+
+  if [ -n "$volumes" ] && [ -f /etc/security/pam_mount.conf.xml ]; then
+    # insere os volumes antes de </pam_mount> (a cópia original fica em .doors-orig)
+    cp -a "/etc/security/pam_mount.conf.xml$ORIG" /etc/security/pam_mount.conf.xml
+    awk -v v="$volumes" '/<\/pam_mount>/ { printf "%s", v } { print }' \
+      "/etc/security/pam_mount.conf.xml$ORIG" > /etc/security/pam_mount.conf.xml
+  fi
+
+  echo
+  echo "Ingressando no domínio $realm (digite a senha de $admin)..."
+  net ads join -U "$admin" || falha "o ingresso falhou. Confira o usuário, a senha, o DNS e o relógio."
+
+  sed -i -E '/^(passwd|group):/{/winbind/!s/$/ winbind/}' /etc/nsswitch.conf
+  pam-auth-update --package --enable winbind mkhomedir
+  mkdir -p "/home/$grupo"
+  systemctl enable winbind.service
+  systemctl restart winbind.service
+
+  if [ -n "$sudo_grupo" ]; then
+    printf '%%%s ALL=(ALL:ALL) ALL\n' "$(echo "$sudo_grupo" | sed 's/ /\\ /g')" > /etc/sudoers.d/doors-dominio
+    chmod 0440 /etc/sudoers.d/doors-dominio
+    visudo -cf /etc/sudoers.d/doors-dominio >/dev/null || { rm -f /etc/sudoers.d/doors-dominio; echo "Aviso: grupo do sudo inválido, ignorado."; }
+  fi
+
+  echo "Conferindo..."
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    wbinfo -t >/dev/null 2>&1 && break
+    sleep 1
+  done
+  wbinfo -t >/dev/null 2>&1 || falha "o computador entrou no domínio, mas o winbind não conversa com o servidor."
+  if getent passwd "$admin" >/dev/null; then
+    echo "OK: usuários do domínio reconhecidos (ex.: $(getent passwd "$admin" | cut -d: -f1,6))."
+  else
+    echo "Aviso: ainda não vejo o usuário $admin; pode levar alguns segundos."
+  fi
+  echo
+  echo "Pronto! Saia da sessão (ou reinicie) e entre com o usuário da rede."
+  echo "Na tela de login, se o usuário não aparecer na lista, escolha \"Outro...\" e digite o nome."
+}
+
+case "${1:-}" in
+  --estado) estado ;;
+  --sair)   sair ;;
+  "")       entrar ;;
+  *) echo "uso: $0 [--estado|--sair]" >&2; exit 1 ;;
+esac
+[ -t 0 ] && pausa
+exit 0

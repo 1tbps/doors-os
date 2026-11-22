@@ -12,3 +12,16 @@ for f in "$O"/kf5-*.directory; do
   [ -f "$f" ] || continue
   sed 's/^\(Icon=.*\)-symbolic$/\1/' "$f" > "$D/$(basename "$f")"
 done
+
+# Bandeja do Plasma: ícones de status (rede, Bluetooth, bateria...) monocromáticos, como o volume
+# e as notificações. O tema Doors herda o elementary-xfce, cujos ícones de status são coloridos.
+# Cópias dos ícones de status do Breeze escuro (o Plasma recolore pela classe ColorScheme-Text);
+# só no KDE (este diretório só entra no XDG_DATA_DIRS do Plasma): no XFCE os mesmos ícones
+# aparecem em menus claros e sumiriam.
+O=/usr/share/icons/breeze-dark/status/22
+D=/usr/share/doors/kde-menu/icons/Doors/status/22
+rm -rf /usr/share/doors/kde-menu/icons
+if [ -d "$O" ]; then
+  mkdir -p "$D"
+  cp -L "$O"/*.svg "$D/" 2>/dev/null || true  # links quebrados do Breeze não impedem o resto
+fi

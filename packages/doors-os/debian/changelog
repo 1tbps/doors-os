@@ -1,3 +1,21 @@
+doors-os (0.4~dev14) trixie; urgency=medium
+
+  * KDE: todos os ícones de status da bandeja (rede, Bluetooth, bateria,
+    área de transferência...) monocromáticos, do Breeze escuro.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sun, 22 Nov 2026 13:00:00 -0300
+
+doors-os (0.4~dev13) trixie; urgency=medium
+
+  * XFCE: barra de título com o mesmo degradê dos botões e topo dos botões
+    com contorno de 2 px (os botões apareciam como quadrados mais claros);
+    ícones da bandeja em 24 px, como volume e notificações.
+  * Cinnamon: contorno da janela sem foco cinza sólido de 2 px (antes preto).
+  * KDE: ícones de rede e Bluetooth da bandeja monocromáticos (Breeze escuro,
+    recoloridos pelo Plasma), como o volume e as notificações.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sun, 22 Nov 2026 12:00:00 -0300
+
 doors-os (0.4~dev12) trixie; urgency=medium
 
   * Contorno das janelas com 2 px em todos os ambientes (padrão do Doors):

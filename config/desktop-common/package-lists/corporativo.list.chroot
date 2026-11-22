@@ -1,0 +1,18 @@
+# Doors OS — uso corporativo (rede Windows / Active Directory)
+# domínio pelo winbind: o assistente "Entrar no domínio" (doors-entrar-dominio) configura e liga
+winbind
+libnss-winbind
+libpam-winbind
+samba-common-bin
+krb5-user
+# pastas compartilhadas: abrir pelo gerenciador de arquivos (smb://) e montar no login (pam_mount)
+cifs-utils
+keyutils
+libpam-mount
+smbclient
+gvfs-backends
+# relógio sincronizado com o servidor do domínio (o Kerberos exige)
+systemd-timesyncd
+# scanner: multifuncionais de rede sem driver (eSCL/WSD) + programa de digitalizar
+sane-airscan
+simple-scan

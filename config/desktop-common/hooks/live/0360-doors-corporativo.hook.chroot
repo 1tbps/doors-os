@@ -1,0 +1,9 @@
+#!/bin/sh
+# Uso corporativo: os pacotes do winbind vêm instalados, mas desligados até o computador
+# entrar num domínio (doors-entrar-dominio liga tudo). Assim nada muda fora de uma empresa.
+set -e
+sed -i -E '/^(passwd|group|shadow):/s/ winbind//' /etc/nsswitch.conf
+pam-auth-update --package --disable winbind
+systemctl disable winbind.service 2>/dev/null || true
+! grep -qE '^(passwd|group):.*winbind' /etc/nsswitch.conf
+! grep -q pam_winbind /etc/pam.d/common-auth

@@ -6,10 +6,18 @@ Uso: python3 -I branding/gerar-bordas-xfwm4.py packages/doors-os/artwork/themes/
 Cores das peças (as mesmas do Greybird): " " transparente, "." contorno, "+" brilho
 da barra de título, "@" fundo da barra (cor do tema GTK, "s active_color_2").
 Ativa e inativa têm a mesma espessura (senão a janela "pula" ao ganhar o foco).
+
+Os botões (hide/close/menu...) trazem por cima um PNG com degradê branco; a barra de título
+e os cantos de cima ganham o mesmo degradê (title-*.png, top-*.png), senão os botões viram
+quadrados mais claros. O topo dos botões (contorno + brilho) é ajustado para a espessura T.
 """
+import glob
 import math
 import os
+import re
 import sys
+
+from PIL import Image
 
 X = sys.argv[1]
 R, T = 6, 2  # raio dos cantos e espessura do contorno
@@ -69,6 +77,41 @@ def titulo():
     return [linha_titulo(y) * 2 for y in range(ALTURA_TITULO)]
 
 
+def degrade():
+    """alfa do degradê branco por linha, lido do botão do próprio tema"""
+    im = Image.open(os.path.join(X, "close-active.png")).convert("RGBA")
+    return [im.getpixel((0, y))[3] for y in range(im.size[1])]
+
+
+def png(nome, linhas, alfa):
+    """sobreposição: degradê só onde a peça é barra (brilho/fundo), nunca no contorno"""
+    w, h = len(linhas[0]), len(linhas)
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    for y, l in enumerate(linhas):
+        for x, c in enumerate(l):
+            if c in "+@" and y < len(alfa):
+                im.putpixel((x, y), (255, 255, 255, alfa[y]))
+    im.save(os.path.join(X, nome + ".png"))
+
+
+def topo_dos_botoes(arq, borda):
+    """linhas 0..T-1 = contorno, linha T = brilho, como na barra de título"""
+    t = open(arq).read()
+    # "`" e "|" não aparecem em nenhum botão do Greybird; sobram de uma geração anterior
+    t, extras = re.subn(r'"[`|]\tc [^"]*",\n', "", t)
+    cab = re.search(r'"(\d+) (\d+) (\d+) 1"', t)
+    w, h, n = map(int, cab.groups())
+    n -= extras
+    t = t.replace(cab.group(0), f'"{w} {h} {n + 2} 1",\n"`\tc {borda}",\n"|\tc #FFFFFF"', 1)
+    linhas = re.findall(r'^("[^"]*")', t, re.M)  # cabeçalho, paleta, pixels
+    ini = len(linhas) - h
+    novas = ["`" * w] * T + ["|" * w] + [l.strip('"') for l in linhas[ini + T + 1:]]
+    t = t[:t.index(linhas[ini], t.index(linhas[ini - 1]) + len(linhas[ini - 1]))]
+    t += ",\n".join(f'"{l}"' for l in novas) + "};\n"
+    open(arq, "w").write(t)
+
+
+ALFA = degrade()
 for estado, borda in CORES.items():
     te = topo_esquerdo()
     be = baixo_esquerdo()
@@ -86,4 +129,10 @@ for estado, borda in CORES.items():
     for nome, linhas in pecas.items():
         with open(os.path.join(X, nome + ".xpm"), "w") as f:
             f.write(xpm(nome, linhas, borda))
+        if nome.startswith(("top-", "title-")):
+            png(nome, linhas, ALFA)
+for arq in sorted(glob.glob(os.path.join(X, "*.xpm"))):
+    nome = os.path.basename(arq)
+    if not nome.startswith(("top-", "bottom", "left-", "right-", "title-")):
+        topo_dos_botoes(arq, CORES["inactive" if "inactive" in nome else "active"])
 print("bordas do xfwm4 geradas")

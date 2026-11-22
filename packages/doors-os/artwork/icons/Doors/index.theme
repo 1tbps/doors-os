@@ -4,7 +4,7 @@ Comment=Ícones do Doors OS (elementary-xfce, os mesmos do Xubuntu)
 Inherits=elementary-xfce-dark,elementary-xfce,breeze,Adwaita,hicolor
 # Precisa de ao menos uma pasta própria: sem "Directories", o Qt (Plasma) considera o tema
 # inválido e cai direto no hicolor, e quase todos os ícones somem no KDE.
-Directories=scalable/apps
+Directories=scalable/apps,status/22
 Example=folder
 
 [scalable/apps]
@@ -13,3 +13,13 @@ MinSize=8
 MaxSize=512
 Type=Scalable
 Context=Applications
+
+# Ícones da bandeja do KDE (rede, Bluetooth): ficam em /usr/share/doors/kde-menu/icons/Doors/
+# status/22 (só no XDG_DATA_DIRS do Plasma; ver /usr/lib/doors/kde-menu-colorido). Nos outros
+# ambientes a pasta não existe e nada muda.
+[status/22]
+Size=22
+MinSize=16
+MaxSize=32
+Type=Scalable
+Context=Status

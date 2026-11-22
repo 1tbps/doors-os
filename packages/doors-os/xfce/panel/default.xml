@@ -76,7 +76,7 @@
     </property>
     <property name="plugin-10" type="string" value="systray">
       <property name="square-icons" type="bool" value="true"/>
-      <property name="icon-size" type="int" value="20"/>
+      <property name="icon-size" type="int" value="24"/>
     </property>
     <property name="plugin-11" type="string" value="pulseaudio">
       <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
