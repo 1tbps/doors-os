@@ -94,15 +94,8 @@ impl Ambiente {
                 let atual = saida("gsettings", &["get", "org.cinnamon", "panels-enabled"])?;
                 gsettings("org.cinnamon", "panels-enabled", &tema::painel_cinnamon(atual.trim(), painel))
             }
-            Ambiente::Xfce => {
-                let ids = saida("xfconf-query", &["-c", "xfce4-panel", "-p", "/panels"])?;
-                let mut algum = false;
-                for id in ids.lines().filter_map(|l| l.trim().parse::<u32>().ok()) {
-                    xfconf("xfce4-panel", &format!("/panels/panel-{id}/position"), tema::painel_xfce(painel))?;
-                    algum = true;
-                }
-                if algum { Ok(()) } else { Err("nenhum painel do XFCE encontrado".into()) }
-            }
+            // painel flutuante do Doors: posição e margem das janelas calculadas pelo script
+            Ambiente::Xfce => executar("doors-painel-flutuante", &[tema::painel_xfce(painel)]),
             Ambiente::Gnome => Err("no GNOME a barra fica no topo, do jeito do GNOME".into()),
             Ambiente::Outro => Err(nao_suportado()),
         }

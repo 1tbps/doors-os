@@ -1,3 +1,10 @@
+doors-aparencia (0.3.5) trixie; urgency=medium
+
+  * XFCE: painel em cima/embaixo pelo doors-painel-flutuante (painel solto da
+    borda, com margem para as janelas maximizadas).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sun, 22 Nov 2026 14:00:00 -0300
+
 doors-aparencia (0.3.4) trixie; urgency=medium
 
   * XFCE: o tema pessoal usa as bordas do Doors (2 px, 4 cantos arredondados)

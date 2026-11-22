@@ -20,3 +20,5 @@ qemu-guest-agent
 pciutils
 # capturador de tela (Print Screen no GNOME, Cinnamon e XFCE; no KDE fica o Spectacle)
 flameshot
+# cópias do sistema (como no Linux Mint): desfazer atualização/configuração que quebrou o sistema
+timeshift

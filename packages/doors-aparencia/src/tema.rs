@@ -285,11 +285,11 @@ pub fn painel_cinnamon(valor: &str, painel: Painel) -> String {
     valor.replace(de, para)
 }
 
-/// XFCE: valor de /panels/panel-N/position (p=8 embaixo, p=6 em cima).
+/// XFCE: argumento do doors-painel-flutuante (embaixo ou em-cima).
 pub fn painel_xfce(painel: Painel) -> &'static str {
     match painel {
-        Painel::Embaixo => "p=8;x=0;y=0",
-        Painel::EmCima => "p=6;x=0;y=0",
+        Painel::Embaixo => "embaixo",
+        Painel::EmCima => "em-cima",
     }
 }
 
@@ -406,7 +406,7 @@ inactiveBackground=239,240,241\n";
     fn paineis() {
         assert_eq!(painel_cinnamon("['1:0:bottom']", Painel::EmCima), "['1:0:top']");
         assert_eq!(painel_cinnamon("['1:0:top', '2:1:top']", Painel::Embaixo), "['1:0:bottom', '2:1:bottom']");
-        assert_eq!(painel_xfce(Painel::EmCima), "p=6;x=0;y=0");
+        assert_eq!(painel_xfce(Painel::EmCima), "em-cima");
     }
 
     #[test]

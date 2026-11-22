@@ -1,0 +1,5 @@
+/* Doors OS (XFCE): painel flutuante com cantos levemente arredondados.
+   O XFCE usa o tema GTK Greybird; esta regra vem do ~/.config/gtk-3.0/gtk.css.
+   A posição solta da borda vem de /usr/bin/doors-painel-flutuante. */
+/* só a janela do painel: ".xfce4-panel" também pega os plugins (o menu ficava arredondado à parte) */
+#XfcePanelWindow { border-radius: 8px; }

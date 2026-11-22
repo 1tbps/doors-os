@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Painel flutuante do Doors
+Comment=Posiciona o painel do XFCE pela resolução da tela
+Exec=/usr/bin/doors-painel-flutuante --vigiar
+OnlyShowIn=XFCE;
+NoDisplay=true
+X-XFCE-Autostart-Override=true

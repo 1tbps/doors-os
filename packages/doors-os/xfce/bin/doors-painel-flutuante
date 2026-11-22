@@ -1,0 +1,51 @@
+#!/bin/sh
+# Doors OS (XFCE): painel flutuante — solto da borda, quase de ponta a ponta, cantos levemente
+# arredondados (gtk.css do tema Doors). O XFCE não tem "flutuante" nativo: o painel fica em
+# posição livre (p=0), calculada pela resolução do monitor principal, e o xfwm4 ganha uma margem
+# para as janelas maximizadas pararem antes do painel.
+# Uso: doors-painel-flutuante [embaixo|em-cima]   (sem argumento: mantém o lado atual)
+#      doors-painel-flutuante --vigiar           (login: posiciona e reposiciona quando a
+#                                                 resolução muda; usado pelo autostart)
+# Também chamado pelo Doors Aparência. Se falhar, o painel fica grudado na borda.
+set -u
+FOLGA=8   # distância do painel até a borda da tela, em px
+P=/panels/panel-1
+q() { xfconf-query -c "$@"; }
+
+geometria() {  # LxA+X+Y do monitor principal (ou do primeiro conectado), sem sondar a tela
+  g=$(xrandr --current 2>/dev/null | awk '/ connected primary [0-9]/ {print $4; exit}')
+  [ -n "$g" ] || g=$(xrandr --current 2>/dev/null | awk '/ connected [0-9]/ {print $3; exit}')
+  echo "$g"
+}
+
+if [ "${1:-}" = --vigiar ]; then
+  "$0"
+  antes=$(geometria)
+  while sleep 3; do
+    agora=$(geometria)
+    if [ -n "$agora" ] && [ "$agora" != "$antes" ]; then "$0"; antes=$agora; fi
+  done
+fi
+
+lado=${1:-}
+if [ -z "$lado" ]; then
+  [ "$(q xfwm4 -p /general/margin_top 2>/dev/null || echo 0)" -gt 0 ] && lado=em-cima || lado=embaixo
+fi
+
+geo=$(geometria)
+case "$geo" in *x*+*+*) ;; *) echo "doors-painel-flutuante: resolução não encontrada" >&2; exit 1 ;; esac
+L=${geo%%x*}; r=${geo#*x}; A=${r%%+*}; r=${r#*+}; OX=${r%%+*}; OY=${r#*+}
+
+alt=$(q xfce4-panel -p $P/size 2>/dev/null || echo 38)
+x=$((OX + L / 2))
+margem=$((alt + 2 * FOLGA))
+if [ "$lado" = em-cima ]; then
+  y=$((OY + FOLGA + alt / 2)); topo=$margem; baixo=0
+else
+  y=$((OY + A - FOLGA - alt / 2)); topo=0; baixo=$margem
+fi
+
+q xfce4-panel -p $P/position -t string -s "p=0;x=$x;y=$y" --create
+q xfce4-panel -p $P/position-locked -t bool -s true --create
+q xfwm4 -p /general/margin_top -t int -s $topo --create
+q xfwm4 -p /general/margin_bottom -t int -s $baixo --create

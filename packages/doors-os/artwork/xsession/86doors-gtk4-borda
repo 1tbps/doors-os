@@ -1,11 +1,20 @@
 # Doors OS (Cinnamon e XFCE): contorno colorido também nos apps GTK 4 com barra própria
 # (Calculadora, Arquivos e outros apps do GNOME). Cria ~/.config/gtk-4.0/gtk.css se não
 # existir; o Doors Aparência troca a cor. No KDE e no GNOME a borda vem de outro jeito.
+# No XFCE também cria ~/.config/gtk-3.0/gtk.css com os cantos do painel flutuante.
 case "${DESKTOP_SESSION:-}" in
   cinnamon*|xfce*)
     _f="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/gtk.css"
     if [ ! -e "$_f" ] && [ -r /usr/share/doors/gtk4-borda.css ]; then
       mkdir -p "$(dirname "$_f")" && cp /usr/share/doors/gtk4-borda.css "$_f" 2>/dev/null || true
     fi
+    # XFCE: cantos arredondados do painel flutuante (o XFCE usa o tema GTK Greybird)
+    _f="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-3.0/gtk.css"
+    case "${DESKTOP_SESSION:-}" in
+      xfce*)
+        if [ ! -e "$_f" ] && [ -r /usr/share/doors/xfce-painel.css ]; then
+          mkdir -p "$(dirname "$_f")" && cp /usr/share/doors/xfce-painel.css "$_f" 2>/dev/null || true
+        fi ;;
+    esac
     unset _f ;;
 esac

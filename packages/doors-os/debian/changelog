@@ -1,3 +1,19 @@
+doors-os (0.4~dev16) trixie; urgency=medium
+
+  * XFCE: cantos do painel flutuante pelo ~/.config/gtk-3.0/gtk.css (o XFCE
+    usa o tema GTK Greybird), só na janela do painel; espaço vazio no início
+    do painel; reposiciona sozinho quando a resolução muda.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sun, 22 Nov 2026 15:00:00 -0300
+
+doors-os (0.4~dev15) trixie; urgency=medium
+
+  * XFCE: painel flutuante (solto 8 px da borda, 99% da largura, cantos de
+    8 px), posicionado pela resolução no login (doors-painel-flutuante), com
+    margem para as janelas maximizadas.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sun, 22 Nov 2026 14:00:00 -0300
+
 doors-os (0.4~dev14) trixie; urgency=medium
 
   * KDE: todos os ícones de status da bandeja (rede, Bluetooth, bateria,
