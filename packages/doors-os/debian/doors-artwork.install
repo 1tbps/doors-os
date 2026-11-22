@@ -13,3 +13,6 @@ scripts/atualizar-papeis-de-parede usr/lib/doors/
 artwork/themes/Doors usr/share/themes/
 artwork/plymouth/doors usr/share/plymouth/themes/
 artwork/doors-logos usr/share/desktop-base/
+artwork/xsession/86doors-gtk4-borda etc/X11/Xsession.d/
+artwork/xsession/gtk4-borda.css usr/share/doors/
+artwork/dconf-profile/user etc/dconf/profile/

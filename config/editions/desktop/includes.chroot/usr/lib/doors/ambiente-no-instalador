@@ -1,0 +1,10 @@
+#!/bin/sh
+# Doors OS — roda na LIVE (Calamares, dontChroot): descobre o ambiente do live
+# (doors.ambiente= no menu de boot; padrão KDE) e executa escolher-ambiente no sistema instalado.
+set -u
+A=$(sed -n 's/.*doors\.ambiente=\([a-z]*\).*/\1/p' /proc/cmdline)
+case "$A" in kde|cinnamon|xfce|gnome) ;; *) A=kde ;; esac
+T=$(mount | grep proc | grep calamares | awk '{print $3}' | sed -e "s#/proc##g" | head -1)
+[ -n "$T" ] || { echo "doors: sistema instalado não encontrado"; exit 1; }
+echo "Doors OS: instalando o ambiente $A"
+exec chroot "$T" /usr/lib/doors/escolher-ambiente "$A"

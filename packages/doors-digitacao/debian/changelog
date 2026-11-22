@@ -1,3 +1,13 @@
+doors-digitacao (0.2.0) trixie; urgency=medium
+
+  * Área do texto com 5 linhas fixas (o texto não "remexe" a cada tecla) e
+    dois modos: linha fixa (linha atual no meio) ou rolagem.
+  * Quando errar: parar no erro (padrão) ou seguir no erro; o caractere
+    atual fica vermelho depois de um erro.
+  * Preferências na página "Teclado e preferências". Ícone próprio.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 22:00:00 -0300
+
 doors-digitacao (0.1.1) trixie; urgency=medium
 
   * Primeira versão (0.1.1: rótulo Shift no teclado e dica do espaço): lições, teclado na tela, teste de velocidade, jogo de

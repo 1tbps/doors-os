@@ -20,13 +20,17 @@ pub struct Sessao {
     fim: Option<Instant>,
     /// limite de tempo (testes de velocidade)
     pub limite: Option<Duration>,
+    /// true: um erro marca o caractere e passa para o próximo; false: para até acertar
+    pub seguir_no_erro: bool,
+    /// a última tecla foi um erro (para destacar o caractere atual)
+    pub errou_agora: bool,
 }
 
 impl Sessao {
     pub fn nova(texto: &str, limite: Option<Duration>) -> Sessao {
         let alvo: Vec<char> = texto.chars().collect();
         let n = alvo.len();
-        Sessao { alvo, pos: 0, erros: 0, teclas: 0, errou: vec![false; n], inicio: None, fim: None, limite }
+        Sessao { alvo, pos: 0, erros: 0, teclas: 0, errou: vec![false; n], inicio: None, fim: None, limite, seguir_no_erro: false, errou_agora: false }
     }
 
     pub fn terminou(&self) -> bool {
@@ -42,7 +46,8 @@ impl Sessao {
         self.alvo.get(self.pos).copied()
     }
 
-    /// O cursor só avança com o caractere certo; cada erro conta.
+    /// Parar no erro: o cursor só avança com o caractere certo. Seguir no erro: o erro fica
+    /// marcado e o cursor avança. Nos dois casos cada erro conta na precisão.
     pub fn digitar(&mut self, c: char) -> Resultado {
         if self.terminou() {
             return Resultado::Fim;
@@ -55,6 +60,7 @@ impl Sessao {
         }
         self.teclas += 1;
         if Some(c) == self.esperado() {
+            self.errou_agora = false;
             self.pos += 1;
             if self.pos >= self.alvo.len() {
                 self.fim = Some(agora);
@@ -65,6 +71,14 @@ impl Sessao {
             self.erros += 1;
             if let Some(e) = self.errou.get_mut(self.pos) {
                 *e = true;
+            }
+            self.errou_agora = true;
+            if self.seguir_no_erro {
+                self.pos += 1;
+                if self.pos >= self.alvo.len() {
+                    self.fim = Some(agora);
+                    return Resultado::Fim;
+                }
             }
             Resultado::Errado
         }
@@ -116,6 +130,30 @@ impl Sessao {
     }
 }
 
+/// Quebra o texto em linhas de até `largura` caracteres sem cortar palavras: devolve
+/// (início, fim) de cada linha; o espaço que separa fica no fim da linha.
+pub fn quebrar(alvo: &[char], largura: usize) -> Vec<(usize, usize)> {
+    let mut linhas = Vec::new();
+    let mut ini = 0;
+    while ini < alvo.len() {
+        let mut fim = (ini + largura).min(alvo.len());
+        if fim < alvo.len() {
+            // volta até o último espaço da linha (se houver)
+            if let Some(k) = (ini..fim).rev().find(|&k| alvo[k] == ' ') {
+                fim = k + 1;
+            }
+        }
+        linhas.push((ini, fim));
+        ini = fim;
+    }
+    linhas
+}
+
+/// Linha onde está a posição `pos` (a última, se estiver no fim).
+pub fn linha_de(linhas: &[(usize, usize)], pos: usize) -> usize {
+    linhas.iter().position(|&(a, b)| pos >= a && pos < b).unwrap_or(linhas.len().saturating_sub(1))
+}
+
 pub fn calcular_ppm(certos: usize, segundos: f64) -> f64 {
     if segundos < 1.0 { 0.0 } else { certos as f64 / 5.0 / (segundos / 60.0) }
 }
@@ -155,6 +193,30 @@ mod testes {
         assert_eq!(s.teclas, 3);
         assert!((s.precisao() - 66.66).abs() < 0.1);
         assert_eq!(s.digitar('c'), Resultado::Fim);
+    }
+
+    #[test]
+    fn seguir_no_erro() {
+        let mut s = Sessao::nova("abc", None);
+        s.seguir_no_erro = true;
+        assert_eq!(s.digitar('x'), Resultado::Errado);
+        assert_eq!(s.pos, 1);
+        assert!(s.errou[0] && s.errou_agora);
+        assert_eq!(s.digitar('b'), Resultado::Certo);
+        assert!(!s.errou_agora);
+        assert_eq!(s.digitar('z'), Resultado::Fim);
+        assert_eq!(s.erros, 2);
+    }
+
+    #[test]
+    fn linhas_sem_cortar_palavras() {
+        let t: Vec<char> = "abc def ghi jkl".chars().collect();
+        let l = quebrar(&t, 8);
+        assert_eq!(l, vec![(0, 8), (8, 15)]);
+        assert_eq!(linha_de(&l, 9), 1);
+        assert_eq!(linha_de(&l, 15), 1);
+        let longo: Vec<char> = "abcdefghij".chars().collect();
+        assert_eq!(quebrar(&longo, 4), vec![(0, 4), (4, 8), (8, 10)]);
     }
 
     #[test]

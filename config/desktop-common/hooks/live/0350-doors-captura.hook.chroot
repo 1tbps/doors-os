@@ -1,0 +1,8 @@
+#!/bin/sh
+# XFCE: tecla Print Screen abre o Flameshot (capturar, anotar, desfocar, copiar).
+# Alt+Print e Shift+Print continuam com o capturador do XFCE.
+set -e
+F=/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+[ -f "$F" ] && [ -x /usr/bin/flameshot ] || exit 0
+sed -i 's#<property name="Print" type="string" value="xfce4-screenshooter"/>#<property name="Print" type="string" value="flameshot gui"/>#' "$F"
+grep -q 'name="Print" type="string" value="flameshot gui"' "$F"

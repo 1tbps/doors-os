@@ -1,3 +1,18 @@
+doors-os (0.4~dev9) trixie; urgency=medium
+
+  * Instalador: instala o ambiente escolhido no menu de boot (sem perguntar
+    de novo) e aceita senhas curtas.
+  * KDE: categorias do menu com ícones coloridos.
+  * Cinnamon: contorno da janela ativa sem brilho e sem arredondamento
+    extra (faixas pretas ao abrir e conteúdo "furando" a borda).
+  * GNOME: borda das janelas com 3 px.
+  * Cinnamon e XFCE: contorno colorido também nos apps GTK 4 com barra
+    própria (Calculadora, Arquivos...).
+  * Flameshot na tecla Print Screen (GNOME, Cinnamon, XFCE); KDE: Spectacle.
+  * O perfil dconf do Doors passa para o doors-artwork.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 22:30:00 -0300
+
 doors-os (0.4~dev8) trixie; urgency=medium
 
   * doors-artwork: tema de ícones "Doors" com uma pasta própria; sem ela o

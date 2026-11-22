@@ -22,7 +22,9 @@ Description: identificação do sistema Doors OS
 
 Package: doors-artwork
 Architecture: all
-Depends: ${misc:Depends}, desktop-base
+Depends: ${misc:Depends}, desktop-base, dconf-cli
+Breaks: doors-gnome-settings (<< 0.4~dev9)
+Replaces: doors-gnome-settings (<< 0.4~dev9)
 Recommends: elementary-xfce-icon-theme, greybird-gtk-theme, plasma-workspace-wallpapers, gnome-backgrounds
 Description: tema visual do Doors OS
  Papéis de parede, tela de bloqueio, fundo de login e GRUB do Doors OS,
@@ -53,7 +55,7 @@ Description: aparência padrão do Doors OS para o KDE Plasma
 
 Package: doors-cinnamon-settings
 Architecture: all
-Depends: ${misc:Depends}, doors-artwork, cinnamon, greybird-gtk-theme,
+Depends: ${misc:Depends}, doors-artwork, dconf-cli, cinnamon, greybird-gtk-theme,
  elementary-xfce-icon-theme, fonts-noto-core
 Recommends: plasma-workspace-wallpapers, gnome-backgrounds
 Description: aparência padrão do Doors OS para o Cinnamon

@@ -25,6 +25,10 @@ pub struct Progresso {
     pub recorde_jogo: u32,
     /// layout escolhido à mão ("" = automático)
     pub layout: String,
+    /// como o texto se move: "fixa" (linha atual sempre no meio) ou "rolagem"
+    pub texto_modo: String,
+    /// "parar" (só avança com o caractere certo) ou "seguir" (marca o erro e avança)
+    pub erro_modo: String,
 }
 
 impl Progresso {
@@ -46,6 +50,8 @@ impl Progresso {
                 "pontos" => p.pontos = v.trim().parse().unwrap_or(0),
                 "jogo" => p.recorde_jogo = v.trim().parse().unwrap_or(0),
                 "layout" => p.layout = v.trim().to_string(),
+                "texto" => p.texto_modo = v.trim().to_string(),
+                "erro" => p.erro_modo = v.trim().to_string(),
                 "teste" => {
                     let partes: Vec<&str> = v.split(',').collect();
                     if partes.len() == 3 {
@@ -62,7 +68,10 @@ impl Progresso {
 
     pub fn para_texto(&self) -> String {
         let mut s = String::from("# Doors Digitação\n");
-        s.push_str(&format!("pontos={}\njogo={}\nlayout={}\n", self.pontos, self.recorde_jogo, self.layout));
+        s.push_str(&format!(
+            "pontos={}\njogo={}\nlayout={}\ntexto={}\nerro={}\n",
+            self.pontos, self.recorde_jogo, self.layout, self.texto_modo, self.erro_modo
+        ));
         for (i, r) in self.licoes.iter().enumerate() {
             if r.estrelas > 0 || r.ppm > 0 {
                 s.push_str(&format!("licao.{i}={},{},{}\n", r.estrelas, r.ppm, r.precisao));
@@ -163,11 +172,14 @@ mod testes {
         p.registrar_teste(Teste { data: "21/11/2026".into(), ppm: 30, precisao: 97 }, 150);
         p.recorde_jogo = 420;
         p.layout = "us-intl".into();
+        p.texto_modo = "rolagem".into();
+        p.erro_modo = "seguir".into();
         let q = Progresso::de_texto(&p.para_texto());
         assert_eq!(q.resultado(2), Resultado { estrelas: 2, ppm: 18, precisao: 96 });
         assert_eq!(q.testes.len(), 1);
         assert_eq!(q.recorde_jogo, 420);
         assert_eq!(q.layout, "us-intl");
+        assert_eq!((q.texto_modo.as_str(), q.erro_modo.as_str()), ("rolagem", "seguir"));
         assert_eq!(q.pontos, 300 + 300);
     }
 

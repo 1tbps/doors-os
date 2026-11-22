@@ -1,0 +1,11 @@
+# Doors OS (Cinnamon e XFCE): contorno colorido também nos apps GTK 4 com barra própria
+# (Calculadora, Arquivos e outros apps do GNOME). Cria ~/.config/gtk-4.0/gtk.css se não
+# existir; o Doors Aparência troca a cor. No KDE e no GNOME a borda vem de outro jeito.
+case "${DESKTOP_SESSION:-}" in
+  cinnamon*|xfce*)
+    _f="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/gtk.css"
+    if [ ! -e "$_f" ] && [ -r /usr/share/doors/gtk4-borda.css ]; then
+      mkdir -p "$(dirname "$_f")" && cp /usr/share/doors/gtk4-borda.css "$_f" 2>/dev/null || true
+    fi
+    unset _f ;;
+esac

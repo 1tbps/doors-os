@@ -1,0 +1,14 @@
+#!/bin/sh
+# Doors OS (KDE): cópias das categorias do menu (kf5-*.directory) com ícones coloridos.
+# O KDE pede a versão "-symbolic" (monocromática) dos ícones; o Doors usa a colorida do mesmo
+# tema. As cópias ficam em /usr/share/doors/kde-menu (vem antes no XDG_DATA_DIRS do Plasma,
+# ver /etc/xdg/plasma-workspace/env/doors-menu.sh). Regerado quando o KDE atualiza os originais.
+set -e
+O=/usr/share/desktop-directories
+D=/usr/share/doors/kde-menu/desktop-directories
+mkdir -p "$D"
+find "$D" -maxdepth 1 -name 'kf5-*.directory' -delete
+for f in "$O"/kf5-*.directory; do
+  [ -f "$f" ] || continue
+  sed 's/^\(Icon=.*\)-symbolic$/\1/' "$f" > "$D/$(basename "$f")"
+done

@@ -18,3 +18,5 @@ spice-vdagent
 qemu-guest-agent
 # detecção de placa NVIDIA (software de terceiros)
 pciutils
+# capturador de tela (Print Screen no GNOME, Cinnamon e XFCE; no KDE fica o Spectacle)
+flameshot

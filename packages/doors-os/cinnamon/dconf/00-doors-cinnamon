@@ -1,0 +1,11 @@
+# Doors OS (Cinnamon): Print Screen abre o Flameshot (capturar, anotar, desfocar, copiar)
+[org/cinnamon/desktop/keybindings/media-keys]
+screenshot=@as []
+
+[org/cinnamon/desktop/keybindings]
+custom-list=['doors-flameshot']
+
+[org/cinnamon/desktop/keybindings/custom-keybindings/doors-flameshot]
+name='Flameshot'
+command='flameshot gui'
+binding=['Print']

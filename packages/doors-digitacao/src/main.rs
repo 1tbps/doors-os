@@ -18,6 +18,9 @@ use std::time::Duration;
 use teclado::{Layout, Passo};
 
 const ID: &str = "org.doors.Digitacao";
+/// caracteres por linha e linhas visíveis na área do texto
+const LARGURA_LINHA: usize = 52;
+const LINHAS_VISIVEIS: usize = 5;
 const DURACOES_TESTE: [(u64, &str); 3] = [(30, "30 segundos"), (60, "1 minuto"), (120, "2 minutos")];
 
 struct App {
@@ -47,7 +50,7 @@ fn estilo() {
     let css = "
         .pagina-titulo { font-size: 1.5em; font-weight: bold; }
         .secao { font-weight: bold; margin-top: 8px; }
-        .texto-treino { font-family: monospace; font-size: 22px; padding: 16px 20px; border-radius: 12px;
+        .texto-treino { font-family: monospace; font-size: 22px; padding: 16px 24px; border-radius: 12px; line-height: 1.5;
                         background: alpha(currentColor, 0.06); }
         .numero-grande { font-size: 2.2em; font-weight: bold; }
         .estrelas { font-size: 1.6em; color: #e0a020; }
@@ -240,6 +243,14 @@ fn treino(app: &Rc<App>, area: &gtk::Box, modo: Modo, voltar: Rc<dyn Fn()>) {
         ),
     };
     let sessao = Rc::new(RefCell::new(Sessao::nova(&texto, limite)));
+    let (rolagem, seguir) = {
+        let p = app.progresso.borrow();
+        (p.texto_modo == "rolagem", p.erro_modo == "seguir")
+    };
+    sessao.borrow_mut().seguir_no_erro = seguir;
+    // texto em linhas fixas (não "remexe" a cada tecla); 5 linhas visíveis
+    let linhas = Rc::new(motor::quebrar(&sessao.borrow().alvo, LARGURA_LINHA));
+    let topo_linha = Rc::new(Cell::new(0usize));
 
     let topo = gtk::Box::new(gtk::Orientation::Horizontal, 12);
     let t = rotulo(&titulo, "pagina-titulo");
@@ -255,11 +266,12 @@ fn treino(app: &Rc<App>, area: &gtk::Box, modo: Modo, voltar: Rc<dyn Fn()>) {
         let extra = if novas.is_empty() { String::new() } else { format!("  Teclas novas: {}", novas.chars().map(|c| c.to_string()).collect::<Vec<_>>().join(" ")) };
         area.append(&rotulo(&format!("{}{}", LICOES[i].descricao, extra), "dim-label"));
     } else {
-        area.append(&rotulo("O tempo começa na primeira tecla. Erros não precisam ser apagados: digite o caractere certo para seguir.", "dim-label"));
+        area.append(&rotulo(if seguir { "O tempo começa na primeira tecla. Quando você erra, o erro fica marcado em vermelho e o texto segue." } else { "O tempo começa na primeira tecla. Quando você erra, o caractere fica vermelho até você digitar o certo." }, "dim-label"));
     }
 
     let quadro = rotulo("", "texto-treino");
     quadro.set_selectable(false);
+    quadro.set_wrap(false);
     quadro.set_halign(gtk::Align::Fill);
     area.append(&quadro);
 
@@ -300,24 +312,49 @@ fn treino(app: &Rc<App>, area: &gtk::Box, modo: Modo, voltar: Rc<dyn Fn()>) {
     }
 
     let atualizar: Rc<dyn Fn()> = {
-        let (s, quadro, v_ppm, v_prec, v_tempo, dica, desenho) =
-            (sessao.clone(), quadro.clone(), v_ppm.clone(), v_prec.clone(), v_tempo.clone(), dica.clone(), desenho.clone());
+        let (s, quadro, v_ppm, v_prec, v_tempo, dica, desenho, linhas, topo_linha) = (
+            sessao.clone(), quadro.clone(), v_ppm.clone(), v_prec.clone(), v_tempo.clone(), dica.clone(), desenho.clone(),
+            linhas.clone(), topo_linha.clone(),
+        );
         Rc::new(move || {
             let s = s.borrow();
-            // janela do texto em volta do cursor
-            let ini = s.pos.saturating_sub(60);
-            let fim = (s.pos + 140).min(s.alvo.len());
+            // 5 linhas: "linha fixa" deixa a linha atual sempre no meio (3ª);
+            // "rolagem" só move o texto quando o cursor chega perto do fim da área
+            let atual = motor::linha_de(&linhas, s.pos);
+            let primeira: isize = if rolagem {
+                let mut t = topo_linha.get();
+                if atual < t {
+                    t = atual;
+                }
+                if atual > t + 3 {
+                    t = atual - 3;
+                }
+                topo_linha.set(t);
+                t as isize
+            } else {
+                atual as isize - 2
+            };
             let mut m = String::new();
-            for k in ini..fim {
-                let c = s.alvo[k];
-                let txt = if c == ' ' && k == s.pos { "␣".to_string() } else { glib::markup_escape_text(&c.to_string()).to_string() };
-                if k < s.pos {
-                    let cor = if s.errou[k] { "#c0393d" } else { "#2e9e5b" };
-                    m.push_str(&format!("<span foreground=\"{cor}\">{txt}</span>"));
-                } else if k == s.pos && !s.terminou() {
-                    m.push_str(&format!("<span background=\"#2f78b5\" foreground=\"#ffffff\"><u>{txt}</u></span>"));
-                } else {
-                    m.push_str(&txt);
+            for l in primeira..primeira + LINHAS_VISIVEIS as isize {
+                if l > primeira {
+                    m.push('\n');
+                }
+                let Some(&(a, b)) = (l >= 0).then(|| linhas.get(l as usize)).flatten() else {
+                    m.push('\u{00a0}');
+                    continue;
+                };
+                for k in a..b {
+                    let c = s.alvo[k];
+                    let txt = if c == ' ' && k == s.pos { "␣".to_string() } else { glib::markup_escape_text(&c.to_string()).to_string() };
+                    if k < s.pos {
+                        let cor = if s.errou[k] { "#c0393d" } else { "#2e9e5b" };
+                        m.push_str(&format!("<span foreground=\"{cor}\">{txt}</span>"));
+                    } else if k == s.pos && !s.terminou() {
+                        let fundo = if s.errou_agora { "#c0393d" } else { "#2f78b5" };
+                        m.push_str(&format!("<span background=\"{fundo}\" foreground=\"#ffffff\"><u>{txt}</u></span>"));
+                    } else {
+                        m.push_str(&txt);
+                    }
                 }
             }
             quadro.set_markup(&m);
@@ -832,7 +869,7 @@ fn pagina_progresso(app: &Rc<App>) -> gtk::Box {
 }
 
 fn pagina_teclado(app: &Rc<App>, ao_mudar: Rc<dyn Fn()>) -> gtk::Box {
-    let p = pagina("Teclado", "As lições e o teclado na tela seguem o layout do seu teclado. O Doors detecta sozinho, mas você pode escolher outro, por exemplo para treinar para o teclado do trabalho.");
+    let p = pagina("Teclado e preferências", "As lições e o teclado na tela seguem o layout do seu teclado. O Doors detecta sozinho, mas você pode escolher outro, por exemplo para treinar para o teclado do trabalho.");
     let (det, achou) = app.detectado;
     let atual = app.progresso.borrow().layout.clone();
     let mut grupo: Option<gtk::CheckButton> = None;
@@ -889,6 +926,40 @@ fn pagina_teclado(app: &Rc<App>, ao_mudar: Rc<dyn Fn()>) -> gtk::Box {
     p.add_controller(tick);
     p.append(&dica);
     p.append(&desenho);
+    // preferências das lições e dos testes
+    let opcoes = |titulo: &str, chave: fn(&mut Progresso) -> &mut String, itens: [(&'static str, &'static str); 2]| {
+        p.append(&rotulo(titulo, "secao"));
+        let atual = chave(&mut app.progresso.borrow_mut()).clone();
+        let mut grupo: Option<gtk::CheckButton> = None;
+        for (i, (id, nome)) in itens.iter().enumerate() {
+            let b = gtk::CheckButton::with_label(nome);
+            if let Some(g) = grupo.as_ref() {
+                b.set_group(Some(g));
+            }
+            // o primeiro item é o padrão (valor vazio)
+            b.set_active(atual == *id || (i == 0 && atual.is_empty()));
+            let app = app.clone();
+            let id = id.to_string();
+            b.connect_toggled(move |b| {
+                if b.is_active() {
+                    *chave(&mut app.progresso.borrow_mut()) = id.clone();
+                    app.progresso.borrow().salvar();
+                }
+            });
+            p.append(&b);
+            grupo.get_or_insert(b);
+        }
+    };
+    opcoes(
+        "Texto das lições",
+        |p| &mut p.texto_modo,
+        [("fixa", "Linha fixa: a linha que você está digitando fica sempre no meio"), ("rolagem", "Rolagem: o texto sobe quando você chega ao fim da área")],
+    );
+    opcoes(
+        "Quando errar",
+        |p| &mut p.erro_modo,
+        [("parar", "Parar no erro: o caractere fica vermelho até você digitar o certo"), ("seguir", "Seguir no erro: o erro fica marcado em vermelho e o texto continua")],
+    );
     p
 }
 
@@ -900,7 +971,7 @@ fn montar(gapp: &gtk::Application) {
     let janela = gtk::ApplicationWindow::builder()
         .application(gapp)
         .title("Doors Digitação")
-        .icon_name("doors-logo")
+        .icon_name("org.doors.Digitacao")
         .default_width(1100)
         .default_height(760)
         .build();
@@ -938,7 +1009,7 @@ fn montar(gapp: &gtk::Application) {
             }
         })
     };
-    for (id, nome) in [("licoes", "Lições"), ("teste", "Teste de velocidade"), ("jogo", "Jogo"), ("progresso", "Progresso"), ("teclado", "Teclado")] {
+    for (id, nome) in [("licoes", "Lições"), ("teste", "Teste de velocidade"), ("jogo", "Jogo"), ("progresso", "Progresso"), ("teclado", "Teclado e preferências")] {
         let rolagem = gtk::ScrolledWindow::new();
         rolagem.set_hscrollbar_policy(gtk::PolicyType::Never);
         rolagem.set_child(Some(&fazer(id)));
@@ -967,7 +1038,7 @@ fn montar(gapp: &gtk::Application) {
     topo.set_margin_bottom(8);
     topo.set_margin_start(16);
     topo.set_margin_end(16);
-    let logo = gtk::Image::from_icon_name("doors-logo");
+    let logo = gtk::Image::from_icon_name("org.doors.Digitacao");
     logo.set_pixel_size(40);
     let tx = gtk::Box::new(gtk::Orientation::Vertical, 0);
     tx.append(&rotulo("Digitação", "secao"));

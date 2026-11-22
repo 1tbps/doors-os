@@ -176,3 +176,8 @@ Padrões do Dash to Panel via dconf validados na ISO final (0.4~dev5): sem aviso
 - XFCE: o seletor só mostrava 1 papel de parede (xfce-x.svg apontava para a pasta do tema). Agora aponta para /usr/share/backgrounds/doors.
 - Chromium: usa a barra de título e a borda do sistema (perfis novos), para ganhar os cantos arredondados e a borda colorida.
 - Em PCs já instalados: KDE → Ícones "elementary Xfce dark" ou Breeze; XFCE → pasta /usr/share/backgrounds/doors; Chromium → Aparência → "Usar a barra de título e as bordas do sistema".
+
+### 0.4-dev — quarta rodada (2026-11-21, noite): lista de defeitos do teste em PC (Dell OptiPlex 3060, Intel UHD 630, monitor 2560x1440)
+
+Corrigido e validado em VM: instalador instala o ambiente do live (tela "Ambiente gráfico" removida; menu de boot "experimentar e instalar"); senhas curtas aceitas (instalado com "123"); KDE instalado só com KDE; GNOME com borda de 3 px; Cinnamon sem brilho/arredondamento extra no contorno (faixas pretas ao abrir); apps GTK 4 com contorno no XFCE/Cinnamon (~/.config/gtk-4.0/gtk.css); ícones próprios (Aparência = paleta, Digitação = teclado); KDE com categorias do menu coloridas; Doors Digitação 0.2.0 (5 linhas fixas, modos linha fixa/rolagem e parar/seguir no erro); Flameshot na Print Screen (GNOME, Cinnamon, XFCE), Spectacle no KDE.
+Pendente: XFCE "conteúdo furando a borda" não reproduzido em VM (aguardando print do usuário); menu novo do Cinnamon (precisa baixar o menu do linuxmint/cinnamon — aguardando autorização). Faixas pretas do Cinnamon só confirmáveis em PC físico.

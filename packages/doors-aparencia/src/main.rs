@@ -477,7 +477,7 @@ fn montar(gapp: &gtk::Application) {
     let janela = gtk::ApplicationWindow::builder()
         .application(gapp)
         .title("Aparência")
-        .icon_name("doors-logo")
+        .icon_name("org.doors.Aparencia")
         .default_width(1000)
         .default_height(700)
         .build();
@@ -511,7 +511,7 @@ fn montar(gapp: &gtk::Application) {
     topo.set_margin_bottom(8);
     topo.set_margin_start(16);
     topo.set_margin_end(16);
-    let logo = gtk::Image::from_icon_name("doors-logo");
+    let logo = gtk::Image::from_icon_name("org.doors.Aparencia");
     logo.set_pixel_size(40);
     let tx = gtk::Box::new(gtk::Orientation::Vertical, 0);
     tx.append(&rotulo("Aparência", "secao"));

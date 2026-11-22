@@ -27,6 +27,10 @@ if [ "$1" = configure ] && [ -x /usr/sbin/plymouth-set-default-theme ]; then
       fi;;
   esac
 fi
+# padrões do Doors no dconf (perfil "user" + banco "local", ver /etc/dconf/db/local.d)
+if [ "$1" = configure ] && command -v dconf >/dev/null 2>&1; then
+  dconf update || true
+fi
 if [ "$1" = configure ] || [ "$1" = triggered ]; then
   /usr/lib/doors/atualizar-papeis-de-parede || true
   gtk-update-icon-cache -q -f /usr/share/icons/Doors 2>/dev/null || true

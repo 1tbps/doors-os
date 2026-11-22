@@ -1,1 +1,2 @@
 cinnamon/90_doors-cinnamon.gschema.override usr/share/glib-2.0/schemas/
+cinnamon/dconf/00-doors-cinnamon etc/dconf/db/local.d/

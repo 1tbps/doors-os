@@ -1,20 +1,17 @@
 #!/bin/sh
-# ISO única: a live usa o SDDM para abrir qualquer um dos 3 ambientes (escolhido no menu de boot)
+# ISO única: a live usa o SDDM para abrir qualquer um dos 4 ambientes (escolhido no menu de boot)
 set -e
 echo /usr/bin/sddm > /etc/X11/default-display-manager
 ln -sf /usr/lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service
-# Calamares: tela de escolha do ambiente e remoção dos outros; opção de software de terceiros
+# Calamares: instala o ambiente do live (sem perguntar de novo) e oferece software de terceiros
 S=/etc/calamares/settings.conf
-grep -q 'packagechooser@ambiente' $S || python3 - "$S" <<'PY'
+grep -q 'shellprocess@ambiente' $S || python3 - "$S" <<'PY'
 import sys
 p=sys.argv[1]; s=open(p).read()
 inst = """instances:
 - id: ambiente
-  module: packagechooser
-  config: packagechooser-ambiente.conf
-- id: ambiente
-  module: contextualprocess
-  config: contextualprocess-ambiente.conf
+  module: shellprocess
+  config: shellprocess-ambiente.conf
 - id: terceiros
   module: packagechooser
   config: packagechooser-terceiros.conf
@@ -24,11 +21,12 @@ inst = """instances:
 
 """
 s = s.replace("sequence:", inst + "sequence:", 1)
-s = s.replace("  - keyboard\n  - partition\n", "  - keyboard\n  - packagechooser@ambiente\n  - packagechooser@terceiros\n  - partition\n", 1)
-s = s.replace("  - users\n  - displaymanager\n", "  - users\n  - contextualprocess@ambiente\n  - displaymanager\n", 1)
+s = s.replace("  - keyboard\n  - partition\n", "  - keyboard\n  - packagechooser@terceiros\n  - partition\n", 1)
+# mantém só o ambiente do live, antes de configurar o gerenciador de login
+s = s.replace("  - users\n  - displaymanager\n", "  - users\n  - shellprocess@ambiente\n  - displaymanager\n", 1)
 # software de terceiros: depois que o sources.list final existe (sources-final), antes de desmontar
 s = s.replace("  - sources-final\n  - umount\n", "  - sources-final\n  - contextualprocess@terceiros\n  - umount\n", 1)
 open(p,"w").write(s)
 PY
-grep -q 'packagechooser@ambiente' $S && grep -q 'contextualprocess@ambiente' $S \
-  && grep -q 'packagechooser@terceiros' $S && grep -q 'contextualprocess@terceiros' $S
+grep -q 'shellprocess@ambiente' $S && grep -q 'packagechooser@terceiros' $S && grep -q 'contextualprocess@terceiros' $S
+! grep -q 'packagechooser@ambiente' $S

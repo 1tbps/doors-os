@@ -310,6 +310,13 @@ fn gtk_tema_pessoal(e: &Estado) -> Result<String, String> {
             }
         }
     }
+    // apps GTK 4 com barra própria: contorno na cor de destaque (só se o arquivo for do Doors)
+    let g4 = config_usuario().join("gtk-4.0").join("gtk.css");
+    let do_doors = fs::read_to_string(&g4).map(|t| t.contains("Doors OS")).unwrap_or(true);
+    if do_doors {
+        let _ = fs::create_dir_all(g4.parent().unwrap_or(Path::new(".")));
+        let _ = fs::write(&g4, tema::css_gtk4(&e.cor));
+    }
     // remove o tema da geração anterior
     let antigo = if nome.ends_with('A') { "DoorsPessoalB" } else { "DoorsPessoalA" };
     let _ = fs::remove_dir_all(temas.join(antigo));
@@ -323,6 +330,12 @@ fn preferencia_escura(modo: Modo) {
 }
 
 // ------------------------------------------------------------------ utilitários
+
+fn config_usuario() -> PathBuf {
+    std::env::var_os("XDG_CONFIG_HOME")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(std::env::var_os("HOME").unwrap_or_default()).join(".config"))
+}
 
 fn dados_usuario() -> PathBuf {
     std::env::var_os("XDG_DATA_HOME")

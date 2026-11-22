@@ -1,0 +1,8 @@
+/* Doors OS: contorno na janela ativa também nos apps GTK 4 com barra própria.
+   Gerado pelo Doors (o Doors Aparência troca a cor). Apague este arquivo para voltar ao padrão. */
+window.csd:not(.maximized):not(.fullscreen):not(.tiled):not(.tiled-top):not(.tiled-bottom):not(.tiled-left):not(.tiled-right) {
+  box-shadow: 0 0 0 2px #2f78b5, 0 2px 8px 2px rgba(0, 0, 0, 0.35);
+}
+window.csd:backdrop:not(.maximized):not(.fullscreen):not(.tiled):not(.tiled-top):not(.tiled-bottom):not(.tiled-left):not(.tiled-right) {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 2px 6px 2px rgba(0, 0, 0, 0.2);
+}

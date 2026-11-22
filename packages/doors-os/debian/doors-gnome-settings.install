@@ -1,3 +1,2 @@
 gnome/99_doors-gnome.gschema.override usr/share/glib-2.0/schemas/
-gnome/dconf/profile/user etc/dconf/profile/
 gnome/dconf/db/00-doors-gnome etc/dconf/db/local.d/

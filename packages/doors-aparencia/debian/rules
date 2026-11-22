@@ -18,6 +18,7 @@ override_dh_auto_test:
 override_dh_auto_install:
 	install -D -m 755 target/release/doors-aparencia debian/doors-aparencia/usr/bin/doors-aparencia
 	install -D -m 644 data/org.doors.Aparencia.desktop debian/doors-aparencia/usr/share/applications/org.doors.Aparencia.desktop
+	install -D -m 644 data/org.doors.Aparencia.svg debian/doors-aparencia/usr/share/icons/hicolor/scalable/apps/org.doors.Aparencia.svg
 
 override_dh_auto_clean:
 	rm -rf target $(CARGO_HOME) Cargo.lock

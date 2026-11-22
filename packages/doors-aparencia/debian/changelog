@@ -1,3 +1,10 @@
+doors-aparencia (0.3.3) trixie; urgency=medium
+
+  * Ícone próprio (paleta). Cinnamon e XFCE: a cor de destaque também vai
+    para o contorno dos apps GTK 4; contorno do Cinnamon sem brilho.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sat, 21 Nov 2026 22:30:00 -0300
+
 doors-aparencia (0.3.2) trixie; urgency=medium
 
   * GNOME: as prévias mostram a barra no topo.
