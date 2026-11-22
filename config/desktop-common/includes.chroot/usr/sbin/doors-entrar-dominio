@@ -37,6 +37,13 @@ falha() {
   exit 1
 }
 
+# pasta do scanner (doors-pasta-scanner) continua compartilhada depois de mexer no smb.conf
+manter_scanner() {
+  if [ -f /etc/samba/doors-scanner.conf ] && ! grep -qxF "include = /etc/samba/doors-scanner.conf" /etc/samba/smb.conf; then
+    printf '\n# Doors OS: pasta do scanner\ninclude = /etc/samba/doors-scanner.conf\n' >> /etc/samba/smb.conf
+  fi
+}
+
 guardar_originais() {
   for f in $ARQUIVOS; do
     if [ -f "$f" ] && [ ! -f "$f$ORIG" ]; then cp -a "$f" "$f$ORIG"; fi
@@ -71,6 +78,7 @@ sair() {
     if [ -f "$f$ORIG" ]; then mv -f "$f$ORIG" "$f"; fi
   done
   rm -f /etc/sudoers.d/doors-dominio /etc/systemd/timesyncd.conf.d/doors-dominio.conf
+  manter_scanner
   echo "Pronto: só os usuários locais entram neste computador."
 }
 
@@ -160,6 +168,7 @@ EOF
 	log file = /var/log/samba/log.%m
 	max log size = 1000
 EOF
+  manter_scanner
 
   cat > /etc/security/pam_winbind.conf <<'EOF'
 # Doors OS (doors-entrar-dominio)

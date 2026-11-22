@@ -5,5 +5,7 @@ set -e
 sed -i -E '/^(passwd|group|shadow):/s/ winbind//' /etc/nsswitch.conf
 pam-auth-update --package --disable winbind
 systemctl disable winbind.service 2>/dev/null || true
+# servidor Samba: só liga quando a pasta do scanner é criada (doors-pasta-scanner)
+systemctl disable smbd.service nmbd.service samba-ad-dc.service 2>/dev/null || true
 ! grep -qE '^(passwd|group):.*winbind' /etc/nsswitch.conf
 ! grep -q pam_winbind /etc/pam.d/common-auth

@@ -1,0 +1,164 @@
+#!/bin/bash
+# Doors OS — pasta compartilhada para a impressora gravar as digitalizações ("digitalizar
+# para pasta"), em /home/scanner, compartilhada como \\ESTE-PC\scanner.
+#   doors-pasta-scanner            cria ou ajusta (senha da impressora e quem pode abrir)
+#   doors-pasta-scanner --remover  desliga o compartilhamento (a pasta e os arquivos ficam)
+#
+# A impressora entra com um usuário só dela ("scanner"): sem login no computador, sem shell e
+# com senha só do Samba. A senha não expira nem depende de nenhuma pessoa.
+# Quem abre os arquivos no PC: usuários locais ou do domínio (d123456) e grupos do AD,
+# por ACL (setfacl) — usuários do AD não ficam no /etc/passwd, mas têm UID/GID pelo winbind.
+set -eu
+
+if [ "$(id -u)" != 0 ]; then
+  exec sudo "$0" "$@"
+fi
+
+PASTA=/home/scanner
+CONTA=scanner
+CONF=/etc/samba/doors-scanner.conf
+SMB=/etc/samba/smb.conf
+INCLUDE="include = $CONF"
+
+pausa() { read -r -p "Tecle Enter para fechar." _ || true; }
+falha() { echo; echo "ERRO: $*" >&2; [ -t 0 ] && pausa; exit 1; }
+
+# quem chamou (pelo menu vem do pkexec, pelo terminal do sudo)
+quem_chamou() {
+  if [ -n "${PKEXEC_UID:-}" ]; then getent passwd "$PKEXEC_UID" | cut -d: -f1
+  else echo "${SUDO_USER:-}"; fi
+}
+
+incluir_no_smb_conf() {
+  grep -qxF "$INCLUDE" "$SMB" 2>/dev/null || printf '\n# Doors OS: pasta do scanner\n%s\n' "$INCLUDE" >> "$SMB"
+}
+
+remover() {
+  echo "== Desligar a pasta do scanner =="
+  rm -f "$CONF"
+  sed -i "\|^# Doors OS: pasta do scanner\$|d; \|^$INCLUDE\$|d" "$SMB"
+  smbpasswd -x "$CONTA" >/dev/null 2>&1 || true
+  systemctl disable --now smbd.service 2>/dev/null || true
+  echo "Pronto: a impressora não grava mais aqui. A pasta $PASTA e os arquivos continuam."
+}
+
+criar() {
+  local pc senha senha2 quem entrada nome id ok=""
+  echo "== Pasta do scanner (impressora \"digitalizar para pasta\") =="
+  echo "A impressora vai gravar em $PASTA, compartilhada na rede como \\\\$(hostname -s)\\scanner."
+  echo
+
+  # 1. usuário só da impressora: sem login, sem shell, sem senha de sistema
+  if ! getent passwd "$CONTA" >/dev/null; then
+    useradd --system --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin \
+      --comment "Impressora (pasta do scanner)" "$CONTA"
+  fi
+  usermod -L "$CONTA" 2>/dev/null || true
+
+  # 2. senha só do Samba (a que vai na impressora)
+  if pdbedit -L 2>/dev/null | grep -q "^$CONTA:"; then
+    echo "A impressora já tem senha. Enter para manter, ou digite uma nova."
+  fi
+  while :; do
+    read -r -s -p "Senha da impressora (usuário \"$CONTA\"): " senha || true; echo
+    if [ -z "$senha" ] && pdbedit -L 2>/dev/null | grep -q "^$CONTA:"; then break; fi
+    [ -n "$senha" ] || { echo "  a senha não pode ficar vazia"; continue; }
+    read -r -s -p "Repita a senha: " senha2 || true; echo
+    [ "$senha" = "$senha2" ] || { echo "  as senhas não conferem"; continue; }
+    printf '%s\n%s\n' "$senha" "$senha" | smbpasswd -a -s "$CONTA" >/dev/null || falha "não consegui definir a senha"
+    smbpasswd -e "$CONTA" >/dev/null
+    break
+  done
+  unset senha senha2
+
+  # 3. a pasta
+  mkdir -p "$PASTA"
+  chown "$CONTA:$CONTA" "$PASTA"
+  chmod 2770 "$PASTA"
+
+  # 4. quem pode abrir: usuários e grupos (locais ou do AD), por ACL
+  echo
+  echo "Quem pode abrir as digitalizações neste PC? Usuários ou grupos, separados por vírgula."
+  echo "  ex.: d123456, d654321   ou um grupo do domínio, como: domain users"
+  quem=$(quem_chamou)
+  read -r -p "Usuários/grupos${quem:+ [$quem]}: " entrada || true
+  entrada=${entrada:-$quem}
+  IFS=',' read -r -a lista <<< "$entrada"
+  for nome in "${lista[@]}"; do
+    nome=$(echo "$nome" | sed 's/^ *//; s/ *$//')
+    nome=${nome##*\\}   # REDE\d123456 -> d123456
+    [ -n "$nome" ] || continue
+    # ACL pelo número (UID/GID): nomes do AD podem ter espaço ("domain users")
+    if id=$(getent passwd "$nome" | cut -d: -f3) && [ -n "$id" ]; then
+      setfacl -R -m "u:$id:rwX" "$PASTA"; setfacl -R -d -m "u:$id:rwX" "$PASTA"
+      echo "  usuário $nome: pode abrir, renomear e apagar"; ok=1
+    elif id=$(getent group "$nome" | cut -d: -f3) && [ -n "$id" ]; then
+      setfacl -R -m "g:$id:rwX" "$PASTA"; setfacl -R -d -m "g:$id:rwX" "$PASTA"
+      echo "  grupo $nome: todos do grupo podem abrir, renomear e apagar"; ok=1
+    else
+      echo "  AVISO: não encontrei \"$nome\" (no domínio? confira com: getent passwd $nome)"
+    fi
+  done
+  setfacl -d -m "g:$CONTA:rwX" "$PASTA"
+  [ -n "$ok" ] || echo "  (ninguém além da impressora; rode de novo para dar acesso)"
+
+  # 5. compartilhamento (arquivo próprio, incluído no smb.conf; sobrevive ao assistente do domínio)
+  cat > "$CONF" <<EOF
+# Doors OS (doors-pasta-scanner): pasta da impressora. Gerado — rode o assistente para mudar.
+[global]
+	server min protocol = SMB3
+
+[scanner]
+	comment = Digitalizações da impressora
+	path = $PASTA
+	valid users = $CONTA
+	read only = no
+	force group = $CONTA
+	inherit acls = yes
+	create mask = 0660
+	directory mask = 2770
+EOF
+  incluir_no_smb_conf
+  testparm -s "$SMB" >/dev/null 2>&1 || falha "configuração do Samba inválida (testparm -s)"
+
+  # 6. atalho "Scanner" na pasta pessoal (novos usuários, inclusive do domínio, e quem chamou)
+  [ -e /etc/skel/Scanner ] || ln -s "$PASTA" /etc/skel/Scanner
+  if [ -n "$quem" ]; then
+    casa=$(getent passwd "$quem" | cut -d: -f6)
+    if [ -n "$casa" ] && [ -d "$casa" ] && [ ! -e "$casa/Scanner" ]; then
+      ln -s "$PASTA" "$casa/Scanner" && chown -h "$quem" "$casa/Scanner" 2>/dev/null || true
+    fi
+  fi
+
+  # 7. liga o Samba (o nmbd não é necessário: a impressora usa o IP ou o nome)
+  systemctl enable smbd.service >/dev/null 2>&1 || true
+  systemctl restart smbd.service || falha "o Samba não iniciou (journalctl -u smbd)"
+  if command -v ufw >/dev/null && ufw status 2>/dev/null | grep -q "Status: active"; then
+    ufw allow Samba >/dev/null || true
+  fi
+
+  pc=$(hostname -s | tr 'a-z' 'A-Z')
+  echo
+  echo "Pronto! Cadastre na impressora (digitalizar para pasta / SMB):"
+  for ip in $(hostname -I 2>/dev/null); do
+    case "$ip" in *:*) ;; *) echo "  caminho:  \\\\$ip\\scanner" ;; esac
+  done
+  echo "            (ou \\\\$pc\\scanner)"
+  if grep -qiE '^[[:space:]]*security[[:space:]]*=[[:space:]]*ads' "$SMB"; then
+    # no domínio: "scanner" com o domínio da empresa vai para o AD, que não conhece a conta
+    echo "  usuário:  $pc\\$CONTA"
+    echo "            (ou só $CONTA, com o campo domínio em branco ou $pc — nunca o domínio da empresa)"
+  else
+    echo "  usuário:  $CONTA      (se não aceitar, use $pc\\$CONTA)"
+  fi
+  echo "  senha:    a que você acabou de definir"
+  echo "Os arquivos aparecem em $PASTA (atalho \"Scanner\" na pasta pessoal)."
+}
+
+case "${1:-}" in
+  --remover) remover ;;
+  "") criar ;;
+  *) echo "uso: $0 [--remover]" >&2; exit 1 ;;
+esac
+[ -t 0 ] && pausa
+exit 0

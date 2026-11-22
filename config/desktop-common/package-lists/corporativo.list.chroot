@@ -13,6 +13,10 @@ smbclient
 gvfs-backends
 # relógio sincronizado com o servidor do domínio (o Kerberos exige)
 systemd-timesyncd
+# pasta do scanner: a impressora grava no PC (doors-pasta-scanner); servidor Samba desligado
+# até o assistente ser usado; acl para dar acesso a usuários/grupos do AD
+samba
+acl
 # scanner: multifuncionais de rede sem driver (eSCL/WSD) + programa de digitalizar
 sane-airscan
 simple-scan
