@@ -8,3 +8,5 @@
 --debian-installer none
 --iso-publisher "Doors OS Project"
 --bootappend-live "boot=live components locales=pt_BR.UTF-8 keyboard-layouts=br timezone=America/Sao_Paulo username=doors user-fullname=Doors hostname=doors"
+--chroot-squashfs-compression-type zstd
+--chroot-squashfs-compression-level 15

@@ -17,3 +17,29 @@ H=/usr/bin/add-calamares-desktop-icon
 if [ -f "$H" ]; then
   sed -i 's|mkdir -p \$DESKTOP|mkdir -p "$DESKTOP"|; s| \$DESKTOP/calamares-install-debian.desktop| "$DESKTOP/calamares-install-debian.desktop"|g; s|cp /usr/share/applications/calamares-install-debian.desktop \$DESKTOP$|cp /usr/share/applications/calamares-install-debian.desktop "$DESKTOP"|; s|~/Desktop/calamares-install-debian.desktop|"$DESKTOP/calamares-install-debian.desktop"|g; s|): do$|); do|' "$H"
 fi
+# Disco em btrfs (padrão do particionador): subvolumes @ (raiz) e @home — o formato que o
+# Timeshift usa para snapshots —, @swap para o arquivo de troca (o Calamares cria sozinho),
+# compressão zstd e noatime. Acrescentado ao mount.conf do Debian (mantém os extraMounts).
+M=/etc/calamares/modules/mount.conf
+if ! grep -q '^btrfsSubvolumes' "$M"; then
+  cat >> "$M" <<'EOF'
+
+# Doors OS
+btrfsSubvolumes:
+    - mountPoint: /
+      subvolume: /@
+    - mountPoint: /home
+      subvolume: /@home
+btrfsSwapSubvol: /@swap
+mountOptions:
+    - filesystem: default
+      options: [ defaults ]
+    - filesystem: efi
+      options: [ defaults, umask=0077 ]
+    - filesystem: btrfs
+      options: [ defaults, noatime, compress=zstd:1 ]
+    - filesystem: btrfs_swap
+      options: [ defaults, noatime ]
+EOF
+fi
+grep -q '^btrfsSubvolumes' "$M" && grep -q 'compress=zstd' "$M"

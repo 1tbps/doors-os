@@ -22,3 +22,20 @@ custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybin
 name='Flameshot'
 command='flameshot gui'
 binding='Print'
+
+# Grade de aplicativos: as pastas padrão do GNOME (Sistema e Utilitários, mesmas listas do
+# gnome-shell 48), com os assistentes "Entrar no domínio" e "Pasta do scanner" no começo de Sistema
+# (a pasta segue a ordem da lista; 9 por página).
+# Com folder-children definido o GNOME não recria as pastas no primeiro login.
+[org/gnome/desktop/app-folders]
+folder-children=['System', 'Utilities']
+
+[org/gnome/desktop/app-folders/folders/System]
+name='X-GNOME-Shell-System.directory'
+translate=true
+apps=['doors-entrar-dominio.desktop', 'doors-pasta-scanner.desktop', 'nm-connection-editor.desktop', 'org.gnome.DejaDup.desktop', 'org.gnome.baobab.desktop', 'org.gnome.DiskUtility.desktop', 'im-config.desktop', 'org.gnome.Logs.desktop', 'org.freedesktop.MalcontentControl.desktop', 'org.freedesktop.GnomeAbrt.desktop', 'org.gnome.tweaks.desktop', 'org.gnome.Sysprof.desktop', 'org.gnome.SystemMonitor.desktop']
+
+[org/gnome/desktop/app-folders/folders/Utilities]
+name='X-GNOME-Shell-Utilities.directory'
+translate=true
+apps=['org.gnome.Decibels.desktop', 'org.gnome.Connections.desktop', 'org.gnome.Evince.desktop', 'org.gnome.FileRoller.desktop', 'org.gnome.font-viewer.desktop', 'org.gnome.Loupe.desktop', 'org.gnome.seahorse.Application.desktop']

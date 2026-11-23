@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build de uma edição Doors OS. Roda DENTRO do container (/doors = /mnt/disco/doors).
 # Uso: build.sh <desktop|base>
-#   desktop: ISO única com KDE Plasma, Cinnamon e XFCE (doors-<versão>-amd64.hybrid.iso)
+#   desktop: ISO única com KDE Plasma, Cinnamon, XFCE e GNOME (doors-<revisão>-amd64.hybrid.iso, ex.: doors-0.4-dev18)
 #   base:    sistema sem ambiente gráfico (validação da camada comum)
 # Camadas: config/common  +  config/desktop-common + config/editions/desktop (só na "desktop").
 set -euo pipefail
@@ -30,11 +30,17 @@ for d in /doors/apt/public/pool/main/d/*/*.deb; do
 done
 ls config/packages.chroot/*.deb >/dev/null || { echo "sem pacotes Doors: rode build-packages.sh e apt-repo.sh publish" >&2; exit 1; }
 B=config/includes.chroot/etc/calamares/branding/doors/branding.desc; if [ -f "$B" ]; then sed -i "s/@VERSION@/$VER/g" "$B"; fi
+# compressão (mksquashfs) com prioridade alta: o live-build fixa "nice -n 17"
+( while sleep 3; do for p in $(pgrep -x mksquashfs); do renice -n -10 -p "$p" >/dev/null 2>&1; done; done ) &
+RENICE=$!; trap 'kill $RENICE 2>/dev/null || true' EXIT
 lb build
-ISO="$NAME-amd64.hybrid.iso"
+# nome com a revisão do pacote doors-os (0.4~dev18 -> doors-0.4-dev18-amd64.hybrid.iso)
+REV=$(sed -n '1s/^[^(]*(\([^)]*\)).*/\1/p' "$R/packages/doors-os/debian/changelog" | tr '~' '-')
+OUT="doors-${REV:-$VER}"; [ "$ED" = desktop ] || OUT="$OUT-$ED"
+ISO="$OUT-amd64.hybrid.iso"
 mkdir -p /doors/isos
-cp "$ISO" /doors/isos/
-cp chroot.packages.live "/doors/isos/$NAME.packages" 2>/dev/null || true
+cp "$NAME-amd64.hybrid.iso" "/doors/isos/$ISO"
+cp chroot.packages.live "/doors/isos/$OUT.packages" 2>/dev/null || true
 cd /doors/isos && sha256sum "$ISO" > "$ISO.sha256"
-chown "$OWNER" "/doors/isos/$NAME"*
+chown "$OWNER" "/doors/isos/$OUT"*
 echo "ISO=/mnt/disco/doors/isos/$ISO"

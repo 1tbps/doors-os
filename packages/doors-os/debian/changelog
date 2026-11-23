@@ -1,3 +1,24 @@
+doors-os (0.4~dev19) trixie; urgency=medium
+
+  * Instalador: btrfs como sistema de arquivos padrão (subvolumes @, @home e
+    @swap, compressão zstd, noatime); Timeshift já no modo btrfs.
+  * ISO comprimida com zstd (compilação mais rápida) e com a revisão no nome.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Mon, 23 Nov 2026 08:57:21 -0300
+
+doors-os (0.4~dev18) trixie; urgency=medium
+
+  * GNOME: assistentes no começo da pasta Sistema (primeira página).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Mon, 23 Nov 2026 08:38:31 -0300
+
+doors-os (0.4~dev17) trixie; urgency=medium
+
+  * GNOME: "Entrar no domínio" e "Pasta do scanner" na pasta Sistema da grade
+    de aplicativos (pastas padrão do GNOME definidas pelo dconf).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Sun, 22 Nov 2026 23:01:30 -0300
+
 doors-os (0.4~dev16) trixie; urgency=medium
 
   * XFCE: cantos do painel flutuante pelo ~/.config/gtk-3.0/gtk.css (o XFCE

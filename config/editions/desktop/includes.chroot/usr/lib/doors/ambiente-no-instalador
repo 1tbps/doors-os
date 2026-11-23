@@ -6,5 +6,11 @@ A=$(sed -n 's/.*doors\.ambiente=\([a-z]*\).*/\1/p' /proc/cmdline)
 case "$A" in kde|cinnamon|xfce|gnome) ;; *) A=kde ;; esac
 T=$(mount | grep proc | grep calamares | awk '{print $3}' | sed -e "s#/proc##g" | head -1)
 [ -n "$T" ] || { echo "doors: sistema instalado não encontrado"; exit 1; }
+# disco em btrfs (padrão): Timeshift já no modo btrfs (snapshots instantâneos de @ e @home)
+J="$T/etc/timeshift/default.json"
+if [ "$(stat -f -c %T "$T")" = btrfs ] && [ -f "$J" ]; then
+  sed -i 's/"btrfs_mode" : "false"/"btrfs_mode" : "true"/' "$J"
+  echo "Doors OS: Timeshift no modo btrfs"
+fi
 echo "Doors OS: instalando o ambiente $A"
 exec chroot "$T" /usr/lib/doors/escolher-ambiente "$A"
