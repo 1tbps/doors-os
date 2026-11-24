@@ -4,24 +4,50 @@
 #   doors-pasta-scanner            cria ou ajusta (senha da impressora e quem pode abrir)
 #   doors-pasta-scanner --remover  desliga o compartilhamento (a pasta e os arquivos ficam)
 #
-# A impressora entra com um usuário só dela ("scanner"): sem login no computador, sem shell e
+# A impressora entra com um usuário só dela ("impressora"): sem login no computador, sem shell e
 # com senha só do Samba. A senha não expira nem depende de nenhuma pessoa.
 # Quem abre os arquivos no PC: usuários locais ou do domínio (d123456) e grupos do AD,
 # por ACL (setfacl) — usuários do AD não ficam no /etc/passwd, mas têm UID/GID pelo winbind.
-set -eu
+set -u
 
 if [ "$(id -u)" != 0 ]; then
-  exec sudo "$0" "$@"
+  exec pkexec env DISPLAY="${DISPLAY:-}" XAUTHORITY="${XAUTHORITY:-}" "$0" "$@"
 fi
 
 PASTA=/home/scanner
-CONTA=scanner
+CONTA=impressora   # não "scanner": esse grupo já existe (SANE, acesso aos scanners USB)
 CONF=/etc/samba/doors-scanner.conf
 SMB=/etc/samba/smb.conf
 INCLUDE="include = $CONF"
+TITULO="Pasta do scanner"
+LOG=/var/log/doors-pasta-scanner.log
 
-pausa() { read -r -p "Tecle Enter para fechar." _ || true; }
-falha() { echo; echo "ERRO: $*" >&2; [ -t 0 ] && pausa; exit 1; }
+# ---------- caixas de diálogo (zenity) ou terminal ----------
+if [ -n "${DISPLAY:-}" ] && command -v zenity >/dev/null 2>&1; then GUI=1; else GUI=; fi
+z() { zenity --title="$TITULO" "$@" 2>/dev/null; }
+# o zenity interpreta "\" no texto (\n, \t...): dobra as barras para \\PC\pasta aparecer certo
+esc() { printf '%s' "$1" | sed 's/\\/\\\\/g'; }
+cancelar() { [ -n "$GUI" ] || echo "Cancelado."; exit 1; }
+perguntar() {
+  local r
+  if [ -n "$GUI" ]; then r=$(z --entry --width=480 --text="$(esc "$1")" --entry-text="$2") || cancelar
+  else read -r -p "$1 [$2]: " r || cancelar; r=${r:-$2}; fi
+  printf '%s' "$r"
+}
+senha() {
+  local r
+  if [ -n "$GUI" ]; then r=$(z --entry --hide-text --width=480 --text="$(esc "$1")") || cancelar
+  else read -r -s -p "$1: " r || cancelar; echo >&2; fi
+  printf '%s' "$r"
+}
+aviso() { if [ -n "$GUI" ]; then z --info --width=480 --text="$(esc "$1")"; else echo "$1"; fi; }
+falha() {
+  echo "ERRO: $1" >>"$LOG"
+  if [ -n "$GUI" ]; then z --error --width=480 --text="$(esc "$1
+
+Detalhes em $LOG")"; else echo "ERRO: $1" >&2; fi
+  exit 1
+}
 
 # quem chamou (pelo menu vem do pkexec, pelo terminal do sudo)
 quem_chamou() {
@@ -34,42 +60,44 @@ incluir_no_smb_conf() {
 }
 
 remover() {
-  echo "== Desligar a pasta do scanner =="
   rm -f "$CONF"
   sed -i "\|^# Doors OS: pasta do scanner\$|d; \|^$INCLUDE\$|d" "$SMB"
   smbpasswd -x "$CONTA" >/dev/null 2>&1 || true
-  systemctl disable --now smbd.service 2>/dev/null || true
-  echo "Pronto: a impressora não grava mais aqui. A pasta $PASTA e os arquivos continuam."
+  if grep -qiE '^[[:space:]]*security[[:space:]]*=[[:space:]]*ads' "$SMB"; then
+    systemctl restart smbd.service 2>/dev/null || true   # no domínio o smbd continua (winbind)
+  else
+    systemctl disable --now smbd.service 2>/dev/null || true
+  fi
+  aviso "Pronto: a impressora não grava mais aqui.
+A pasta $PASTA e os arquivos continuam."
 }
 
 criar() {
-  local pc senha senha2 quem entrada nome id ok=""
-  echo "== Pasta do scanner (impressora \"digitalizar para pasta\") =="
-  echo "A impressora vai gravar em $PASTA, compartilhada na rede como \\\\$(hostname -s)\\scanner."
-  echo
+  local pc s1 s2 quem entrada nome id ok="" lista_ok="" avisos="" caminhos="" usuario ip
+  : >"$LOG"; chmod 600 "$LOG"
 
   # 1. usuário só da impressora: sem login, sem shell, sem senha de sistema
   if ! getent passwd "$CONTA" >/dev/null; then
     useradd --system --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin \
-      --comment "Impressora (pasta do scanner)" "$CONTA"
+      --comment "Impressora (pasta do scanner)" "$CONTA" >>"$LOG" 2>&1 || falha "Não consegui criar o usuário $CONTA."
   fi
-  usermod -L "$CONTA" 2>/dev/null || true
+  usermod -L "$CONTA" >>"$LOG" 2>&1 || true
 
   # 2. senha só do Samba (a que vai na impressora)
-  if pdbedit -L 2>/dev/null | grep -q "^$CONTA:"; then
-    echo "A impressora já tem senha. Enter para manter, ou digite uma nova."
-  fi
+  local tem_senha=""
+  pdbedit -L 2>/dev/null | grep -q "^$CONTA:" && tem_senha=1
   while :; do
-    read -r -s -p "Senha da impressora (usuário \"$CONTA\"): " senha || true; echo
-    if [ -z "$senha" ] && pdbedit -L 2>/dev/null | grep -q "^$CONTA:"; then break; fi
-    [ -n "$senha" ] || { echo "  a senha não pode ficar vazia"; continue; }
-    read -r -s -p "Repita a senha: " senha2 || true; echo
-    [ "$senha" = "$senha2" ] || { echo "  as senhas não conferem"; continue; }
-    printf '%s\n%s\n' "$senha" "$senha" | smbpasswd -a -s "$CONTA" >/dev/null || falha "não consegui definir a senha"
-    smbpasswd -e "$CONTA" >/dev/null
+    s1=$(senha "Senha que a impressora vai usar (usuário \"$CONTA\")${tem_senha:+
+Deixe em branco para manter a senha atual.}")
+    if [ -z "$s1" ] && [ -n "$tem_senha" ]; then break; fi
+    if [ -z "$s1" ]; then aviso "A senha não pode ficar em branco."; continue; fi
+    s2=$(senha "Repita a senha")
+    if [ "$s1" != "$s2" ]; then aviso "As senhas não conferem. Tente de novo."; continue; fi
+    printf '%s\n%s\n' "$s1" "$s1" | smbpasswd -a -s "$CONTA" >>"$LOG" 2>&1 || falha "Não consegui definir a senha."
+    smbpasswd -e "$CONTA" >>"$LOG" 2>&1
     break
   done
-  unset senha senha2
+  unset s1 s2
 
   # 3. a pasta
   mkdir -p "$PASTA"
@@ -77,37 +105,33 @@ criar() {
   chmod 2770 "$PASTA"
 
   # 4. quem pode abrir: usuários e grupos (locais ou do AD), por ACL
-  echo
-  echo "Quem pode abrir as digitalizações neste PC? Usuários ou grupos, separados por vírgula."
-  echo "  ex.: d123456, d654321   ou um grupo do domínio, como: domain users"
   quem=$(quem_chamou)
-  read -r -p "Usuários/grupos${quem:+ [$quem]}: " entrada || true
-  entrada=${entrada:-$quem}
+  entrada=$(perguntar "Quem pode abrir as digitalizações neste PC?
+Usuários ou grupos, separados por vírgula (ex.: d123456, d654321 ou um grupo do domínio)." "$quem")
   IFS=',' read -r -a lista <<< "$entrada"
   for nome in "${lista[@]}"; do
     nome=$(echo "$nome" | sed 's/^ *//; s/ *$//')
-    nome=${nome##*\\}   # REDE\d123456 -> d123456
+    nome=${nome##*\\}   # DOMINIO\d123456 -> d123456
     [ -n "$nome" ] || continue
     # ACL pelo número (UID/GID): nomes do AD podem ter espaço ("domain users")
     if id=$(getent passwd "$nome" | cut -d: -f3) && [ -n "$id" ]; then
       setfacl -R -m "u:$id:rwX" "$PASTA"; setfacl -R -d -m "u:$id:rwX" "$PASTA"
-      echo "  usuário $nome: pode abrir, renomear e apagar"; ok=1
+      lista_ok="$lista_ok
+• $nome"; ok=1
     elif id=$(getent group "$nome" | cut -d: -f3) && [ -n "$id" ]; then
       setfacl -R -m "g:$id:rwX" "$PASTA"; setfacl -R -d -m "g:$id:rwX" "$PASTA"
-      echo "  grupo $nome: todos do grupo podem abrir, renomear e apagar"; ok=1
+      lista_ok="$lista_ok
+• grupo $nome"; ok=1
     else
-      echo "  AVISO: não encontrei \"$nome\" (no domínio? confira com: getent passwd $nome)"
+      avisos="$avisos
+• não encontrei \"$nome\" (confira com: getent passwd $nome)"
     fi
   done
   setfacl -d -m "g:$CONTA:rwX" "$PASTA"
-  [ -n "$ok" ] || echo "  (ninguém além da impressora; rode de novo para dar acesso)"
 
   # 5. compartilhamento (arquivo próprio, incluído no smb.conf; sobrevive ao assistente do domínio)
   cat > "$CONF" <<EOF
 # Doors OS (doors-pasta-scanner): pasta da impressora. Gerado — rode o assistente para mudar.
-[global]
-	server min protocol = SMB3
-
 [scanner]
 	comment = Digitalizações da impressora
 	path = $PASTA
@@ -119,40 +143,49 @@ criar() {
 	directory mask = 2770
 EOF
   incluir_no_smb_conf
-  testparm -s "$SMB" >/dev/null 2>&1 || falha "configuração do Samba inválida (testparm -s)"
+  testparm -s "$SMB" >>"$LOG" 2>&1 || falha "A configuração do Samba ficou inválida (testparm -s)."
 
   # 6. atalho "Scanner" na pasta pessoal (novos usuários, inclusive do domínio, e quem chamou)
   [ -e /etc/skel/Scanner ] || ln -s "$PASTA" /etc/skel/Scanner
   if [ -n "$quem" ]; then
-    casa=$(getent passwd "$quem" | cut -d: -f6)
+    local casa; casa=$(getent passwd "$quem" | cut -d: -f6)
     if [ -n "$casa" ] && [ -d "$casa" ] && [ ! -e "$casa/Scanner" ]; then
       ln -s "$PASTA" "$casa/Scanner" && chown -h "$quem" "$casa/Scanner" 2>/dev/null || true
     fi
   fi
 
   # 7. liga o Samba (o nmbd não é necessário: a impressora usa o IP ou o nome)
-  systemctl enable smbd.service >/dev/null 2>&1 || true
-  systemctl restart smbd.service || falha "o Samba não iniciou (journalctl -u smbd)"
+  systemctl enable smbd.service >>"$LOG" 2>&1 || true
+  systemctl restart smbd.service >>"$LOG" 2>&1 || falha "O Samba não iniciou (journalctl -u smbd)."
   if command -v ufw >/dev/null && ufw status 2>/dev/null | grep -q "Status: active"; then
-    ufw allow Samba >/dev/null || true
+    ufw allow Samba >>"$LOG" 2>&1 || true
   fi
 
   pc=$(hostname -s | tr 'a-z' 'A-Z')
-  echo
-  echo "Pronto! Cadastre na impressora (digitalizar para pasta / SMB):"
   for ip in $(hostname -I 2>/dev/null); do
-    case "$ip" in *:*) ;; *) echo "  caminho:  \\\\$ip\\scanner" ;; esac
+    case "$ip" in *:*|172.17.*) ;; *) caminhos="$caminhos
+      \\\\$ip\\scanner" ;; esac
   done
-  echo "            (ou \\\\$pc\\scanner)"
   if grep -qiE '^[[:space:]]*security[[:space:]]*=[[:space:]]*ads' "$SMB"; then
     # no domínio: "scanner" com o domínio da empresa vai para o AD, que não conhece a conta
-    echo "  usuário:  $pc\\$CONTA"
-    echo "            (ou só $CONTA, com o campo domínio em branco ou $pc — nunca o domínio da empresa)"
+    usuario="$pc\\$CONTA
+      (ou só $CONTA, com o campo domínio em branco ou $pc — nunca o domínio da empresa)"
   else
-    echo "  usuário:  $CONTA      (se não aceitar, use $pc\\$CONTA)"
+    usuario="$CONTA      (se não aceitar, use $pc\\$CONTA)"
   fi
-  echo "  senha:    a que você acabou de definir"
-  echo "Os arquivos aparecem em $PASTA (atalho \"Scanner\" na pasta pessoal)."
+  aviso "Pronto! Cadastre na impressora (digitalizar para pasta / SMB):
+
+  caminho:$caminhos
+      (ou \\\\$pc\\scanner)
+  usuário: $usuario
+  senha:   a que você acabou de definir
+
+Podem abrir as digitalizações:${lista_ok:-
+• ninguém além da impressora (rode de novo para dar acesso)}${avisos:+
+
+Atenção:$avisos}
+
+Os arquivos aparecem em $PASTA (atalho \"Scanner\" na pasta pessoal)."
 }
 
 case "${1:-}" in
@@ -160,5 +193,4 @@ case "${1:-}" in
   "") criar ;;
   *) echo "uso: $0 [--remover]" >&2; exit 1 ;;
 esac
-[ -t 0 ] && pausa
 exit 0

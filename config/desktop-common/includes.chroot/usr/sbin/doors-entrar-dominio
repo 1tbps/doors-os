@@ -1,140 +1,231 @@
 #!/bin/bash
-# Doors OS — coloca este computador num domínio Windows (Active Directory) usando o winbind.
-#   doors-entrar-dominio           entra no domínio (pergunta tudo)
+# Doors OS — coloca este computador num domínio Windows (Active Directory) pelo winbind.
+#   doors-entrar-dominio           entra no domínio (caixas de diálogo; no terminal, perguntas)
 #   doors-entrar-dominio --estado  mostra se está no domínio e se a ligação funciona
 #   doors-entrar-dominio --sair    sai do domínio e volta só para os usuários locais
-# Depois do ingresso: login com o usuário da rede (sem o domínio na frente), pasta pessoal
-# criada no primeiro login em /home/<DOMINIO>/<usuario>, login sem rede (cache) e,
-# se escolhidas, pastas da rede montadas no login em ~/Rede/<pasta>.
-set -eu
+# Passos: nome do PC (+ /etc/hosts com o nome completo), DNS do AD, relógio, placa de rede,
+# smb.conf (ADS + idmap rid), ingresso, winbind/smbd, registro no DNS (e de novo quando o IP
+# muda pelo DHCP), login pelo AD (PAM + pasta pessoal /home/usuario) e testes.
+set -u
 
 if [ "$(id -u)" != 0 ]; then
-  exec sudo "$0" "$@"
+  exec pkexec env DISPLAY="${DISPLAY:-}" XAUTHORITY="${XAUTHORITY:-}" "$0" "$@"
 fi
 
 ORIG=.doors-orig   # cópia dos arquivos originais (para --sair)
-ARQUIVOS="/etc/samba/smb.conf /etc/krb5.conf /etc/security/pam_winbind.conf /etc/security/pam_mount.conf.xml"
+ARQUIVOS="/etc/samba/smb.conf /etc/krb5.conf /etc/security/pam_winbind.conf /etc/hosts"
+DISPATCHER=/etc/NetworkManager/dispatcher.d/90-doors-ad-dns
+TITULO="Entrar no domínio"
+LOG=/var/log/doors-entrar-dominio.log
 
-perguntar() {  # perguntar "texto" "padrão" -> resposta
+# ---------- caixas de diálogo (zenity) ou terminal ----------
+if [ -n "${DISPLAY:-}" ] && command -v zenity >/dev/null 2>&1; then GUI=1; else GUI=; fi
+z() { zenity --title="$TITULO" "$@" 2>/dev/null; }
+# o zenity interpreta "\" no texto (\n, \t...): dobra as barras para \\PC\pasta aparecer certo
+esc() { printf '%s' "$1" | sed 's/\\/\\\\/g'; }
+
+cancelar() { [ -n "$GUI" ] || echo "Cancelado."; exit 1; }
+
+perguntar() {  # perguntar "texto" "padrão" -> resposta (Cancelar sai)
   local r
-  if [ -n "$2" ]; then
-    read -r -p "$1 [$2]: " r || true
-    echo "${r:-$2}"
+  if [ -n "$GUI" ]; then
+    r=$(z --entry --width=460 --text="$(esc "$1")" --entry-text="$2") || cancelar
   else
-    read -r -p "$1: " r || true
-    echo "$r"
+    read -r -p "$1 [$2]: " r || cancelar
+    r=${r:-$2}
   fi
+  printf '%s' "$r"
 }
 
-pausa() {  # mantém o terminal aberto quando foi aberto pelo menu
-  read -r -p "Tecle Enter para fechar." _ || true
+senha() {  # senha "texto" -> senha digitada (não aparece na tela nem no registro)
+  local r
+  if [ -n "$GUI" ]; then
+    r=$(z --entry --hide-text --width=460 --text="$(esc "$1")") || cancelar
+  else
+    read -r -s -p "$1: " r || cancelar; echo >&2
+  fi
+  printf '%s' "$r"
 }
+
+escolher() {  # escolher "texto" "padrão" opção... -> opção escolhida
+  local texto=$1 padrao=$2 r o; shift 2
+  if [ -n "$GUI" ]; then
+    local itens=()
+    for o in "$@"; do if [ "$o" = "$padrao" ]; then itens+=(TRUE "$o"); else itens+=(FALSE "$o"); fi; done
+    r=$(z --list --radiolist --width=460 --height=300 --text="$(esc "$texto")" \
+          --column=" " --column="Placa de rede" "${itens[@]}") || cancelar
+  else
+    echo "$texto (opções: $*)" >&2
+    read -r -p "[$padrao]: " r || cancelar
+    r=${r:-$padrao}
+  fi
+  printf '%s' "${r:-$padrao}"
+}
+
+aviso() { if [ -n "$GUI" ]; then z --info --width=460 --text="$(esc "$1")"; else echo "$1"; fi; }
 
 falha() {
-  echo
-  echo "ERRO: $*" >&2
-  pausa
+  echo "ERRO: $1" >>"$LOG"
+  fechar_progresso
+  if [ -n "$GUI" ]; then
+    z --error --width=520 --text="$(esc "$1
+
+Detalhes em $LOG")"
+  else
+    echo; echo "ERRO: $1 (detalhes em $LOG)" >&2
+  fi
   exit 1
 }
 
-# pasta do scanner (doors-pasta-scanner) continua compartilhada depois de mexer no smb.conf
+# janela "trabalhando..." com a etapa atual
+abrir_progresso() {
+  if [ -n "$GUI" ]; then
+    exec 3> >(zenity --progress --pulsate --auto-close --no-cancel --width=460 \
+               --title="$TITULO" --text="Configurando..." 2>/dev/null)
+  else
+    exec 3>&1
+  fi
+}
+fechar_progresso() { { [ -z "$GUI" ] || echo 100 >&3; exec 3>&-; } 2>/dev/null || true; }
+passo() { echo "# $1" >&3; echo "== $1" >>"$LOG"; }
+rodar() { "$@" >>"$LOG" 2>&1; }   # rodar comando, saída só no registro
+
+guardar_originais() {
+  local f
+  for f in $ARQUIVOS; do
+    if [ -f "$f" ] && [ ! -f "$f$ORIG" ]; then cp -a "$f" "$f$ORIG"; fi
+  done
+}
+
+# pasta do scanner (doors-pasta-scanner) continua compartilhada depois de reescrever o smb.conf
 manter_scanner() {
   if [ -f /etc/samba/doors-scanner.conf ] && ! grep -qxF "include = /etc/samba/doors-scanner.conf" /etc/samba/smb.conf; then
     printf '\n# Doors OS: pasta do scanner\ninclude = /etc/samba/doors-scanner.conf\n' >> /etc/samba/smb.conf
   fi
 }
 
-guardar_originais() {
-  for f in $ARQUIVOS; do
-    if [ -f "$f" ] && [ ! -f "$f$ORIG" ]; then cp -a "$f" "$f$ORIG"; fi
-  done
-}
-
+# ---------- --estado ----------
 estado() {
+  local t
   if ! grep -qE '^passwd:.*winbind' /etc/nsswitch.conf; then
-    echo "Este computador não está em nenhum domínio."
+    aviso "Este computador não está em nenhum domínio."
     return 0
   fi
-  echo "Domínio: $(sed -n 's/^[[:space:]]*realm = //p' /etc/samba/smb.conf)"
-  if wbinfo -t >/dev/null 2>&1; then
-    echo "Ligação com o servidor: OK"
+  t="Computador: $(hostname -f 2>/dev/null || hostname)
+Domínio: $(sed -n 's/^[[:space:]]*realm = //p' /etc/samba/smb.conf)"
+  if net ads testjoin >/dev/null 2>&1 && wbinfo -t >/dev/null 2>&1; then
+    t="$t
+Ligação com o servidor: OK"
   else
-    echo "Ligação com o servidor: FALHOU (sem rede? relógio errado?)"
+    t="$t
+Ligação com o servidor: FALHOU (sem rede? relógio errado? DNS?)"
   fi
-  net ads info 2>/dev/null | grep -E '^(LDAP server name|Realm|Server time)' || true
+  aviso "$t"
 }
 
+# ---------- --sair ----------
 sair() {
-  local admin
-  echo "== Sair do domínio =="
-  admin=$(perguntar "Usuário administrador do domínio (Enter para só desligar aqui)" "")
+  local admin pw
+  admin=$(perguntar "Usuário com permissão no domínio para remover este computador
+(deixe em branco para só desligar aqui):" "")
+  abrir_progresso
   if [ -n "$admin" ]; then
-    net ads leave -U "$admin" || echo "Aviso: não consegui remover o computador do servidor; só desligando aqui."
+    fechar_progresso; pw=$(senha "Senha de $admin"); abrir_progresso
+    passo "Removendo o computador do domínio..."
+    PASSWD="$pw" rodar net ads leave -U "$admin" || echo "aviso: não removido no servidor" >>"$LOG"
+    unset pw
   fi
-  systemctl disable --now winbind.service 2>/dev/null || true
+  passo "Desligando o login pela rede..."
+  rodar systemctl disable --now winbind.service
   sed -i -E '/^(passwd|group|shadow):/s/ winbind//' /etc/nsswitch.conf
-  pam-auth-update --package --disable winbind mkhomedir
+  rodar pam-auth-update --package --disable winbind mkhomedir
+  local f
   for f in $ARQUIVOS; do
     if [ -f "$f$ORIG" ]; then mv -f "$f$ORIG" "$f"; fi
   done
-  rm -f /etc/sudoers.d/doors-dominio /etc/systemd/timesyncd.conf.d/doors-dominio.conf
+  rm -f /etc/systemd/timesyncd.conf.d/doors-dominio.conf "$DISPATCHER"
   manter_scanner
-  echo "Pronto: só os usuários locais entram neste computador."
+  if [ -f /etc/samba/doors-scanner.conf ]; then rodar systemctl restart smbd.service; else rodar systemctl disable --now smbd.service; fi
+  fechar_progresso
+  aviso "Pronto: só os usuários locais entram neste computador."
 }
 
+# ---------- entrar ----------
 entrar() {
-  local dominio realm grupo admin pasta sudo_grupo nome servidor caminho volumes=""
-  echo "== Entrar num domínio Windows (Active Directory) =="
-  echo "Antes: este computador precisa usar o servidor do domínio como DNS."
-  echo
-  dominio=$(perguntar "Domínio (ex.: empresa.local)" "")
-  dominio=$(echo "$dominio" | tr 'A-Z' 'a-z' | tr -d ' ')
-  [ -n "$dominio" ] || falha "domínio vazio"
-  realm=$(echo "$dominio" | tr 'a-z' 'A-Z')
+  local nome dominio realm grupo placa placas admin pw ip resumo erros=""
+  : >"$LOG"; chmod 600 "$LOG"
+  echo "Doors OS — ingresso no domínio, $(date)" >>"$LOG"
 
-  echo "Procurando $dominio..."
-  getent ahosts "$dominio" >/dev/null 2>&1 ||
-    falha "não encontrei $dominio. Confira se o DNS deste computador é o servidor do domínio (Configurações de rede)."
-
-  grupo=$(perguntar "Nome NetBIOS do domínio (o que vem antes da barra em DOMINIO\\usuario)" "$(echo "${realm%%.*}" | cut -c1-15)")
-  grupo=$(echo "$grupo" | tr 'a-z' 'A-Z')
-
-  nome=$(hostname -s)
-  if [ "${#nome}" -gt 15 ]; then
-    falha "o nome deste computador ($nome) tem mais de 15 letras; o Windows não aceita. Troque com: sudo hostnamectl set-hostname NOVO-NOME"
-  fi
-
-  admin=$(perguntar "Usuário administrador do domínio (para o ingresso)" "administrador")
-
-  echo
-  echo "Pastas da rede para abrir em ~/Rede no login (ex.: //servidor/publico)."
+  # 1. nome do computador (até 15 letras: limite do Windows/NetBIOS)
   while :; do
-    pasta=$(perguntar "Pasta (Enter para terminar)" "")
-    [ -n "$pasta" ] || break
-    pasta=$(echo "$pasta" | tr '\\' '/')
-    pasta="//${pasta#//}"
-    servidor=$(echo "$pasta" | cut -d/ -f3)
-    caminho=$(echo "$pasta" | cut -d/ -f4-)
-    if [ -z "$servidor" ] || [ -z "$caminho" ]; then
-      echo "  formato: //servidor/pasta"
-      continue
-    fi
-    volumes="$volumes<volume fstype=\"cifs\" server=\"$servidor\" path=\"$caminho\" mountpoint=\"~/Rede/$(basename "$caminho")\" options=\"vers=3.0,domain=$grupo,uid=%(USERUID),gid=%(USERGID),file_mode=0700,dir_mode=0700\" uid=\"10000-2147483647\" />
-"
+    nome=$(perguntar "Nome deste computador (até 15 letras, números ou hífen; ex.: SUBMPLAGTI001).
+O domínio é completado sozinho." "$(hostname -s)")
+    nome=$(printf '%s' "$nome" | tr -d ' ')
+    if printf '%s' "$nome" | grep -qE '^[A-Za-z0-9]([A-Za-z0-9-]{0,13}[A-Za-z0-9])?$'; then break; fi
+    aviso "Nome inválido: \"$nome\".
+Use até 15 caracteres: letras, números ou hífen (sem hífen no começo ou no fim)."
   done
 
-  sudo_grupo=$(perguntar "Grupo do domínio que pode administrar este computador (sudo; ex.: domain admins; Enter para nenhum)" "")
+  # 2. domínio
+  dominio=$(perguntar "Domínio (ex.: empresa.local)" "")
+  dominio=$(printf '%s' "$dominio" | tr 'A-Z' 'a-z' | tr -d ' ')
+  [ -n "$dominio" ] || falha "O domínio ficou em branco."
+  realm=$(printf '%s' "$dominio" | tr 'a-z' 'A-Z')
+  grupo=$(perguntar "Nome curto do domínio (o que vem antes da barra em DOMINIO\\usuario)" \
+          "$(printf '%s' "${realm%%.*}" | cut -c1-15)")
+  grupo=$(printf '%s' "$grupo" | tr 'a-z' 'A-Z')
 
-  echo
-  echo "Configurando..."
+  # 3. placa de rede (o Samba só usa e só registra no DNS o IP dela)
+  placa=$(ip route show default 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="dev"){print $(i+1); exit}}')
+  placas=$(ip -o link show | awk -F': ' '{print $2}' | cut -d@ -f1 |
+           grep -vE '^(lo|docker|br-|veth|virbr|vnet|tun|tap|wg)' || true)
+  [ -n "$placas" ] || falha "Nenhuma placa de rede encontrada."
+  # shellcheck disable=SC2086
+  placa=$(escolher "Placa de rede ligada à rede da empresa:" "${placa:-$(echo "$placas" | head -1)}" $placas)
+
+  # 4. usuário que pode colocar computadores no domínio
+  admin=$(perguntar "Usuário com permissão para colocar computadores no domínio" "")
+  admin=${admin##*\\}
+  [ -n "$admin" ] || falha "O usuário ficou em branco."
+  pw=$(senha "Senha de $admin")
+  [ -n "$pw" ] || falha "A senha ficou em branco."
+
+  abrir_progresso
   guardar_originais
 
-  # relógio pelo servidor do domínio (Kerberos recusa diferença de mais de 5 minutos)
+  passo "Definindo o nome do computador ($nome.$dominio)..."
+  rodar hostnamectl set-hostname "$nome" || hostname "$nome"
+  if grep -q '^127\.0\.1\.1[[:space:]]' /etc/hosts; then
+    sed -i "s/^127\.0\.1\.1[[:space:]].*/127.0.1.1\t$nome.$dominio $nome/" /etc/hosts
+  else
+    printf '127.0.1.1\t%s.%s %s\n' "$nome" "$dominio" "$nome" >> /etc/hosts
+  fi
+  [ "$(hostname -d 2>/dev/null)" = "$dominio" ] || echo "aviso: hostname -d = $(hostname -d 2>&1)" >>"$LOG"
+
+  passo "Procurando o domínio no DNS..."
+  cat /etc/resolv.conf >>"$LOG" 2>&1
+  host "$dominio" >>"$LOG" 2>&1 ||
+    falha "Não encontrei $dominio no DNS.
+O DNS deste computador precisa ser o servidor do domínio (Configurações de rede)."
+  host -t SRV "_ldap._tcp.$dominio" >>"$LOG" 2>&1 ||
+    falha "O DNS não informa os servidores do domínio (_ldap._tcp.$dominio).
+Confira se o DNS deste computador é o servidor do domínio."
+  host -t SRV "_kerberos._udp.$dominio" >>"$LOG" 2>&1 || echo "aviso: sem _kerberos._udp" >>"$LOG"
+
+  passo "Acertando fuso e relógio..."
+  rodar timedatectl set-timezone America/Sao_Paulo
   mkdir -p /etc/systemd/timesyncd.conf.d
   printf '[Time]\nNTP=%s\n' "$dominio" > /etc/systemd/timesyncd.conf.d/doors-dominio.conf
-  timedatectl set-ntp true 2>/dev/null || true
-  systemctl restart systemd-timesyncd.service 2>/dev/null || true
+  rodar timedatectl set-ntp true
+  rodar systemctl restart systemd-timesyncd.service
+  rodar timedatectl
 
+  passo "Conferindo programas que atrapalham..."
+  if dpkg -l sssd 2>/dev/null | grep -q '^ii'; then
+    falha "O sssd está instalado e conflita com o winbind. Remova com: sudo apt purge sssd"
+  fi
+
+  passo "Gravando a configuração (Kerberos e Samba)..."
   cat > /etc/krb5.conf <<EOF
 # Doors OS (doors-entrar-dominio)
 [libdefaults]
@@ -143,78 +234,133 @@ entrar() {
 	dns_lookup_kdc = true
 	rdns = false
 EOF
-
   cat > /etc/samba/smb.conf <<EOF
 # Doors OS (doors-entrar-dominio): membro do domínio $realm pelo winbind
 [global]
 	workgroup = $grupo
 	realm = $realm
-	security = ads
+	security = ADS
+	server role = member server
+
+	interfaces = lo $placa
+	bind interfaces only = yes
+
 	kerberos method = secrets and keytab
-	dedicated keytab file = /etc/krb5.keytab
-	# mesmos UID/GID em todos os computadores (calculados do RID do AD)
-	idmap config * : backend = tdb
-	idmap config * : range = 3000-7999
-	idmap config $grupo : backend = rid
-	idmap config $grupo : range = 10000-999999
-	template shell = /bin/bash
-	template homedir = /home/%D/%U
+
 	winbind use default domain = yes
 	winbind offline logon = yes
-	winbind refresh tickets = yes
-	winbind enum users = no
-	winbind enum groups = no
-	client min protocol = SMB2
+	winbind enum users = yes
+	winbind enum groups = yes
+
+	idmap config * : backend = tdb
+	idmap config * : range = 3000-7999
+
+	idmap config $grupo : backend = rid
+	idmap config $grupo : range = 10000-999999
+
+	template shell = /bin/bash
+	template homedir = /home/%U
+
 	log file = /var/log/samba/log.%m
 	max log size = 1000
 EOF
   manter_scanner
-
   cat > /etc/security/pam_winbind.conf <<'EOF'
-# Doors OS (doors-entrar-dominio)
+# Doors OS (doors-entrar-dominio): login sem rede com a última senha usada
 [global]
-	krb5_auth = yes
-	krb5_ccache_type = FILE
 	cached_login = yes
 EOF
+  rodar testparm -s || falha "A configuração do Samba ficou inválida (testparm -s)."
 
-  if [ -n "$volumes" ] && [ -f /etc/security/pam_mount.conf.xml ]; then
-    # insere os volumes antes de </pam_mount> (a cópia original fica em .doors-orig)
-    cp -a "/etc/security/pam_mount.conf.xml$ORIG" /etc/security/pam_mount.conf.xml
-    awk -v v="$volumes" '/<\/pam_mount>/ { printf "%s", v } { print }' \
-      "/etc/security/pam_mount.conf.xml$ORIG" > /etc/security/pam_mount.conf.xml
+  passo "Colocando o computador no domínio..."
+  if ! PASSWD="$pw" net ads join -U "$admin" >>"$LOG" 2>&1; then
+    unset pw
+    local motivo
+    motivo=$(sed -n '/Colocando o computador/,$p' "$LOG" | grep -m1 -E 'Failed to join|failed|error|Error' || true)
+    case "$motivo" in
+      *"administrator privileges"*|*"Insufficient access"*)
+        falha "O usuário $admin não tem permissão para colocar computadores no domínio.
+Use um usuário com essa permissão (peça à TI)." ;;
+      *"Logon failure"*|*"LOGON_FAILURE"*|*"Preauthentication failed"*|*"Password"*)
+        falha "Usuário ou senha errados ($admin)." ;;
+      *"Clock skew"*|*"clock"*)
+        falha "O relógio deste computador está diferente do servidor do domínio.
+Confira a data e a hora e tente de novo." ;;
+      *)
+        falha "O ingresso falhou. Confira o usuário, a senha, o DNS e o relógio.
+Resposta do servidor: ${motivo:-(sem mensagem)}" ;;
+    esac
   fi
+  unset pw
+  rodar net ads testjoin || falha "O computador entrou, mas o teste do ingresso (net ads testjoin) falhou."
 
-  echo
-  echo "Ingressando no domínio $realm (digite a senha de $admin)..."
-  net ads join -U "$admin" || falha "o ingresso falhou. Confira o usuário, a senha, o DNS e o relógio."
+  passo "Ligando o winbind e o Samba..."
+  rodar systemctl enable winbind.service smbd.service
+  rodar systemctl restart winbind.service smbd.service
 
+  passo "Registrando este computador no DNS do domínio..."
+  rodar net ads dns register -P || echo "aviso: registro no DNS falhou" >>"$LOG"
+  mkdir -p "$(dirname "$DISPATCHER")"
+  cat > "$DISPATCHER" <<'EOF'
+#!/bin/sh
+# Doors OS: atualiza o registro deste computador no DNS do AD quando o IP muda (DHCP)
+case "$2" in up|dhcp4-change) ;; *) exit 0 ;; esac
+sleep 5
+/usr/bin/net ads dns register -P >/dev/null 2>&1
+EOF
+  chmod 755 "$DISPATCHER"
+
+  passo "Ligando o login com usuários do domínio..."
   sed -i -E '/^(passwd|group):/{/winbind/!s/$/ winbind/}' /etc/nsswitch.conf
-  pam-auth-update --package --enable winbind mkhomedir
-  mkdir -p "/home/$grupo"
-  systemctl enable winbind.service
-  systemctl restart winbind.service
+  rodar pam-auth-update --package --enable winbind mkhomedir
 
-  if [ -n "$sudo_grupo" ]; then
-    printf '%%%s ALL=(ALL:ALL) ALL\n' "$(echo "$sudo_grupo" | sed 's/ /\\ /g')" > /etc/sudoers.d/doors-dominio
-    chmod 0440 /etc/sudoers.d/doors-dominio
-    visudo -cf /etc/sudoers.d/doors-dominio >/dev/null || { rm -f /etc/sudoers.d/doors-dominio; echo "Aviso: grupo do sudo inválido, ignorado."; }
-  fi
-
-  echo "Conferindo..."
-  for _ in 1 2 3 4 5 6 7 8 9 10; do
-    wbinfo -t >/dev/null 2>&1 && break
-    sleep 1
-  done
-  wbinfo -t >/dev/null 2>&1 || falha "o computador entrou no domínio, mas o winbind não conversa com o servidor."
-  if getent passwd "$admin" >/dev/null; then
-    echo "OK: usuários do domínio reconhecidos (ex.: $(getent passwd "$admin" | cut -d: -f1,6))."
+  passo "Testando..."
+  local i
+  for i in 1 2 3 4 5 6 7 8 9 10; do wbinfo -t >/dev/null 2>&1 && break; sleep 1; done
+  rodar wbinfo -t || erros="$erros
+• winbind não conversa com o servidor (wbinfo -t)"
+  if getent passwd "$admin" >>"$LOG" 2>&1; then
+    rodar id "$admin"
   else
-    echo "Aviso: ainda não vejo o usuário $admin; pode levar alguns segundos."
+    erros="$erros
+• usuário $admin ainda não aparece (getent passwd); às vezes leva alguns segundos"
   fi
-  echo
-  echo "Pronto! Saia da sessão (ou reinicie) e entre com o usuário da rede."
-  echo "Na tela de login, se o usuário não aparecer na lista, escolha \"Outro...\" e digite o nome."
+  grep -q pam_winbind /etc/pam.d/common-auth || erros="$erros
+• login pelo domínio não ficou ligado no PAM"
+  grep -q pam_mkhomedir /etc/pam.d/common-session || erros="$erros
+• criação da pasta pessoal não ficou ligada"
+  ip=$(ip -4 -o addr show dev "$placa" 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -1)
+  host "$nome.$dominio" >>"$LOG" 2>&1 || erros="$erros
+• $nome.$dominio ainda não aparece no DNS (pode demorar alguns minutos)"
+  fechar_progresso
+
+  resumo="Computador: $nome.$dominio (IP ${ip:-?} na placa $placa)
+Domínio: $realm"
+  # pasta do scanner criada antes do ingresso: o nome do PC pode ter mudado e os usuários do
+  # domínio só existem agora
+  if [ -f /etc/samba/doors-scanner.conf ]; then
+    local pc; pc=$(printf '%s' "$nome" | tr 'a-z' 'A-Z')
+    resumo="$resumo
+
+Pasta do scanner — confira na impressora:
+  caminho: \\\\${ip:-$pc}\\scanner   (ou \\\\$pc\\scanner)
+  usuário: $pc\\impressora   (nunca o domínio da empresa)
+Para os usuários do domínio abrirem as digitalizações, abra \"Pasta do scanner\" de novo
+e digite os usuários (ex.: d123456)."
+  fi
+  if [ -n "$erros" ]; then
+    aviso "O computador entrou no domínio, mas alguns testes não passaram:$erros
+
+$resumo
+Detalhes em $LOG"
+  else
+    aviso "Pronto! Este computador está no domínio.
+
+$resumo
+
+Saia da sessão (ou reinicie) e entre com o usuário da rede, sem o domínio na frente
+(ex.: d123456). Se o usuário não aparecer na lista, use \"Outro...\" e digite o nome."
+  fi
 }
 
 case "${1:-}" in
@@ -223,5 +369,4 @@ case "${1:-}" in
   "")       entrar ;;
   *) echo "uso: $0 [--estado|--sair]" >&2; exit 1 ;;
 esac
-[ -t 0 ] && pausa
 exit 0

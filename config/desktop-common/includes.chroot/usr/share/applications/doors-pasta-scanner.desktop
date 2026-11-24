@@ -2,8 +2,8 @@
 Type=Application
 Name=Pasta do scanner
 Comment=Pasta compartilhada para a impressora gravar as digitalizações
-Exec=pkexec /usr/sbin/doors-pasta-scanner
-Terminal=true
+Exec=/usr/sbin/doors-pasta-scanner
+Terminal=false
 Icon=scanner
 Categories=System;Settings;
 Keywords=scanner;digitalizar;impressora;pasta;compartilhar;smb;samba;

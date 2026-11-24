@@ -4,6 +4,8 @@ winbind
 libnss-winbind
 libpam-winbind
 samba-common-bin
+# testes de DNS do assistente (host)
+bind9-host
 krb5-user
 # pastas compartilhadas: abrir pelo gerenciador de arquivos (smb://) e montar no login (pam_mount)
 cifs-utils
@@ -20,3 +22,6 @@ acl
 # scanner: multifuncionais de rede sem driver (eSCL/WSD) + programa de digitalizar
 sane-airscan
 simple-scan
+# caixas de diálogo dos assistentes (entrar no domínio, pasta do scanner) em qualquer ambiente
+zenity
+pkexec

@@ -1,3 +1,12 @@
+doors-os (0.4~dev20) trixie; urgency=medium
+
+  * Entrar no domínio refeito (caixas de diálogo): nome do PC com /etc/hosts,
+    placa de rede, smb.conf do jeito da rede corporativa, registro no DNS.
+  * Pasta do scanner com caixas; conta da impressora "impressora" (o grupo
+    "scanner" já existe no Debian).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Mon, 23 Nov 2026 23:47:34 -0300
+
 doors-os (0.4~dev19) trixie; urgency=medium
 
   * Instalador: btrfs como sistema de arquivos padrão (subvolumes @, @home e

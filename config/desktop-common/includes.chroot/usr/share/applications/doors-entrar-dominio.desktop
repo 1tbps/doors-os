@@ -2,8 +2,8 @@
 Type=Application
 Name=Entrar no domínio
 Comment=Usar as contas da rede Windows (Active Directory) neste computador
-Exec=pkexec /usr/sbin/doors-entrar-dominio
-Terminal=true
+Exec=/usr/sbin/doors-entrar-dominio
+Terminal=false
 Icon=network-workgroup
 Categories=System;Settings;
 Keywords=domínio;dominio;AD;Active Directory;winbind;Samba;Windows;rede;empresa;
