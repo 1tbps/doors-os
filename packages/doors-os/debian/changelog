@@ -1,3 +1,13 @@
+doors-os (0.4~rc1) trixie; urgency=medium
+
+  * Candidata à versão 0.4.
+  * Senha de administrador dos assistentes com mensagem própria (política
+    polkit org.doors-os.*).
+  * Links do instalador (suporte, problemas conhecidos, notas) apontam para o
+    projeto Doors OS.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Tue, 24 Nov 2026 13:53:54 -0300
+
 doors-os (0.4~dev22) trixie; urgency=medium
 
   * Assistentes: caixas de diálogo desenhadas por software (GSK_RENDERER=cairo);

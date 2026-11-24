@@ -13,10 +13,10 @@ strings:
     versionedName:       Doors OS @VERSION@
     shortVersionedName:  Doors OS @VERSION@
     bootloaderEntryName: Doors OS
-    productUrl:          https://www.debian.org
-    supportUrl:          https://www.debian.org/support
-    knownIssuesUrl:      https://bugs.debian.org
-    releaseNotesUrl:     https://www.debian.org/releases/trixie/releasenotes
+    productUrl:          https://github.com/1tbps/doors-os
+    supportUrl:          https://github.com/1tbps/doors-os/issues
+    knownIssuesUrl:      https://github.com/1tbps/doors-os/issues
+    releaseNotesUrl:     https://github.com/1tbps/doors-os/releases
 sidebar: widget
 navigation: widget
 images:

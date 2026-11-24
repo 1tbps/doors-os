@@ -9,7 +9,8 @@
 set -u
 
 if [ "$(id -u)" != 0 ]; then
-  exec pkexec env DISPLAY="${DISPLAY:-}" XAUTHORITY="${XAUTHORITY:-}" "$0" "$@"
+  # política própria (org.doors-os.*): mensagem em português e acesso à tela (allow_gui)
+  exec pkexec "/usr/sbin/doors-entrar-dominio" "$@"
 fi
 
 ORIG=.doors-orig   # cópia dos arquivos originais (para --sair)
@@ -192,7 +193,7 @@ entrar() {
 
   # 1. nome do computador (até 15 letras: limite do Windows/NetBIOS)
   while :; do
-    nome=$(perguntar "Nome deste computador (até 15 letras, números ou hífen; ex.: SUBMPLAGTI001).
+    nome=$(perguntar "Nome deste computador (até 15 letras, números ou hífen; ex.: FINANCEIRO-PC01).
 O domínio é completado sozinho." "$(hostname -s)")
     nome=$(printf '%s' "$nome" | tr -d ' ')
     if printf '%s' "$nome" | grep -qE '^[A-Za-z0-9]([A-Za-z0-9-]{0,13}[A-Za-z0-9])?$'; then break; fi

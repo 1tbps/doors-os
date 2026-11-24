@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<!-- Doors OS: senha de administrador dos assistentes corporativos (pkexec), com mensagem
+     própria e acesso à tela (allow_gui mantém DISPLAY e XAUTHORITY para as caixas do zenity). -->
+<policyconfig>
+  <vendor>Doors OS</vendor>
+  <vendor_url>https://github.com/1tbps/doors-os</vendor_url>
+
+  <action id="org.doors-os.entrar-dominio">
+    <description>Entrar no domínio</description>
+    <message>Para colocar ou tirar este computador de um domínio Windows, digite a senha de administrador.</message>
+    <icon_name>network-workgroup</icon_name>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/sbin/doors-entrar-dominio</annotate>
+    <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
+  </action>
+
+  <action id="org.doors-os.pasta-scanner">
+    <description>Pasta do scanner</description>
+    <message>Para configurar a pasta onde a impressora grava as digitalizações, digite a senha de administrador.</message>
+    <icon_name>scanner</icon_name>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/sbin/doors-pasta-scanner</annotate>
+    <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
+  </action>
+</policyconfig>

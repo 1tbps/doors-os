@@ -11,7 +11,8 @@
 set -u
 
 if [ "$(id -u)" != 0 ]; then
-  exec pkexec env DISPLAY="${DISPLAY:-}" XAUTHORITY="${XAUTHORITY:-}" "$0" "$@"
+  # política própria (org.doors-os.*): mensagem em português e acesso à tela (allow_gui)
+  exec pkexec "/usr/sbin/doors-pasta-scanner" "$@"
 fi
 
 PASTA=/home/scanner
