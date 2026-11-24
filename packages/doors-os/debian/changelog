@@ -1,3 +1,12 @@
+doors-os (0.4~dev21) trixie; urgency=medium
+
+  * Entrar no domínio: confirma (Aceitar/Cancelar) antes de mudar qualquer
+    coisa; se o computador já está no domínio, oferece Remover do domínio.
+  * Pasta do scanner: pergunta tudo e confirma antes de aplicar; se já
+    existe, oferece Alterar, Remover ou Cancelar.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Tue, 24 Nov 2026 00:25:47 -0300
+
 doors-os (0.4~dev20) trixie; urgency=medium
 
   * Entrar no domínio refeito (caixas de diálogo): nome do PC com /etc/hosts,

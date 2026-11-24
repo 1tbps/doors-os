@@ -64,6 +64,19 @@ escolher() {  # escolher "texto" "padrão" opção... -> opção escolhida
 
 aviso() { if [ -n "$GUI" ]; then z --info --width=460 --text="$(esc "$1")"; else echo "$1"; fi; }
 
+confirmar() {  # confirmar "texto" "botão de seguir" -> 0 se aceitou; Cancelar sai sem mudar nada
+  local r
+  if [ -n "$GUI" ]; then
+    z --question --width=520 --text="$(esc "$1")" --ok-label="$2" --cancel-label="Cancelar" || cancelar
+  else
+    echo "$1" >&2
+    read -r -p "$2? [s/N]: " r || cancelar
+    case "$r" in s|S|sim|Sim|SIM) ;; *) cancelar ;; esac
+  fi
+}
+
+no_dominio() { grep -qE '^passwd:.*winbind' /etc/nsswitch.conf || grep -qiE '^[[:space:]]*security[[:space:]]*=[[:space:]]*ads' /etc/samba/smb.conf 2>/dev/null; }
+
 falha() {
   echo "ERRO: $1" >>"$LOG"
   fechar_progresso
@@ -125,29 +138,47 @@ Ligação com o servidor: FALHOU (sem rede? relógio errado? DNS?)"
 
 # ---------- --sair ----------
 sair() {
-  local admin pw
-  admin=$(perguntar "Usuário com permissão no domínio para remover este computador
-(deixe em branco para só desligar aqui):" "")
+  local admin pw="" realm servidor=""
+  realm=$(sed -n 's/^[[:space:]]*realm[[:space:]]*=[[:space:]]*//p' /etc/samba/smb.conf | head -1)
+  admin=$(perguntar "Usuário com permissão para remover computadores do domínio ${realm:-}
+(deixe em branco para só desligar aqui; o computador continua cadastrado no servidor):" "")
+  admin=${admin##*\\}
+  [ -z "$admin" ] || pw=$(senha "Senha de $admin")
+  confirmar "Remover este computador ($(hostname -s)) do domínio ${realm:-}?
+
+• o login com usuários da rede deixa de funcionar neste computador
+• as pastas pessoais dos usuários da rede (/home/...) continuam no disco
+• $(if [ -n "$admin" ]; then echo "o cadastro do computador será apagado no servidor (com $admin)"; else echo "o cadastro do computador fica no servidor (nenhum usuário informado)"; fi)" "Remover do domínio"
+  : >>"$LOG"; chmod 600 "$LOG"; echo "Doors OS — saída do domínio, $(date)" >>"$LOG"
   abrir_progresso
   if [ -n "$admin" ]; then
-    fechar_progresso; pw=$(senha "Senha de $admin"); abrir_progresso
     passo "Removendo o computador do domínio..."
-    PASSWD="$pw" rodar net ads leave -U "$admin" || echo "aviso: não removido no servidor" >>"$LOG"
-    unset pw
+    if PASSWD="$pw" rodar net ads leave -U "$admin"; then servidor=ok; else servidor=falhou; fi
   fi
+  unset pw
   passo "Desligando o login pela rede..."
   rodar systemctl disable --now winbind.service
   sed -i -E '/^(passwd|group|shadow):/s/ winbind//' /etc/nsswitch.conf
   rodar pam-auth-update --package --disable winbind mkhomedir
   local f
   for f in $ARQUIVOS; do
+    # /etc/hosts fica como está: o nome do computador não volta ao antigo
+    [ "$f" = /etc/hosts ] && { rm -f "$f$ORIG"; continue; }
     if [ -f "$f$ORIG" ]; then mv -f "$f$ORIG" "$f"; fi
   done
   rm -f /etc/systemd/timesyncd.conf.d/doors-dominio.conf "$DISPATCHER"
   manter_scanner
   if [ -f /etc/samba/doors-scanner.conf ]; then rodar systemctl restart smbd.service; else rodar systemctl disable --now smbd.service; fi
   fechar_progresso
-  aviso "Pronto: só os usuários locais entram neste computador."
+  case "$servidor" in
+    ok)     aviso "Pronto: este computador saiu do domínio ${realm:-} e foi apagado do servidor.
+Só os usuários locais entram neste computador." ;;
+    falhou) aviso "Este computador foi desligado do domínio aqui, mas NÃO consegui apagá-lo do servidor
+(usuário sem permissão, senha errada ou sem rede). Peça à TI para remover o computador
+$(hostname -s) no Active Directory. Detalhes em $LOG" ;;
+    *)      aviso "Pronto: só os usuários locais entram neste computador.
+O cadastro do computador $(hostname -s) continua no servidor do domínio." ;;
+  esac
 }
 
 # ---------- entrar ----------
@@ -189,6 +220,16 @@ Use até 15 caracteres: letras, números ou hífen (sem hífen no começo ou no 
   [ -n "$admin" ] || falha "O usuário ficou em branco."
   pw=$(senha "Senha de $admin")
   [ -n "$pw" ] || falha "A senha ficou em branco."
+
+  # 5. até aqui nada mudou no computador: confirma antes de aplicar
+  confirmar "Colocar este computador no domínio?
+
+• nome do computador: $nome.$dominio$([ "$nome" = "$(hostname -s)" ] || printf '   (hoje: %s)' "$(hostname -s)")
+• domínio: $realm   (nome curto $grupo)
+• placa de rede: $placa
+• usuário do ingresso: $admin
+
+Depois disso os usuários da rede entram neste computador com o próprio usuário e senha." "Aceitar"
 
   abrir_progresso
   guardar_originais
@@ -363,10 +404,24 @@ Saia da sessão (ou reinicie) e entre com o usuário da rede, sem o domínio na 
   fi
 }
 
+# já está num domínio: mostra qual e oferece remover (ou cancelar sem mexer em nada)
+ja_no_dominio() {
+  local realm ligacao
+  realm=$(sed -n 's/^[[:space:]]*realm[[:space:]]*=[[:space:]]*//p' /etc/samba/smb.conf | head -1)
+  if net ads testjoin >/dev/null 2>&1; then ligacao="OK"; else ligacao="sem resposta do servidor (sem rede? DNS?)"; fi
+  confirmar "Este computador já está no domínio ${realm:-?}.
+
+• nome: $(hostname -f 2>/dev/null || hostname)
+• ligação com o servidor: $ligacao
+
+Para colocá-lo em outro domínio (ou trocar o nome), remova primeiro." "Remover do domínio"
+  sair
+}
+
 case "${1:-}" in
   --estado) estado ;;
   --sair)   sair ;;
-  "")       entrar ;;
+  "")       if no_dominio; then ja_no_dominio; else entrar; fi ;;
   *) echo "uso: $0 [--estado|--sair]" >&2; exit 1 ;;
 esac
 exit 0

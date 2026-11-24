@@ -41,6 +41,15 @@ senha() {
   printf '%s' "$r"
 }
 aviso() { if [ -n "$GUI" ]; then z --info --width=480 --text="$(esc "$1")"; else echo "$1"; fi; }
+confirmar() {  # confirmar "texto" "botão de seguir"; Cancelar sai sem mudar nada
+  local r
+  if [ -n "$GUI" ]; then
+    z --question --width=500 --text="$(esc "$1")" --ok-label="$2" --cancel-label="Cancelar" || cancelar
+  else
+    echo "$1" >&2; read -r -p "$2? [s/N]: " r || cancelar
+    case "$r" in s|S|sim|Sim|SIM) ;; *) cancelar ;; esac
+  fi
+}
 falha() {
   echo "ERRO: $1" >>"$LOG"
   if [ -n "$GUI" ]; then z --error --width=480 --text="$(esc "$1
@@ -60,6 +69,10 @@ incluir_no_smb_conf() {
 }
 
 remover() {
+  confirmar "Desligar a pasta do scanner?
+
+• a impressora deixa de conseguir gravar neste computador
+• a pasta $PASTA e as digitalizações continuam no disco" "Remover"
   rm -f "$CONF"
   sed -i "\|^# Doors OS: pasta do scanner\$|d; \|^$INCLUDE\$|d" "$SMB"
   smbpasswd -x "$CONTA" >/dev/null 2>&1 || true
@@ -73,17 +86,11 @@ A pasta $PASTA e os arquivos continuam."
 }
 
 criar() {
-  local pc s1 s2 quem entrada nome id ok="" lista_ok="" avisos="" caminhos="" usuario ip
+  local pc s1="" s2 quem entrada nome id ok="" lista_ok="" avisos="" caminhos="" usuario ip
   : >"$LOG"; chmod 600 "$LOG"
 
-  # 1. usuário só da impressora: sem login, sem shell, sem senha de sistema
-  if ! getent passwd "$CONTA" >/dev/null; then
-    useradd --system --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin \
-      --comment "Impressora (pasta do scanner)" "$CONTA" >>"$LOG" 2>&1 || falha "Não consegui criar o usuário $CONTA."
-  fi
-  usermod -L "$CONTA" >>"$LOG" 2>&1 || true
-
-  # 2. senha só do Samba (a que vai na impressora)
+  # --- perguntas (nada muda no computador até a confirmação) ---
+  # senha só do Samba (a que vai na impressora)
   local tem_senha=""
   pdbedit -L 2>/dev/null | grep -q "^$CONTA:" && tem_senha=1
   while :; do
@@ -93,21 +100,40 @@ Deixe em branco para manter a senha atual.}")
     if [ -z "$s1" ]; then aviso "A senha não pode ficar em branco."; continue; fi
     s2=$(senha "Repita a senha")
     if [ "$s1" != "$s2" ]; then aviso "As senhas não conferem. Tente de novo."; continue; fi
-    printf '%s\n%s\n' "$s1" "$s1" | smbpasswd -a -s "$CONTA" >>"$LOG" 2>&1 || falha "Não consegui definir a senha."
-    smbpasswd -e "$CONTA" >>"$LOG" 2>&1
     break
   done
-  unset s1 s2
+  unset s2
 
-  # 3. a pasta
+  # quem pode abrir: usuários e grupos (locais ou do AD)
+  quem=$(quem_chamou)
+  entrada=$(perguntar "Quem pode abrir as digitalizações neste PC?
+Usuários ou grupos, separados por vírgula (ex.: d123456, d654321 ou um grupo do domínio)." "$quem")
+
+  confirmar "$([ -f "$CONF" ] && echo "Alterar" || echo "Criar") a pasta do scanner?
+
+• pasta: $PASTA   (na rede: \\\\$(hostname -s | tr 'a-z' 'A-Z')\\scanner)
+• usuário da impressora: $CONTA   ($([ -n "$s1" ] && echo "senha nova" || echo "senha atual mantida"))
+• podem abrir: ${entrada:-ninguém além da impressora}" "Aceitar"
+
+  # --- aplicar ---
+  # usuário só da impressora: sem login, sem shell, sem senha de sistema
+  if ! getent passwd "$CONTA" >/dev/null; then
+    useradd --system --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin \
+      --comment "Impressora (pasta do scanner)" "$CONTA" >>"$LOG" 2>&1 || falha "Não consegui criar o usuário $CONTA."
+  fi
+  usermod -L "$CONTA" >>"$LOG" 2>&1 || true
+  if [ -n "$s1" ]; then
+    printf '%s\n%s\n' "$s1" "$s1" | smbpasswd -a -s "$CONTA" >>"$LOG" 2>&1 || falha "Não consegui definir a senha."
+    smbpasswd -e "$CONTA" >>"$LOG" 2>&1
+  fi
+  unset s1
+
   mkdir -p "$PASTA"
   chown "$CONTA:$CONTA" "$PASTA"
   chmod 2770 "$PASTA"
 
-  # 4. quem pode abrir: usuários e grupos (locais ou do AD), por ACL
-  quem=$(quem_chamou)
-  entrada=$(perguntar "Quem pode abrir as digitalizações neste PC?
-Usuários ou grupos, separados por vírgula (ex.: d123456, d654321 ou um grupo do domínio)." "$quem")
+  # quem pode abrir, por ACL (refeita do zero: quem saiu da lista perde o acesso)
+  setfacl -R -b "$PASTA" 2>>"$LOG" || true
   IFS=',' read -r -a lista <<< "$entrada"
   for nome in "${lista[@]}"; do
     nome=$(echo "$nome" | sed 's/^ *//; s/ *$//')
@@ -188,9 +214,35 @@ Atenção:$avisos}
 Os arquivos aparecem em $PASTA (atalho \"Scanner\" na pasta pessoal)."
 }
 
+# a pasta já existe: alterar (senha, quem abre), remover ou cancelar
+ja_existe() {
+  local r usuarios
+  usuarios=$(getfacl -p "$PASTA" 2>/dev/null | sed -n 's/^user:\([^:][^:]*\):.*/\1/p' | tr '\n' ' ')
+  local t="A pasta do scanner já está ligada neste computador.
+
+• pasta: $PASTA
+• usuário da impressora: $CONTA
+• podem abrir: ${usuarios:-ninguém além da impressora}
+
+Alterar: trocar a senha da impressora ou quem pode abrir as digitalizações.
+Remover: a impressora deixa de gravar aqui (os arquivos continuam)."
+  if [ -n "$GUI" ]; then
+    r=$(z --question --width=500 --text="$(esc "$t")" --ok-label="Alterar" \
+          --cancel-label="Cancelar" --extra-button="Remover")
+    case $?:$r in
+      0:*) criar ;;
+      *:Remover) remover ;;
+      *) cancelar ;;
+    esac
+  else
+    echo "$t"; read -r -p "[a]lterar, [r]emover ou [c]ancelar? " r || cancelar
+    case "$r" in a|A) criar ;; r|R) remover ;; *) cancelar ;; esac
+  fi
+}
+
 case "${1:-}" in
   --remover) remover ;;
-  "") criar ;;
+  "") if [ -f "$CONF" ]; then ja_existe; else criar; fi ;;
   *) echo "uso: $0 [--remover]" >&2; exit 1 ;;
 esac
 exit 0
