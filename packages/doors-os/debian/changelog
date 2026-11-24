@@ -1,3 +1,10 @@
+doors-os (0.4~dev22) trixie; urgency=medium
+
+  * Assistentes: caixas de diálogo desenhadas por software (GSK_RENDERER=cairo);
+    no GNOME, rodando como administrador, a caixa aparecia vazia.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Tue, 24 Nov 2026 08:04:49 -0300
+
 doors-os (0.4~dev21) trixie; urgency=medium
 
   * Entrar no domínio: confirma (Aceitar/Cancelar) antes de mudar qualquer

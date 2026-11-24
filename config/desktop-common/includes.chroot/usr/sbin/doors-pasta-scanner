@@ -24,6 +24,9 @@ LOG=/var/log/doors-pasta-scanner.log
 
 # ---------- caixas de diálogo (zenity) ou terminal ----------
 if [ -n "${DISPLAY:-}" ] && command -v zenity >/dev/null 2>&1; then GUI=1; else GUI=; fi
+# como administrador (pkexec) o desenho por GPU falha no GNOME ("Failed to attach to x11 shm":
+# o X roda com o usuário) e a caixa fica vazia; o desenho por software (cairo) funciona em todos
+export GSK_RENDERER=cairo
 z() { zenity --title="$TITULO" "$@" 2>/dev/null; }
 # o zenity interpreta "\" no texto (\n, \t...): dobra as barras para \\PC\pasta aparecer certo
 esc() { printf '%s' "$1" | sed 's/\\/\\\\/g'; }
