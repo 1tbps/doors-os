@@ -72,7 +72,8 @@ function areaPadrao(w) {
 }
 
 function aplicar(w, r) {
-    w.frameGeometry = Qt.rect(r.x, r.y, r.width, r.height);
+    // KWin converte um objeto {x, y, width, height} em retangulo (nao existe Qt.rect aqui).
+    w.frameGeometry = { x: r.x, y: r.y, width: r.width, height: r.height };
 }
 
 function aoMaximizar(w) {
