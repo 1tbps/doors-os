@@ -1,6 +1,8 @@
 kde/xdg/kdeglobals etc/xdg/
 kde/xdg/kwinrc etc/xdg/
 kde/xdg/plasmarc etc/xdg/
+kde/xdg/kcminputrc etc/xdg/
+kde/sddm/doors-numlock.conf etc/sddm.conf.d/
 kde/color-schemes/DoorsClaro.colors usr/share/color-schemes/
 kde/look-and-feel/org.doors.desktop usr/share/plasma/look-and-feel/
 kde/menu/kde-menu-colorido usr/lib/doors/
