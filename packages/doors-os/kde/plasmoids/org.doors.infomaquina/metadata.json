@@ -1,0 +1,15 @@
+{
+    "KPlugin": {
+        "Authors": [{ "Name": "Doors OS" }],
+        "Category": "System Information",
+        "Description": "Nome do computador, IP e domínio no papel de parede (como o BGInfo do Windows)",
+        "Icon": "network-wired",
+        "Id": "org.doors.infomaquina",
+        "License": "GPL-2.0+",
+        "Name": "Nome e IP do computador",
+        "Version": "1.0",
+        "FormFactors": ["desktop"]
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

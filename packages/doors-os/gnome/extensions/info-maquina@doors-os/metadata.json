@@ -1,0 +1,7 @@
+{
+  "uuid": "info-maquina@doors-os",
+  "name": "Nome e IP do computador (Doors)",
+  "description": "Mostra o nome do computador, o IP e o domínio no canto do papel de parede, como o BGInfo do Windows.",
+  "shell-version": ["46", "47", "48"],
+  "url": "https://github.com/1tbps/doors-os"
+}

@@ -8,3 +8,5 @@ kde/look-and-feel/org.doors.desktop usr/share/plasma/look-and-feel/
 kde/menu/kde-menu-colorido usr/lib/doors/
 kde/menu/doors-menu.sh etc/xdg/plasma-workspace/env/
 kde/sddm/doors usr/share/sddm/themes/
+kde/plasmoids/org.doors.infomaquina usr/share/plasma/plasmoids/
+kde/updates/doors-info-maquina.js usr/share/plasma/shells/org.kde.plasma.desktop/contents/updates/
