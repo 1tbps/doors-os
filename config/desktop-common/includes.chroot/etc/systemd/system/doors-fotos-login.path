@@ -1,0 +1,10 @@
+[Unit]
+Description=Doors OS: fotos dos usuários na tela de login (vigia o AccountsService)
+
+[Path]
+PathChanged=/var/lib/AccountsService/users
+PathChanged=/var/lib/AccountsService/icons
+Unit=doors-fotos-login.service
+
+[Install]
+WantedBy=paths.target
