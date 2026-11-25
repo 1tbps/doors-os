@@ -175,6 +175,7 @@ sair() {
     if [ -f "$f$ORIG" ]; then mv -f "$f$ORIG" "$f"; fi
   done
   rm -f /etc/systemd/timesyncd.conf.d/doors-dominio.conf "$DISPATCHER" "$SDDM_CONF"
+  systemctl disable --now doors-fotos-login.path doors-fotos-login.service >>"$LOG" 2>&1 || true
   manter_scanner
   if [ -f /etc/samba/doors-scanner.conf ]; then rodar systemctl restart smbd.service; else rodar systemctl disable --now smbd.service; fi
   fechar_progresso
@@ -385,6 +386,8 @@ EOF
 [Theme]
 Current=doors
 EOF
+      # fotos escolhidas em Configurações > Usuários, legíveis pela tela de login
+      rodar systemctl enable --now doors-fotos-login.path doors-fotos-login.service
     fi
   fi
 

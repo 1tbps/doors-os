@@ -17,7 +17,10 @@ doors-os (0.4~rc3) trixie; urgency=medium
   * doors-kde-settings: tema "doors" da tela de login (SDDM), igual ao Breeze
     do Debian mas com a foto do usuário digitado quando não há lista de
     usuários; a do último que entrou já aparece. O Entrar no domínio liga o
-    tema junto com a tela sem lista.
+    tema junto com a tela sem lista, e o doors-fotos-login.path, que copia a
+    foto de cada usuário para /var/lib/doors/fotos-login (o AccountsService
+    não copia as fotos prontas do sistema, e a tela de login não lê o
+    cadastro dele).
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 

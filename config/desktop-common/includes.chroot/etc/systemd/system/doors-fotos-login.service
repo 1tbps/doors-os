@@ -1,0 +1,10 @@
+[Unit]
+Description=Doors OS: copia as fotos dos usuários para a tela de login
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/doors/fotos-login
+
+[Install]
+WantedBy=multi-user.target

@@ -1,7 +1,7 @@
 // Doors OS: cópia do Login.qml do tema breeze do Debian (Plasma 6.3.6) com a foto do usuário
-// digitado. Com fotoPeloNome, a "lista" tem um item só: o nome digitado e a foto que o
-// AccountsService guarda em /var/lib/AccountsService/icons/<usuário> (a que se escolhe em
-// Configurações > Usuários). Usuário sem foto ou campo vazio: a figura padrão do Breeze.
+// digitado. Com fotoPeloNome, a "lista" tem um item só: o nome digitado e a foto escolhida em
+// Configurações > Usuários, que /usr/lib/doors/fotos-login copia do AccountsService para
+// /var/lib/doors/fotos-login/<usuário>. Usuário sem foto ou campo vazio: a figura padrão do Breeze.
 import org.kde.breeze.components
 
 import QtQuick 2.15
@@ -52,7 +52,7 @@ SessionManagementScreen {
             root.sonda.source = "";
             fotoModel.setProperty(0, "icon", fotoPadrao);
         } else {
-            root.sonda.source = "file:///var/lib/AccountsService/icons/" + encodeURIComponent(n);
+            root.sonda.source = "file:///var/lib/doors/fotos-login/" + encodeURIComponent(n);
         }
     }
 

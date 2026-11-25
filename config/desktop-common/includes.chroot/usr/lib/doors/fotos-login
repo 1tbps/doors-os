@@ -1,0 +1,27 @@
+#!/bin/sh
+# Doors OS: copia a foto de cada usuário (a escolhida em Configurações > Usuários, guardada pelo
+# AccountsService) para /var/lib/doors/fotos-login/<usuário>, legível pela tela de login.
+# O AccountsService só copia para icons/<usuário> as imagens recortadas; uma foto pronta do
+# sistema (/usr/share/...) fica só como caminho em users/<usuário>, que a tela de login (usuário
+# sddm) não consegue ler. Rodado pelo doors-fotos-login.path quando uma foto muda.
+set -u
+AS=/var/lib/AccountsService
+DEST=/var/lib/doors/fotos-login
+mkdir -p "$DEST"
+chmod 755 "$DEST"
+for f in "$DEST"/*; do  # usuário que não existe mais no AccountsService
+  [ -e "$f" ] || continue
+  [ -e "$AS/users/$(basename "$f")" ] || rm -f "$f"
+done
+for u in "$AS"/users/*; do
+  [ -f "$u" ] || continue
+  nome=$(basename "$u")
+  icone=$(sed -n 's/^Icon=//p' "$u" | tail -1)
+  [ -n "$icone" ] || icone="$AS/icons/$nome"
+  if [ -f "$icone" ] && [ -r "$icone" ]; then
+    cmp -s "$icone" "$DEST/$nome" || install -m 644 "$icone" "$DEST/$nome"
+  else
+    rm -f "$DEST/$nome"
+  fi
+done
+exit 0
