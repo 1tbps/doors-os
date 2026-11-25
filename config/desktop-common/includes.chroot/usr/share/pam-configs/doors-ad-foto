@@ -1,0 +1,7 @@
+Name: Doors OS: foto dos usuários do domínio nas Configurações e na tela de bloqueio
+Default: no
+Priority: 0
+Session-Interactive-Only: yes
+Session-Type: Additional
+Session:
+	optional	pam_exec.so quiet /usr/lib/doors/ad-registrar-usuario

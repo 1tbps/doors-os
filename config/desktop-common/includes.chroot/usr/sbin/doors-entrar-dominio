@@ -5,7 +5,8 @@
 #   doors-entrar-dominio --sair    sai do domínio e volta só para os usuários locais
 # Passos: nome do PC (+ /etc/hosts com o nome completo), DNS do AD, relógio, placa de rede,
 # smb.conf (ADS + idmap rid), ingresso, winbind/smbd, registro no DNS (e de novo quando o IP
-# muda pelo DHCP), login pelo AD (PAM + pasta pessoal /home/usuario) e testes.
+# muda pelo DHCP), login pelo AD (PAM + pasta pessoal /home/usuario + foto do usuário nas
+# Configurações, pelo AccountsService) e testes.
 set -u
 
 if [ "$(id -u)" != 0 ]; then
@@ -166,7 +167,7 @@ sair() {
   passo "Desligando o login pela rede..."
   rodar systemctl disable --now winbind.service
   sed -i -E '/^(passwd|group|shadow):/s/ winbind//' /etc/nsswitch.conf
-  rodar pam-auth-update --package --disable winbind mkhomedir
+  rodar pam-auth-update --package --disable winbind mkhomedir doors-ad-foto
   local f
   for f in $ARQUIVOS; do
     # /etc/hosts fica como está: o nome do computador não volta ao antigo
@@ -365,7 +366,7 @@ EOF
 
   passo "Ligando o login com usuários do domínio..."
   sed -i -E '/^(passwd|group):/{/winbind/!s/$/ winbind/}' /etc/nsswitch.conf
-  rodar pam-auth-update --package --enable winbind mkhomedir
+  rodar pam-auth-update --package --enable winbind mkhomedir doors-ad-foto
 
   if [ -d /etc/sddm.conf.d ] || command -v sddm >/dev/null 2>&1; then
     mkdir -p "$(dirname "$SDDM_CONF")"

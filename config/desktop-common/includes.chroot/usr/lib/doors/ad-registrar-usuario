@@ -1,0 +1,18 @@
+#!/bin/sh
+# Doors OS: chamado no login (PAM, pam_exec, como root) quando o computador está num domínio.
+# O AccountsService só conhece os usuários do /etc/passwd; um usuário do AD não aparecia em
+# Configurações > Usuários e não conseguia trocar a própria foto. Aqui ele é registrado
+# (CacheUser), uma vez só: daí a foto fica em /var/lib/AccountsService/icons/<usuário>, que
+# o Plasma, o GNOME, o Cinnamon e as telas de bloqueio leem. Nunca atrasa nem impede o login.
+[ "${PAM_TYPE:-}" = open_session ] || exit 0
+[ -n "${PAM_USER:-}" ] || exit 0
+ent=$(getent passwd "$PAM_USER") || exit 0
+nome=${ent%%:*}
+# usuário local: o AccountsService já conhece
+awk -F: -v u="$nome" '$1 == u { achou = 1 } END { exit !achou }' /etc/passwd && exit 0
+uid=$(printf '%s' "$ent" | cut -d: -f3)
+[ "$uid" -ge 1000 ] 2>/dev/null || exit 0
+[ -e "/var/lib/AccountsService/users/$nome" ] && exit 0
+timeout 10 busctl call org.freedesktop.Accounts /org/freedesktop/Accounts \
+  org.freedesktop.Accounts CacheUser s "$nome" >/dev/null 2>&1 || true
+exit 0

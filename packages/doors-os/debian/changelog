@@ -8,6 +8,12 @@ doors-os (0.4~rc3) trixie; urgency=medium
     (/etc/sddm.conf.d/doors-numlock.conf, Numlock=on) e ao entrar no Plasma
     (/etc/xdg/kcminputrc, NumLock=0). O SDDM abre um X novo para a sessão,
     então o estado da tela de login não passava para o Plasma.
+  * Entrar no domínio: o usuário do AD agora aparece em Configurações >
+    Usuários e consegue trocar a própria foto. O AccountsService só conhecia
+    os usuários do /etc/passwd; no login (pam_exec, perfil doors-ad-foto do
+    pam-auth-update, ligado pelo assistente) o usuário do domínio é registrado
+    nele (CacheUser). A foto vai para /var/lib/AccountsService/icons e aparece
+    no menu e na tela de bloqueio.
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 
