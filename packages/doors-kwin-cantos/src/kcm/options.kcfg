@@ -233,6 +233,12 @@
             <min>0</min>
             <max>20</max>
         </entry>
+        <!-- Doors OS: gap between the window edge and the outer outline (active and inactive) -->
+        <entry name="OuterOutlineGap" type="Double">
+            <default>0</default>
+            <min>0</min>
+            <max>20</max>
+        </entry>
         <entry name="OuterOutlineColor" type="Color">
             <default>black</default>
         </entry>

@@ -76,24 +76,34 @@ vec4 shapeCorner(vec2 coord0, vec4 tex, vec2 start, float angle, vec4 coord_shad
 
     if (hasOuterOutline()) {
         vec4 outerOutlineOverlay = mix(coord_shadowColor, outerOutlineColor, outerOutlineColor.a);
-        if (distance_from_center > radius + outerOutlineThickness - 0.5) {
+        // Doors OS: the outer outline may "float" outside the window, with a transparent gap
+        // of `outerOutlineGap` pixels between the window edge and the outline.
+        float outerOutlineStart = radius + outerOutlineGap;
+        bool  hasGap            = outerOutlineGap > 0.0;
+        if (distance_from_center > outerOutlineStart + outerOutlineThickness - 0.5) {
             // antialiasing for the outer outline to shadow
-            float antialiasing = clamp(distance_from_center - radius - outerOutlineThickness + 0.5, 0.0, 1.0);
+            float antialiasing =
+                    clamp(distance_from_center - outerOutlineStart - outerOutlineThickness + 0.5, 0.0, 1.0);
             return mix(outerOutlineOverlay, coord_shadowColor, antialiasing);
+        } else if (hasGap && distance_from_center > outerOutlineStart - 0.5) {
+            // antialiasing for the gap to the outer outline
+            float antialiasing = clamp(distance_from_center - outerOutlineStart + 0.5, 0.0, 1.0);
+            return mix(coord_shadowColor, outerOutlineOverlay, antialiasing);
         } else if (!inOutlineZone && distance_from_center > radius - 0.5) {
-            // antialiasing for the outer outline to the window edge
+            // antialiasing for the window edge to the outer outline (or to the gap)
             float antialiasing = clamp(distance_from_center - radius + 0.5, 0.0, 1.0);
+            vec4  beyondEdge   = hasGap ? coord_shadowColor : outerOutlineOverlay;
             if (hasPrimaryOutline()) {
                 // if the primary outline is present
                 vec4 outlineOverlay = vec4(mix(tex.rgb, outlineColor.rgb, outlineColor.a), 1.0);
-                return mix(outlineOverlay, outerOutlineOverlay, antialiasing);
+                return mix(outlineOverlay, beyondEdge, antialiasing);
             } else if (hasSecondOutline()) {
                 // if the second outline is present
                 vec4 secondOutlineOverlay = vec4(mix(tex.rgb, secondOutlineColor.rgb, secondOutlineColor.a), 1.0);
-                return mix(secondOutlineOverlay, outerOutlineOverlay, antialiasing);
+                return mix(secondOutlineOverlay, beyondEdge, antialiasing);
             } else {
                 // if the no other outline is not present
-                return mix(tex, outerOutlineOverlay, antialiasing);
+                return mix(tex, beyondEdge, antialiasing);
             }
         }
     } else {
