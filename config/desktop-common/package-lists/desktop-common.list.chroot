@@ -24,3 +24,5 @@ flameshot
 timeshift
 # informações do sistema no terminal, com o logo do Doors (config em doors-artwork)
 fastfetch
+# terminal com o Oh My Bash para todo usuário novo (/etc/skel/.bashrc do doors-oh-my-bash)
+doors-oh-my-bash

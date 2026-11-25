@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+if [ "$1" = configure ]; then
+  # o preinst desviou o .bashrc do Debian para /etc/doors-oh-my-bash/bashrc.debian; aqui entra o do Doors
+  # (cópia de /usr/share/doors-oh-my-bash/skel-bashrc, refeita a cada versão do pacote).
+  # Vale para quem for criado daqui para frente; quem já existe continua com o seu ~/.bashrc.
+  install -m 644 /usr/share/doors-oh-my-bash/skel-bashrc /etc/skel/.bashrc
+fi
+#DEBHELPER#

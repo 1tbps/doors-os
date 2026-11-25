@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+if [ "$1" = remove ] || [ "$1" = abort-install ] || [ "$1" = disappear ]; then
+  # tira a cópia do Doors e devolve o .bashrc do Debian para os próximos usuários (quem já
+  # existe fica com o seu; sem o pacote, o .bashrc do Doors cai sozinho no prompt comum)
+  if dpkg-divert --listpackage /etc/skel/.bashrc | grep -qx doors-oh-my-bash; then
+    rm -f /etc/skel/.bashrc
+    dpkg-divert --package doors-oh-my-bash --remove --rename \
+      --divert /etc/doors-oh-my-bash/bashrc.debian /etc/skel/.bashrc
+  fi
+  rmdir /etc/doors-oh-my-bash 2>/dev/null || true
+fi
+#DEBHELPER#

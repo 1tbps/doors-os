@@ -1,0 +1,21 @@
+Source: doors-oh-my-bash
+Section: shells
+Priority: optional
+Maintainer: Doors OS Project <noreply@doors-os.invalid>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://github.com/ohmybash/oh-my-bash
+
+Package: doors-oh-my-bash
+Architecture: all
+Depends: ${misc:Depends}, bash
+Recommends: git, bash-completion
+Description: Oh My Bash no terminal dos novos usuários (Doors OS)
+ Oh My Bash (github.com/ohmybash/oh-my-bash, licença MIT) instalado para
+ todo o sistema em /usr/share/oh-my-bash, numa versão fixa que só muda com
+ o pacote. O /etc/skel/.bashrc do Doors liga o Oh My Bash (tema "font",
+ git, ssh e atalhos) e mantém o básico do .bashrc do Debian, então todo
+ usuário novo já entra com ele: o criado na instalação, o da sessão live e
+ os usuários do domínio (pasta pessoal criada pelo pam_mkhomedir).
+ Personalizações de cada usuário ficam em ~/.local/share/oh-my-bash/custom.
