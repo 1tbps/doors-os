@@ -25,3 +25,5 @@ simple-scan
 # caixas de diálogo dos assistentes (entrar no domínio, pasta do scanner) em qualquer ambiente
 zenity
 pkexec
+# acesso remoto por SSH para manutenção (openssh-server + /etc/ssh/sshd_config.d/10-doors.conf)
+doors-ssh

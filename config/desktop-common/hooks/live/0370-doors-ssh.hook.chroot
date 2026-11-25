@@ -1,0 +1,11 @@
+#!/bin/sh
+# SSH (pacote doors-ssh): o openssh-server gerou chaves do servidor dentro do chroot; se
+# ficassem na ISO, todos os computadores instalados teriam as mesmas chaves (qualquer um
+# poderia se passar por outro). Apaga; cada computador gera as suas no primeiro boot
+# (ExecStartPre=ssh-keygen -A no drop-in do ssh.service).
+set -e
+rm -f /etc/ssh/ssh_host_*
+systemctl enable ssh.service
+test -f /etc/ssh/sshd_config.d/10-doors.conf
+test -f /usr/lib/systemd/system/ssh.service.d/doors.conf
+! ls /etc/ssh/ssh_host_* >/dev/null 2>&1

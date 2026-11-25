@@ -74,3 +74,14 @@ Description: aparência padrão do Doors OS para o GNOME
  papéis de parede do Doors e as janelas com cantos arredondados e borda
  na cor de destaque na janela ativa (doors-gnome-cantos). Vale para
  novos usuários.
+
+Package: doors-ssh
+Architecture: all
+Depends: ${misc:Depends}, openssh-server
+Description: acesso remoto por SSH no Doors OS
+ Instala e liga o servidor SSH para a manutenção dos computadores pela rede,
+ com /etc/ssh/sshd_config.d/10-doors.conf: root não entra pelo SSH
+ (PermitRootLogin no), entrada com senha permitida, no máximo 4 tentativas
+ por conexão e 30 segundos para fazer o login. As chaves do servidor são
+ geradas em cada computador na primeira vez que o SSH sobe (não vêm na ISO).
+ Na sessão live o SSH fica desligado.
