@@ -13,6 +13,13 @@ recarregar() {
     --method org.kde.KWin.reconfigure >/dev/null
 }
 
+# Tira o script da memoria do KWin na hora (o reconfigure sozinho nao basta:
+# ele roda depois e, com o pacote ja apagado, nao descarrega o script antigo).
+descarregar() {
+  gdbus call --session --dest org.kde.KWin --object-path /Scripting \
+    --method org.kde.kwin.Scripting.unloadScript "$ID" >/dev/null 2>&1 || true
+}
+
 criar_pacote() {
   mkdir -p "$DIR/$ID/contents/code"
   cat > "$DIR/$ID/metadata.json" <<'JSON'
@@ -136,7 +143,7 @@ case "$1" in
     criar_pacote
     kpackagetool6 --type=KWin/Script --remove "$ID" >/dev/null 2>&1 || true
     kwriteconfig6 --file kwinrc --group Plugins --key "${ID}Enabled" false
-    recarregar
+    descarregar
     kpackagetool6 --type=KWin/Script --install "$DIR/$ID" >/dev/null
     kwriteconfig6 --file kwinrc --group "Script-$ID" --key Margem "$margem"
     kwriteconfig6 --file kwinrc --group Plugins --key "${ID}Enabled" true
@@ -146,6 +153,7 @@ case "$1" in
   desligar)
     kwriteconfig6 --file kwinrc --group Plugins --key "${ID}Enabled" --delete
     kwriteconfig6 --file kwinrc --group "Script-$ID" --key Margem --delete
+    descarregar
     recarregar
     kpackagetool6 --type=KWin/Script --remove "$ID" >/dev/null 2>&1 || true
     echo "Maximizar normal de volta." ;;
