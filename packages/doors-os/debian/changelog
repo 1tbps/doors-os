@@ -1,3 +1,11 @@
+doors-os (0.4~rc3) trixie; urgency=medium
+
+  * doors-artwork: logo do Doors no fastfetch (/usr/share/doors/fastfetch/
+    doors.txt e /etc/xdg/fastfetch/config.jsonc). Sem isso o fastfetch não
+    reconhecia ID=doors e mostrava o logo do Debian (ID_LIKE).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
+
 doors-os (0.4~rc2) trixie; urgency=medium
 
   * Entrar no domínio: nome do computador em 127.0.0.1 no /etc/hosts (com

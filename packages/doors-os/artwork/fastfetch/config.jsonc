@@ -1,0 +1,21 @@
+// Configuração padrão do fastfetch no Doors OS (vale para todos os usuários).
+// Quem quiser personalizar cria ~/.config/fastfetch/config.jsonc, que tem prioridade.
+// Sem isto o fastfetch não reconhece ID=doors e mostra o logo do Debian (ID_LIKE).
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "type": "file",
+        "source": "/usr/share/doors/fastfetch/doors.txt",
+        "color": {
+            "1": "blue",
+            "2": "yellow",
+            "3": "white"
+        },
+        "padding": {
+            "right": 2
+        }
+    },
+    "display": {
+        "color": "blue"
+    }
+}

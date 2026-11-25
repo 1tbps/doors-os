@@ -22,3 +22,5 @@ pciutils
 flameshot
 # cópias do sistema (como no Linux Mint): desfazer atualização/configuração que quebrou o sistema
 timeshift
+# informações do sistema no terminal, com o logo do Doors (config em doors-artwork)
+fastfetch

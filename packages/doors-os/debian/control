@@ -29,7 +29,7 @@ Recommends: elementary-xfce-icon-theme, greybird-gtk-theme, plasma-workspace-wal
 Description: tema visual do Doors OS
  Papéis de parede, tela de bloqueio, fundo de login e GRUB do Doors OS,
  registrados como tema do desktop-base, além do logo da tela de login (SDDM)
- e do papel de parede padrão do XFCE.
+ e do papel de parede padrão do XFCE e o logo do Doors no fastfetch.
 
 Package: doors-xfce-settings
 Architecture: all
