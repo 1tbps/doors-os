@@ -4,13 +4,12 @@
 {
     "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
     "logo": {
-        "type": "file",
+        // Porta em arco, gerada por branding/gerar-logo-fastfetch.py (códigos de cor
+        // já no arquivo, por isso "file-raw" com largura e altura fixas).
+        "type": "file-raw",
         "source": "/usr/share/doors/fastfetch/doors.txt",
-        "color": {
-            "1": "blue",
-            "2": "yellow",
-            "3": "white"
-        },
+        "width": 32,
+        "height": 19,
         "padding": {
             "right": 2
         }
