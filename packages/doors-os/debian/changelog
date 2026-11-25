@@ -1,8 +1,9 @@
 doors-os (0.4~rc3) trixie; urgency=medium
 
-  * doors-artwork: logo do Doors (porta em arco) no fastfetch (/usr/share/doors/fastfetch/
-    doors.txt e /etc/xdg/fastfetch/config.jsonc). Sem isso o fastfetch não
-    reconhecia ID=doors e mostrava o logo do Debian (ID_LIKE).
+  * doors-artwork: logo do Doors (porta em arco) no fastfetch
+    (/usr/share/doors/fastfetch/doors.txt e /etc/xdg/fastfetch/config.jsonc).
+    Sem isso o fastfetch não reconhecia ID=doors e mostrava o logo do Debian
+    (ID_LIKE).
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 
