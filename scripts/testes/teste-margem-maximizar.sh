@@ -113,6 +113,18 @@ function depois(fn) {
     t.start();
 }
 
+// Encaixe lado a lado (arrastar para a borda, Meta+setas): usa o "padding" dos
+// blocos de encaixe rapido do KWin. Ele deixa a margem inteira contra a borda da
+// tela e meia margem em cada janela entre elas (vao total = margem).
+function aoEncaixar(w, bloco) {
+    if (!bloco) return;
+    let raiz = bloco;
+    while (raiz.parent) raiz = raiz.parent;
+    const t = workspace.tilingForScreen(w.output);
+    if (t && t.rootTile === raiz) return;   // mosaico personalizado (Meta+T): nao mexe
+    if (raiz.padding !== MARGEM) raiz.padding = MARGEM;
+}
+
 function acompanhar(w) {
     if (!w || !w.normalWindow) return;
     w.maximizedAboutToChange.connect(function (modo) {
@@ -122,11 +134,13 @@ function acompanhar(w) {
         estado[k].antesDeMaximizar = copia(w.frameGeometry);
     });
     w.maximizedChanged.connect(function () { depois(function () { aoMaximizar(w); }); });
+    w.tileChanged.connect(function (bloco) { aoEncaixar(w, bloco); });
     w.interactiveMoveResizeFinished.connect(function () {
         // O usuario arrastou ou redimensionou: deixa de ser "preenchida".
         const e = estado[chave(w)];
         if (e) e.preenchida = null;
     });
+    if (w.tile) aoEncaixar(w, w.tile);
     if (w.maximizeMode === 3) depois(function () { aoMaximizar(w); });
 }
 
@@ -156,6 +170,7 @@ case "$1" in
     descarregar
     recarregar
     kpackagetool6 --type=KWin/Script --remove "$ID" >/dev/null 2>&1 || true
-    echo "Maximizar normal de volta." ;;
+    echo "Maximizar normal de volta."
+    echo "(O vao entre janelas encaixadas lado a lado some depois de sair e entrar na sessao.)" ;;
   *) echo "uso: bash $0 ligar [margem] | desligar"; exit 1 ;;
 esac
