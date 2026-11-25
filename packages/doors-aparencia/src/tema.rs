@@ -142,6 +142,8 @@ pub fn esquema_kde(base: &str, cor: &Cor, nome_id: &str, nome: &str) -> String {
 /// CSS do tema GTK3 pessoal: importa o Greybird (claro ou escuro) e pinta o contorno da
 /// janela ativa (o Cinnamon 6 desenha as bordas por este CSS). Sem brilho e sem mudar o
 /// arredondamento: o muffin não recorta o conteúdo, e o brilho deixava faixas pretas.
+/// Sem sombra nas janelas com barra própria (deixava rastro com janelas gelatinosas): a
+/// sombra transparente só mantém o tamanho da janela e a área de redimensionar.
 pub fn css_gtk3(base_tema: &str, cor: &Cor) -> String {
     let h = cor.hex();
     format!(
@@ -149,22 +151,22 @@ pub fn css_gtk3(base_tema: &str, cor: &Cor) -> String {
 @import url(\"/usr/share/themes/{base_tema}/gtk-3.0/gtk.css\");\n\n\
 .ssd decoration {{ box-shadow: 0 0 0 2px {h}; }}\n\
 .ssd decoration:backdrop {{ box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.23); }}\n\
-decoration {{ box-shadow: 0 3px 9px 1px rgba(0, 0, 0, 0.5), 0 0 0 2px {h}; }}\n\
-decoration:backdrop {{ box-shadow: 0 3px 9px 1px transparent, 0 2px 6px 2px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.18); }}\n\
+decoration {{ box-shadow: 0 3px 9px 1px transparent, 0 0 0 2px {h}; }}\n\
+decoration:backdrop {{ box-shadow: 0 3px 9px 1px transparent, 0 0 0 1px rgba(0, 0, 0, 0.18); }}\n\
 .maximized decoration, .fullscreen decoration, .tiled decoration, .popup decoration,\n\
 tooltip decoration, .csd.popup decoration {{ box-shadow: none; }}\n"
     )
 }
 
 /// ~/.config/gtk-4.0/gtk.css (Cinnamon e XFCE): contorno na janela ativa dos apps GTK 4 com
-/// barra própria (Calculadora, Arquivos...), na cor de destaque.
+/// barra própria (Calculadora, Arquivos...), na cor de destaque, sem sombra.
 pub fn css_gtk4(cor: &Cor) -> String {
     let n = ":not(.maximized):not(.fullscreen):not(.tiled):not(.tiled-top):not(.tiled-bottom):not(.tiled-left):not(.tiled-right)";
     format!(
-        "/* Doors OS: contorno na janela ativa também nos apps GTK 4 com barra própria.\n   \
+        "/* Doors OS: contorno na janela ativa também nos apps GTK 4 com barra própria (sem sombra).\n   \
 Gerado pelo Doors (o Doors Aparência troca a cor). Apague este arquivo para voltar ao padrão. */\n\
-window.csd{n} {{\n  box-shadow: 0 0 0 2px {}, 0 2px 8px 2px rgba(0, 0, 0, 0.35);\n}}\n\
-window.csd:backdrop{n} {{\n  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 2px 6px 2px rgba(0, 0, 0, 0.2);\n}}\n",
+window.csd{n} {{\n  box-shadow: 0 0 0 2px {}, 0 2px 8px 2px transparent;\n}}\n\
+window.csd:backdrop{n} {{\n  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 2px 8px 2px transparent;\n}}\n",
         cor.hex()
     )
 }
@@ -367,6 +369,8 @@ inactiveBackground=239,240,241\n";
         assert!(css.contains("/usr/share/themes/Greybird-dark/gtk-3.0/gtk.css"));
         assert!(css.contains("0 0 0 2px #ce6c20"));
         assert!(!css.contains("border-radius"));
+        // sem sombra visível (rastro com janelas gelatinosas)
+        assert!(!css.contains("rgba(0, 0, 0, 0.5)") && !css.contains("rgba(0, 0, 0, 0.2)"));
     }
 
     #[test]
@@ -391,6 +395,7 @@ inactiveBackground=239,240,241\n";
     fn gtk4_borda() {
         let c = css_gtk4(&cor_por_id("roxo").unwrap());
         assert!(c.contains("Doors OS") && c.contains("0 0 0 2px #7d54b2") && c.contains(":backdrop"));
+        assert!(!c.contains("0.35") && !c.contains("rgba(0, 0, 0, 0.2)"));
     }
 
     #[test]

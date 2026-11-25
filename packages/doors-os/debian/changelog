@@ -21,10 +21,19 @@ doors-os (0.4~rc3) trixie; urgency=medium
     foto de cada usuário para /var/lib/doors/fotos-login (o AccountsService
     não copia as fotos prontas do sistema, e a tela de login não lê o
     cadastro dele).
-  * doors-kde-settings: janelas do KDE sem a sombra/brilho do efeito de
-    cantos arredondados (ShadowSize e ShadowAlpha em 0 no [Round-Corners]).
-    Com "Janelas gelatinosas" ligado a sombra deixava rastro ao arrastar a
-    janela. O contorno colorido continua.
+  * Janelas sem sombra em todos os ambientes (com "Janelas gelatinosas" a
+    sombra deixava rastro ao arrastar). O contorno colorido continua.
+    - doors-kde-settings: ShadowSize e ShadowAlpha em 0 no [Round-Corners]
+      do efeito de cantos arredondados.
+    - doors-gnome-settings: focused-shadow e unfocused-shadow da extensão de
+      cantos arredondados com opacidade 0.
+    - doors-cinnamon-settings: extensão sem-sombra@doors-os (ligada por
+      padrão), que zera a opacidade das sombras de janela do muffin; menus
+      continuam com sombra.
+    - doors-xfce-settings: show_frame_shadow=false no xfwm4.
+    - doors-artwork: tema Doors (GTK 3) e gtk4-borda.css sem a sombra dos
+      apps com barra própria (sombra transparente, para a janela não mudar de
+      tamanho e continuar fácil de redimensionar).
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 

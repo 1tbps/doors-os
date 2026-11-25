@@ -8,6 +8,9 @@ border-width=2
 # também nos apps do GNOME (libadwaita), para a borda colorida aparecer em todas as janelas
 skip-libadwaita-app=false
 global-rounded-corner-settings={'padding': <{'left': <uint32 1>, 'right': <uint32 1>, 'top': <uint32 1>, 'bottom': <uint32 1>}>, 'keepRoundedCorners': <{'maximized': <false>, 'fullscreen': <false>}>, 'borderRadius': <uint32 12>, 'smoothing': <0>, 'borderColor': <[0.184, 0.471, 0.710, 1.0]>, 'enabled': <true>}
+# sem sombra nas janelas (deixava rastro ao arrastar com janelas gelatinosas)
+focused-shadow={'horizontalOffset': 0, 'verticalOffset': 0, 'blurOffset': 0, 'spreadRadius': 0, 'opacity': 0}
+unfocused-shadow={'horizontalOffset': 0, 'verticalOffset': 0, 'blurOffset': 0, 'spreadRadius': 0, 'opacity': 0}
 # sem a entrada "Rounded Corners Settings" no menu do botão direito da área de trabalho
 enable-preferences-entry=false
 

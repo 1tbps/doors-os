@@ -8,5 +8,7 @@
     <property name="button_layout" type="string" value="O|HMC"/>
     <property name="use_compositing" type="bool" value="true"/>
     <property name="show_dock_shadow" type="bool" value="true"/>
+    <!-- sem sombra nas janelas (deixava rastro ao arrastar); menus e painel continuam com sombra -->
+    <property name="show_frame_shadow" type="bool" value="false"/>
   </property>
 </channel>

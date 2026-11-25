@@ -1,0 +1,6 @@
+{
+ "uuid": "sem-sombra@doors-os",
+ "name": "Janelas sem sombra (Doors)",
+ "description": "Tira a sombra que o Cinnamon desenha em volta das janelas (deixava rastro ao arrastar com janelas gelatinosas). Menus continuam com sombra.",
+ "icon": "doors-logo"
+}
