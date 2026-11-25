@@ -194,11 +194,6 @@ namespace ShapeCorners
         int m_shader_outerOutlineThickness = 0;
 
         /**
-         * \brief Reference to `uniform float outerOutlineGap;` (Doors OS)
-         */
-        int m_shader_outerOutlineGap = 0;
-
-        /**
          * \brief Reference to `uniform sampler2D front;`
          *        Containing the active texture. When assigned to zero, it will contain the painted contents of the
          * window.

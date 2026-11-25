@@ -91,7 +91,6 @@ ShapeCorners::Shader::Shader()
     m_shader_outerOutlineColor2     = m_shader->uniformLocation("outerOutlineColor2");
     m_shader_outerOutlineAngle      = m_shader->uniformLocation("outerOutlineAngle");
     m_shader_outerOutlineThickness  = m_shader->uniformLocation("outerOutlineThickness");
-    m_shader_outerOutlineGap        = m_shader->uniformLocation("outerOutlineGap");
     m_shader_front                  = m_shader->uniformLocation("front");
     qInfo() << "ShapeCorners: shaders loaded.";
 }
@@ -141,7 +140,6 @@ void ShapeCorners::Shader::Bind(const Window &window, const double scale) const
                          static_cast<float>(window.currentConfig.secondOutline.size * scale));
     m_shader->setUniform(m_shader_outerOutlineThickness,
                          static_cast<float>(window.currentConfig.outerOutline.size * scale));
-    m_shader->setUniform(m_shader_outerOutlineGap, static_cast<float>(Config::outerOutlineGap() * scale));
     m_shader->setUniform(m_shader_shadowSize, static_cast<float>(shadowSize));
     m_shader->setUniform(m_shader_shadowColor, window.currentConfig.shadowColor.toQColor());
 
