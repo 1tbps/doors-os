@@ -1,3 +1,12 @@
+doors-os (0.4~rc2) trixie; urgency=medium
+
+  * Entrar no domínio: nome do computador em 127.0.0.1 no /etc/hosts (com
+    127.0.1.1 o ingresso falhava na rede real); sem enumerar o AD (enum
+    users/groups = no), que travava a tela de login do KDE no logoff; tela do
+    SDDM sem lista, com o último usuário preenchido.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 08:16:53 -0300
+
 doors-os (0.4~rc1) trixie; urgency=medium
 
   * Candidata à versão 0.4.

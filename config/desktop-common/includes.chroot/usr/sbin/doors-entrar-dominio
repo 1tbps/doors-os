@@ -16,6 +16,9 @@ fi
 ORIG=.doors-orig   # cópia dos arquivos originais (para --sair)
 ARQUIVOS="/etc/samba/smb.conf /etc/krb5.conf /etc/security/pam_winbind.conf /etc/hosts"
 DISPATCHER=/etc/NetworkManager/dispatcher.d/90-doors-ad-dns
+# tela de login do KDE (SDDM): sem lista de usuários, abre no campo de usuário com o último que
+# entrou já preenchido (como no Windows). Só é criado no domínio; --sair apaga.
+SDDM_CONF=/etc/sddm.conf.d/doors-dominio.conf
 TITULO="Entrar no domínio"
 LOG=/var/log/doors-entrar-dominio.log
 
@@ -170,7 +173,7 @@ sair() {
     [ "$f" = /etc/hosts ] && { rm -f "$f$ORIG"; continue; }
     if [ -f "$f$ORIG" ]; then mv -f "$f$ORIG" "$f"; fi
   done
-  rm -f /etc/systemd/timesyncd.conf.d/doors-dominio.conf "$DISPATCHER"
+  rm -f /etc/systemd/timesyncd.conf.d/doors-dominio.conf "$DISPATCHER" "$SDDM_CONF"
   manter_scanner
   if [ -f /etc/samba/doors-scanner.conf ]; then rodar systemctl restart smbd.service; else rodar systemctl disable --now smbd.service; fi
   fechar_progresso
@@ -240,10 +243,13 @@ Depois disso os usuários da rede entram neste computador com o próprio usuári
 
   passo "Definindo o nome do computador ($nome.$dominio)..."
   rodar hostnamectl set-hostname "$nome" || hostname "$nome"
-  if grep -q '^127\.0\.1\.1[[:space:]]' /etc/hosts; then
-    sed -i "s/^127\.0\.1\.1[[:space:]].*/127.0.1.1\t$nome.$dominio $nome/" /etc/hosts
+  # o nome do PC aponta para 127.0.0.1 (o "lo" do Samba): com o 127.0.1.1 do Debian o ingresso
+  # não funcionava na rede real. Sai a linha 127.0.1.1 e a de um ingresso anterior; o localhost fica.
+  sed -i -E '/^127\.0\.1\.1[[:space:]]/d; /^127\.0\.0\.1[[:space:]].*# Doors OS: domínio$/d' /etc/hosts
+  if grep -qE '^127\.0\.0\.1[[:space:]]+localhost' /etc/hosts; then
+    sed -i -E "0,/^127\.0\.0\.1[[:space:]]+localhost.*/s//&\n127.0.0.1\t$nome.$dominio $nome\t# Doors OS: domínio/" /etc/hosts
   else
-    printf '127.0.1.1\t%s.%s %s\n' "$nome" "$dominio" "$nome" >> /etc/hosts
+    sed -i "1i 127.0.0.1\t$nome.$dominio $nome\t# Doors OS: domínio" /etc/hosts
   fi
   [ "$(hostname -d 2>/dev/null)" = "$dominio" ] || echo "aviso: hostname -d = $(hostname -d 2>&1)" >>"$LOG"
 
@@ -294,8 +300,10 @@ EOF
 
 	winbind use default domain = yes
 	winbind offline logon = yes
-	winbind enum users = yes
-	winbind enum groups = yes
+	# sem listar o domínio inteiro (getent passwd sem nome): num AD grande a lista completa
+	# trava a tela de login do KDE. Login, id, su, ACL etc. buscam pelo nome e funcionam igual.
+	winbind enum users = no
+	winbind enum groups = no
 
 	idmap config * : backend = tdb
 	idmap config * : range = 3000-7999
@@ -359,9 +367,21 @@ EOF
   sed -i -E '/^(passwd|group):/{/winbind/!s/$/ winbind/}' /etc/nsswitch.conf
   rodar pam-auth-update --package --enable winbind mkhomedir
 
-  passo "Testando..."
+  if [ -d /etc/sddm.conf.d ] || command -v sddm >/dev/null 2>&1; then
+    mkdir -p "$(dirname "$SDDM_CONF")"
+    cat > "$SDDM_CONF" <<'EOF'
+# Doors OS (doors-entrar-dominio): sem lista de usuários na tela de login; abre no campo de
+# usuário com o último que entrou já preenchido. Os usuários locais entram digitando o nome.
+[Users]
+MaximumUid=999
+RememberLastUser=true
+EOF
+  fi
+
   local i
-  for i in 1 2 3 4 5 6 7 8 9 10; do wbinfo -t >/dev/null 2>&1 && break; sleep 1; done
+  for i in $(seq 1 20); do wbinfo -t >/dev/null 2>&1 && break; sleep 1; done
+
+  passo "Testando..."
   rodar wbinfo -t || erros="$erros
 • winbind não conversa com o servidor (wbinfo -t)"
   if getent passwd "$admin" >>"$LOG" 2>&1; then
@@ -404,7 +424,8 @@ Detalhes em $LOG"
 $resumo
 
 Saia da sessão (ou reinicie) e entre com o usuário da rede, sem o domínio na frente
-(ex.: d123456). Se o usuário não aparecer na lista, use \"Outro...\" e digite o nome."
+(ex.: d123456). Se a tela mostrar uma lista, use \"Outro...\" e digite o nome;
+nas próximas vezes o último usuário que entrou já aparece preenchido."
   fi
 }
 
