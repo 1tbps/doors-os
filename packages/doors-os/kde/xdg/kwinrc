@@ -11,7 +11,11 @@ ButtonsOnRight=IAX
 [Plugins]
 kwin4_effect_shapecornersEnabled=true
 
-# contorno de 2 px na cor de destaque (o Doors Aparência troca a cor) com brilho suave
+# contorno de 2 px na cor de destaque (o Doors Aparência troca a cor), sem sombra:
+# o brilho/sombra do efeito deixava rastro ao arrastar com "Janelas gelatinosas"
+# (ao que parece o KWin repinta só a área da janela deformada, não a sombra em volta).
+# A sombra do Breeze continua existindo (só fica transparente), porque sem ela o
+# KWin 6.3 deixa riscos ao mover janelas (bug 500185).
 [Round-Corners]
 Size=10
 InactiveCornerRadius=10
@@ -26,13 +30,13 @@ InactiveOutlineUseCustom=true
 InactiveOutlineColor=0,0,0
 InactiveOutlineAlpha=50
 UseNativeDecorationShadows=false
-ShadowSize=24
-InactiveShadowSize=18
+ShadowSize=0
+InactiveShadowSize=0
 ActiveShadowUsePalette=false
 ActiveShadowUseCustom=true
 ShadowColor=47,120,181
-ActiveShadowAlpha=140
+ActiveShadowAlpha=0
 InactiveShadowUsePalette=false
 InactiveShadowUseCustom=true
 InactiveShadowColor=0,0,0
-InactiveShadowAlpha=70
+InactiveShadowAlpha=0

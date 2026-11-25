@@ -21,6 +21,10 @@ doors-os (0.4~rc3) trixie; urgency=medium
     foto de cada usuário para /var/lib/doors/fotos-login (o AccountsService
     não copia as fotos prontas do sistema, e a tela de login não lê o
     cadastro dele).
+  * doors-kde-settings: janelas do KDE sem a sombra/brilho do efeito de
+    cantos arredondados (ShadowSize e ShadowAlpha em 0 no [Round-Corners]).
+    Com "Janelas gelatinosas" ligado a sombra deixava rastro ao arrastar a
+    janela. O contorno colorido continua.
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 
