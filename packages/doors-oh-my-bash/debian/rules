@@ -1,0 +1,40 @@
+#!/usr/bin/make -f
+# Oh My Bash embutido em oh-my-bash/ (commit abaixo; para trocar: ./atualizar.sh <commit>)
+COMMIT = 94c2977eda06f230aafa9628fcd869123f01896b
+D = debian/doors-oh-my-bash
+OSH = $(D)/usr/share/oh-my-bash
+
+%:
+	dh $@
+
+override_dh_auto_test:
+	test -f oh-my-bash/oh-my-bash.sh && test -f oh-my-bash/themes/font/font.theme.sh
+	bash -n skel/.bashrc
+	# o .bashrc precisa carregar sem erro num bash interativo, com o tema "font" ativo
+	h=$$(mktemp -d); \
+	sed 's|^export OSH=.*|export OSH=$(CURDIR)/oh-my-bash|' skel/.bashrc > $$h/bashrc; \
+	out=$$(HOME=$$h TERM=xterm-256color \
+	  bash --noprofile --rcfile $$h/bashrc -i -c 'declare -F _omb_theme_PROMPT_COMMAND' </dev/null 2>&1); \
+	r=$$?; rm -r -- "$$h"; echo "$$out"; test $$r = 0 && \
+	  test "$$(echo "$$out" | grep -v 'job control\|terminal process group')" = _omb_theme_PROMPT_COMMAND
+
+override_dh_auto_install:
+	mkdir -p $(OSH)
+	cp -r oh-my-bash/. $(OSH)/
+	# instalado para o sistema: sem atualização própria (vem pelo apt) e sem pastas
+	# graváveis (cache e custom de cada usuário vão para ~/.local; o oh-my-bash.sh já faz isso)
+	cd $(OSH) && rm -r cache log && rm .editorconfig .git-blame-ignore-revs .shellcheckrc
+	echo "$(COMMIT)" > $(OSH)/VERSAO-DOORS
+	# fora do /etc de propósito: o /etc/skel/.bashrc é conffile do bash, e o dpkg não lida
+	# bem com outro pacote trazendo um conffile no mesmo caminho desviado. O postinst copia.
+	install -D -m 644 skel/.bashrc $(D)/usr/share/doors-oh-my-bash/skel-bashrc
+
+override_dh_installdocs:
+	dh_installdocs
+	cp oh-my-bash/LICENSE.md $(D)/usr/share/doc/doors-oh-my-bash/LICENSE.md
+
+# os arquivos do Oh My Bash são carregados com "source"; só tools/*.sh são executáveis
+override_dh_fixperms:
+	dh_fixperms
+	find $(OSH) -type f -exec chmod 644 {} +
+	chmod 755 $(OSH)/tools/*.sh

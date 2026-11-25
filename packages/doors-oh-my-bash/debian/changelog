@@ -1,0 +1,6 @@
+doors-oh-my-bash (0+git20261028.94c2977) trixie; urgency=medium
+
+  * Primeira versão: Oh My Bash no commit 94c2977 (28/10/2026) em
+    /usr/share/oh-my-bash e /etc/skel/.bashrc do Doors (desvia o do bash).
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 16:30:00 -0300

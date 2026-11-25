@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+if [ "$1" = install ] || [ "$1" = upgrade ]; then
+  # O /etc/skel/.bashrc do Debian (pacote bash) vai para /etc/doors-oh-my-bash/bashrc.debian
+  # (fora do /etc/skel, senão seria copiado para a pasta de cada usuário novo); o postinst
+  # põe o do Doors no lugar.
+  mkdir -p /etc/doors-oh-my-bash
+  dpkg-divert --package doors-oh-my-bash --add --rename \
+    --divert /etc/doors-oh-my-bash/bashrc.debian /etc/skel/.bashrc
+fi
+#DEBHELPER#

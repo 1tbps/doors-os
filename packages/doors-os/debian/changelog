@@ -56,6 +56,19 @@ doors-os (0.4~rc3) trixie; urgency=medium
       SSH sobe (ssh-keygen -A no drop-in do ssh.service).
     - Na sessão live o SSH não sobe (a senha do usuário live é conhecida).
     - Em computadores já instalados: sudo apt install doors-ssh.
+  * Novo pacote doors-oh-my-bash: terminal com o Oh My Bash (tema "font",
+    git, ssh, atalhos) para todo usuário novo nos 4 ambientes: o criado na
+    instalação, o da sessão live e os usuários do domínio (o pam_mkhomedir
+    copia o /etc/skel na primeira entrada).
+    - Oh My Bash (MIT) numa versão fixa (commit 94c2977, 28/10/2026) dentro
+      do repositório, em /usr/share/oh-my-bash; nada é baixado na instalação
+      e a atualização vem pelo apt, não pelo próprio Oh My Bash.
+    - /etc/skel/.bashrc do Doors: o básico do .bashrc do Debian (histórico,
+      lesspipe, ~/.bash_aliases, bash-completion) + o Oh My Bash. O do Debian
+      fica em /etc/doors-oh-my-bash/bashrc.debian (dpkg-divert).
+    - Personalizações de cada usuário em ~/.local/share/oh-my-bash/custom.
+    - Quem já existe continua com o seu ~/.bashrc. Para usar num usuário que
+      já existe: cp /etc/skel/.bashrc ~/
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 
