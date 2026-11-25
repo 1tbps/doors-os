@@ -1,6 +1,6 @@
 #!/bin/bash
-# Doors OS (KDE): teste do contorno "flutuando" (vão + contorno de 3 px por fora).
-#   bash teste-contorno.sh ligar [vão] -> liga o contorno flutuante (vão em px, padrão 2)
+# Doors OS (KDE): teste do contorno "flutuando" (vao + contorno de 3 px por fora).
+#   bash teste-contorno.sh ligar [vao] -> liga o contorno flutuante (vao em px, padrao 3)
 #   bash teste-contorno.sh desligar  -> volta ao contorno normal (2 px por dentro)
 # Precisa do pacote doors-kwin-cantos 0.11.0+doors1~teste1 (ou mais novo) instalado.
 set -e
@@ -14,7 +14,7 @@ case "$1" in
     cor=$(kreadconfig6 "${G[@]}" --key OutlineColor --default 47,120,181)
     kwriteconfig6 "${G[@]}" --key OutlineThickness 0
     kwriteconfig6 "${G[@]}" --key InactiveOutlineThickness 0
-    kwriteconfig6 "${G[@]}" --key OuterOutlineGap "${2:-2}"
+    kwriteconfig6 "${G[@]}" --key OuterOutlineGap "${2:-3}"
     kwriteconfig6 "${G[@]}" --key OuterOutlineThickness 3
     kwriteconfig6 "${G[@]}" --key OuterOutlineColor "$cor"
     kwriteconfig6 "${G[@]}" --key ActiveOuterOutlineUsePalette false
@@ -25,7 +25,7 @@ case "$1" in
     kwriteconfig6 "${G[@]}" --key InactiveOuterOutlineUsePalette false
     kwriteconfig6 "${G[@]}" --key InactiveOuterOutlineUseCustom true
     kwriteconfig6 "${G[@]}" --key InactiveOuterOutlineAlpha 60
-    recarregar; echo "Contorno flutuante ligado (vão de ${2:-2} px, contorno de 3 px)." ;;
+    recarregar; echo "Contorno flutuante ligado (vao de ${2:-3} px, contorno de 3 px)." ;;
   desligar)
     for k in OutlineThickness InactiveOutlineThickness OuterOutlineGap OuterOutlineThickness \
              OuterOutlineColor ActiveOuterOutlineUsePalette ActiveOuterOutlineUseCustom ActiveOuterOutlineAlpha \
