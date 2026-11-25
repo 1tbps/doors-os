@@ -7,3 +7,4 @@ kde/color-schemes/DoorsClaro.colors usr/share/color-schemes/
 kde/look-and-feel/org.doors.desktop usr/share/plasma/look-and-feel/
 kde/menu/kde-menu-colorido usr/lib/doors/
 kde/menu/doors-menu.sh etc/xdg/plasma-workspace/env/
+kde/sddm/doors usr/share/sddm/themes/

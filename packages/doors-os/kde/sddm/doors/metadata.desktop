@@ -1,0 +1,15 @@
+[SddmGreeterTheme]
+Name=Doors
+Description=Breeze do Debian com a foto do usuário digitado (computador no domínio)
+Author=KDE Visual Design Group, Debian e Doors OS
+Copyright=(c) 2014, David Edmundson
+License=LGPL-2.0-or-later
+Type=sddm-theme
+Version=0.1
+Website=https://github.com/1tbps/doors-os
+MainScript=Main.qml
+ConfigFile=theme.conf
+TranslationsDirectory=translations
+Theme-Id=doors
+Theme-API=2.0
+QtVersion=6

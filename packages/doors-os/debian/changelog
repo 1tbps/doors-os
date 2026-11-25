@@ -14,6 +14,10 @@ doors-os (0.4~rc3) trixie; urgency=medium
     pam-auth-update, ligado pelo assistente) o usuário do domínio é registrado
     nele (CacheUser). A foto vai para /var/lib/AccountsService/icons e aparece
     no menu e na tela de bloqueio.
+  * doors-kde-settings: tema "doors" da tela de login (SDDM), igual ao Breeze
+    do Debian mas com a foto do usuário digitado quando não há lista de
+    usuários; a do último que entrou já aparece. O Entrar no domínio liga o
+    tema junto com a tela sem lista.
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 

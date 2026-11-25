@@ -377,6 +377,15 @@ EOF
 MaximumUid=999
 RememberLastUser=true
 EOF
+    # tema Doors (doors-kde-settings): igual ao Breeze, mas mostra a foto de quem foi digitado
+    # (a do último usuário já aparece), escolhida em Configurações > Usuários
+    if [ -f /usr/share/sddm/themes/doors/Main.qml ] && [ -d /usr/share/sddm/themes/breeze ]; then
+      cat >> "$SDDM_CONF" <<'EOF'
+
+[Theme]
+Current=doors
+EOF
+    fi
   fi
 
   local i
