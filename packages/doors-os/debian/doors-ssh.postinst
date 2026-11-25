@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+if [ "$1" = configure ]; then
+  # liga o SSH na primeira instalação; depois respeita quem desligou (systemctl disable ssh)
+  if [ -z "$2" ]; then
+    systemctl enable ssh.service >/dev/null 2>&1 || true
+  fi
+  if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload || true
+    if [ -z "$2" ]; then
+      # sistema já instalado: sobe agora (gera as chaves que faltarem pelo drop-in)
+      systemctl start ssh.service || true
+    elif /usr/sbin/sshd -t 2>/dev/null; then
+      systemctl try-reload-or-restart ssh.service || true
+    fi
+  fi
+fi
+#DEBHELPER#
