@@ -19,3 +19,6 @@ artwork/dconf-profile/user etc/dconf/profile/
 artwork/xsession/xfce-painel.css usr/share/doors/
 artwork/fastfetch/doors.txt usr/share/doors/fastfetch/
 artwork/fastfetch/config.jsonc etc/xdg/fastfetch/
+info-maquina/doors-info-maquina usr/bin/
+info-maquina/conky.conf usr/share/doors/info-maquina/
+info-maquina/doors-info-maquina.desktop etc/xdg/autostart/

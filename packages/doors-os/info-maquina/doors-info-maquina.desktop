@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Nome e IP na área de trabalho
+Comment=Mostra o nome do computador, o IP e o domínio no canto do papel de parede
+Exec=sh -c 'sleep 3; exec conky -c /usr/share/doors/info-maquina/conky.conf'
+TryExec=conky
+OnlyShowIn=XFCE;X-Cinnamon;
+NoDisplay=false
+X-GNOME-Autostart-enabled=true

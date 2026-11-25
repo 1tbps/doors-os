@@ -34,6 +34,19 @@ doors-os (0.4~rc3) trixie; urgency=medium
     - doors-artwork: tema Doors (GTK 3) e gtk4-borda.css sem a sombra dos
       apps com barra própria (sombra transparente, para a janela não mudar de
       tamanho e continuar fácil de redimensionar).
+  * Nome do computador, IP e domínio no canto de cima à direita do papel de
+    parede, como o BGInfo do Windows (ajuda na manutenção da rede). Ligado
+    por padrão nos 4 ambientes; atualiza sozinho a cada 10 segundos quando o
+    IP muda. O texto vem de /usr/bin/doors-info-maquina (doors-artwork).
+    - doors-kde-settings: widget "Nome e IP do computador"
+      (org.doors.infomaquina) na área de trabalho, posto no layout padrão e,
+      para quem já usa o Plasma, por um script de atualização do Plasma (roda
+      uma vez; quem tirar o widget não o recebe de volta).
+    - doors-gnome-settings: extensão info-maquina@doors-os, ligada por padrão.
+    - doors-cinnamon-settings e doors-xfce-settings: conky (conky-std) com
+      /usr/share/doors/info-maquina/conky.conf, iniciado por
+      /etc/xdg/autostart/doors-info-maquina.desktop ("Nome e IP na área de
+      trabalho", dá para desligar nos aplicativos de sessão).
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 

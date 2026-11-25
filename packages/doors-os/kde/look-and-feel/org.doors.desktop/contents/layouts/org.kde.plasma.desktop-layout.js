@@ -22,4 +22,9 @@ panel.addWidget("org.kde.plasma.showdesktop")
 var desktopsArray = desktopsForActivity(currentActivity());
 for (var j = 0; j < desktopsArray.length; j++) {
     desktopsArray[j].wallpaperPlugin = 'org.kde.image';
+    // nome do computador, IP e domínio no canto de cima à direita (como o BGInfo)
+    var tela = screenGeometry(desktopsArray[j].screen);
+    desktopsArray[j].addWidget("org.doors.infomaquina",
+                               Math.max(0, tela.width - gridUnit * 19), gridUnit,
+                               gridUnit * 18, gridUnit * 6);
 }

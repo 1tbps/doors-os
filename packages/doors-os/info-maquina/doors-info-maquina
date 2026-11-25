@@ -1,0 +1,41 @@
+#!/bin/sh
+# Doors OS: nome do computador, IP e domínio, para mostrar no papel de parede
+# (como o BGInfo do Windows). Usado pelo widget do KDE, pela extensão do GNOME e
+# pelo conky no Cinnamon e no XFCE, que chamam este script a cada 10 segundos.
+#
+# Saída, uma informação por linha (a primeira é sempre o nome):
+#   SUBMPLAGTI001
+#   IP: 10.0.0.15
+#   Domínio: empresa.local
+# Com --conky, as linhas saem alinhadas à direita para o conky.
+
+nome=$(hostname 2>/dev/null || cat /etc/hostname 2>/dev/null)
+nome=${nome%%.*}
+
+# IPv4 da rede: primeiro o da rota padrão, depois os das outras placas
+# (ficam de fora as redes internas de contêineres e máquinas virtuais)
+principal=$(ip -4 route get 1.1.1.1 2>/dev/null | sed -n 's/.* src \([0-9.]*\).*/\1/p')
+outros=$(ip -4 -o addr show scope global 2>/dev/null |
+  awk '$2 !~ /^(docker|br-|virbr|veth|vnet|lxc|lxd|podman|cni|flannel|cali|tailscale|zt)/ {split($4, a, "/"); print a[1]}')
+ips=$(printf '%s\n%s\n' "$principal" "$outros" | awk 'NF && !visto[$0]++' | head -n 3)
+
+# domínio do AD, se o computador entrou em um (Entrar no domínio: winbind, realm no smb.conf)
+dominio=""
+if [ -r /etc/samba/smb.conf ] && grep -qiE '^[[:space:]]*security[[:space:]]*=[[:space:]]*ads' /etc/samba/smb.conf; then
+  dominio=$(sed -n 's/^[[:space:]]*realm[[:space:]]*=[[:space:]]*//p' /etc/samba/smb.conf | head -n 1 | tr 'A-Z' 'a-z')
+fi
+
+{
+  echo "$nome"
+  if [ -n "$ips" ]; then
+    printf '%s\n' "$ips" | sed 's/^/IP: /'
+  else
+    echo "IP: sem rede"
+  fi
+  [ -n "$dominio" ] && echo "Domínio: $dominio"
+} | if [ "$1" = "--conky" ]; then
+  # primeira linha (nome) maior; todas alinhadas à direita
+  awk 'NR == 1 {print "${alignr}${font Noto Sans:bold:size=16}" $0 "${font}"; next} {print "${alignr}" $0}'
+else
+  cat
+fi
