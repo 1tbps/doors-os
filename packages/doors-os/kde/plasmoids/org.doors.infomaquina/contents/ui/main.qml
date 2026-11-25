@@ -63,5 +63,10 @@ PlasmoidItem {
                 elide: Text.ElideLeft
             }
         }
+
+        // ocupa a sobra de altura, para as linhas ficarem juntas no alto
+        Item {
+            Layout.fillHeight: true
+        }
     }
 }
