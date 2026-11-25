@@ -69,6 +69,10 @@ doors-os (0.4~rc3) trixie; urgency=medium
     - Personalizações de cada usuário em ~/.local/share/oh-my-bash/custom.
     - Quem já existe continua com o seu ~/.bashrc. Para usar num usuário que
       já existe: cp /etc/skel/.bashrc ~/
+  * Doors Aparência 0.3.7: opção "Painel e menu escuros" na página Tema (KDE
+    e XFCE). Desligada, o tema claro deixa o painel e o menu claros também
+    (antes só as janelas ficavam claras). O padrão de fábrica continua com o
+    painel escuro.
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 

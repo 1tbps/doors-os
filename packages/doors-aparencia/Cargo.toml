@@ -1,6 +1,6 @@
 [package]
 name = "doors-aparencia"
-version = "0.3.6"
+version = "0.3.7"
 edition = "2021"
 description = "Doors Aparência: tema, cor de destaque, fundo, layout e fontes do Doors OS em um clique"
 license = "GPL-3.0-or-later"
