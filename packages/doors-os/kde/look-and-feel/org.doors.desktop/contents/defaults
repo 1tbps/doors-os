@@ -9,7 +9,7 @@ AccentColor=47,120,181
 Theme=Doors
 
 [plasmarc][Theme]
-name=breeze-dark
+name=default
 
 [Wallpaper]
 Image=DebianTheme

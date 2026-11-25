@@ -1,9 +1,9 @@
 doors-aparencia (0.3.7) trixie; urgency=medium
 
-  * Tema: nova opção "Painel e menu escuros" (KDE e XFCE). Ligada é o visual
-    de sempre do Doors (janelas claras com painel e menu escuros); desligada,
-    o tema claro deixa também o painel, o menu e a bandeja claros. Antes o
-    tema claro só mudava as janelas.
+  * Tema: nova opção "Painel e menu escuros" (KDE e XFCE), desligada por
+    padrão: o tema claro deixa também o painel, o menu e a bandeja claros
+    (antes só as janelas). Ligada, volta o visual antigo (janelas claras com
+    painel e menu escuros).
     - KDE: troca o estilo do Plasma (Breeze, que segue o esquema de cores,
       ou Breeze escuro) com plasma-apply-desktoptheme.
     - XFCE: dark-mode do xfce4-panel (o menu Whisker acompanha) e fundo claro

@@ -1,3 +1,4 @@
-# Doors OS: painel escuro, como nas outras edições
+# Doors OS: Breeze, que segue o esquema de cores: no tema claro o painel e o menu também
+# ficam claros (o Doors Aparência tem a opção "Painel e menu escuros").
 [Theme]
-name=breeze-dark
+name=default

@@ -298,7 +298,7 @@ fn pagina_tema(app: &Rc<App>) -> gtk::Box {
         textos.set_hexpand(true);
         textos.append(&rotulo("Painel e menu escuros", ""));
         textos.append(&rotulo(
-            "No tema claro, deixa o painel e o menu escuros (padrão do Doors). Desligado, eles ficam claros como as janelas.",
+            "No tema claro, deixa o painel e o menu escuros. Desligado, eles ficam claros como as janelas (padrão do Doors).",
             "dim-label",
         ));
         caixa.append(&textos);
