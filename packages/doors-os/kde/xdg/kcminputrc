@@ -1,0 +1,5 @@
+# Doors OS: teclado numérico ligado ao entrar no Plasma (X11 e Wayland).
+# NumLock: 0 = ligado, 1 = desligado, 2 = não mexer (padrão do KDE).
+# O usuário ainda pode trocar em Configurações do sistema > Teclado.
+[Keyboard]
+NumLock=0

@@ -4,6 +4,10 @@ doors-os (0.4~rc3) trixie; urgency=medium
     (/usr/share/doors/fastfetch/doors.txt e /etc/xdg/fastfetch/config.jsonc).
     Sem isso o fastfetch não reconhecia ID=doors e mostrava o logo do Debian
     (ID_LIKE).
+  * doors-kde-settings: teclado numérico ligado na tela de login do KDE
+    (/etc/sddm.conf.d/doors-numlock.conf, Numlock=on) e ao entrar no Plasma
+    (/etc/xdg/kcminputrc, NumLock=0). O SDDM abre um X novo para a sessão,
+    então o estado da tela de login não passava para o Plasma.
 
  -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 14:45:00 -0300
 
