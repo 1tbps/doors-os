@@ -183,8 +183,7 @@ pub fn xfwm4_escuro(texto: &str) -> String {
 }
 
 /// Pares (chave, valor) do grupo [Round-Corners] do kwinrc (efeito do pacote
-/// doors-kwin-cantos): contornos (o de dentro e o de fora, "flutuando") e brilho da
-/// janela ativa na cor de destaque.
+/// doors-kwin-cantos): contorno e brilho da janela ativa na cor de destaque.
 pub fn cantos_kde(cor: &Cor) -> Vec<(&'static str, String)> {
     vec![
         ("ActiveOutlineUsePalette", "false".into()),
@@ -193,9 +192,6 @@ pub fn cantos_kde(cor: &Cor) -> Vec<(&'static str, String)> {
         ("ActiveShadowUsePalette", "false".into()),
         ("ActiveShadowUseCustom", "true".into()),
         ("ShadowColor", cor.kde()),
-        ("ActiveOuterOutlineUsePalette", "false".into()),
-        ("ActiveOuterOutlineUseCustom", "true".into()),
-        ("OuterOutlineColor", cor.kde()),
     ]
 }
 
@@ -393,7 +389,6 @@ inactiveBackground=239,240,241\n";
         assert_eq!(dpi(130), 125);
         let k = cantos_kde(&cor_por_id("verde").unwrap());
         assert!(k.contains(&("OutlineColor", "39,138,92".to_string())));
-        assert!(k.contains(&("OuterOutlineColor", "39,138,92".to_string())));
     }
 
     #[test]

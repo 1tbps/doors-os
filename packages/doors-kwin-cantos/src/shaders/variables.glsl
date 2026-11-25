@@ -19,7 +19,6 @@ uniform vec4  outerOutlineColor1;     // The RGBA of the outer outline's first g
 uniform vec4  outerOutlineColor2;     // The RGBA of the outer outline's second gradient stop.
 uniform float outerOutlineAngle;      // The outer outline gradient angle in degrees.
 uniform float outerOutlineThickness;  // The thickness of the outer outline in pixels specified in settings.
-uniform float outerOutlineGap;        // Doors OS: transparent gap in pixels between the window edge and the outer outline.
 
 #ifdef HAS_POSITION0
 bool yInverted = true; /* Whether `texcoord0.y` grows downward from the top edge of the offscreen

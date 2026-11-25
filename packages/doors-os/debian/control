@@ -46,7 +46,7 @@ Description: aparência padrão do Doors OS para o XFCE
 
 Package: doors-kde-settings
 Architecture: all
-Depends: ${misc:Depends}, doors-artwork, doors-kwin-cantos (>= 0.11.0+doors1), plasma-desktop, kwin-x11 | kwin-wayland,
+Depends: ${misc:Depends}, doors-artwork, doors-kwin-cantos, plasma-desktop, kwin-x11 | kwin-wayland,
  breeze, elementary-xfce-icon-theme
 Recommends: plasma-workspace-wallpapers, kdeplasma-addons-data
 Description: aparência padrão do Doors OS para o KDE Plasma

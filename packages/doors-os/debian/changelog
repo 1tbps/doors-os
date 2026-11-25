@@ -34,10 +34,6 @@ doors-os (0.4~rc3) trixie; urgency=medium
     - doors-artwork: tema Doors (GTK 3) e gtk4-borda.css sem a sombra dos
       apps com barra própria (sombra transparente, para a janela não mudar de
       tamanho e continuar fácil de redimensionar).
-  * doors-kde-settings: contorno "flutuando" em volta das janelas do KDE:
-    3 px na cor de destaque, com 3 px de vão transparente entre a janela e o
-    contorno (OuterOutlineGap, novo no doors-kwin-cantos 0.11.0+doors1), no
-    lugar do contorno de 2 px por dentro. Depende do doors-kwin-cantos novo.
   * Nome do computador, IP e domínio no canto de cima à direita do papel de
     parede, como o BGInfo do Windows (ajuda na manutenção da rede). Ligado
     por padrão nos 4 ambientes; atualiza sozinho a cada 10 segundos quando o
