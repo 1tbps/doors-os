@@ -1,3 +1,11 @@
+doors-aparencia (0.3.6) trixie; urgency=medium
+
+  * Janelas sem sombra: o tema pessoal (GTK 3) e o ~/.config/gtk-4.0/gtk.css
+    mantêm só o contorno; a sombra deixava rastro ao arrastar com janelas
+    gelatinosas.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 16:00:00 -0300
+
 doors-aparencia (0.3.5) trixie; urgency=medium
 
   * XFCE: painel em cima/embaixo pelo doors-painel-flutuante (painel solto da

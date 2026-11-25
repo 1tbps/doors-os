@@ -1,3 +1,4 @@
 cinnamon/90_doors-cinnamon.gschema.override usr/share/glib-2.0/schemas/
 cinnamon/dconf/00-doors-cinnamon etc/dconf/db/local.d/
 cinnamon/applets/menu-doors@doors-os usr/share/cinnamon/applets/
+cinnamon/extensions/sem-sombra@doors-os usr/share/cinnamon/extensions/
