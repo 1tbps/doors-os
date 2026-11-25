@@ -295,6 +295,22 @@ pub fn painel_xfce(painel: Painel) -> &'static str {
     }
 }
 
+/// Painel e menu claros: só no tema claro com "Painel e menu escuros" desligado.
+pub fn painel_claro(modo: Modo, painel_escuro: bool) -> bool {
+    modo == Modo::Claro && !painel_escuro
+}
+
+/// Estilo do Plasma (painel, menu, bandeja): "default" é o Breeze que segue o esquema de
+/// cores (claro, com a cor de destaque); "breeze-dark" é sempre escuro (padrão do Doors).
+pub fn estilo_plasma(claro: bool) -> &'static str {
+    if claro { "default" } else { "breeze-dark" }
+}
+
+/// Fundo do painel flutuante do XFCE (r, g, b, a), levemente transparente.
+pub fn fundo_painel_xfce(claro: bool) -> [f64; 4] {
+    if claro { [0.96, 0.96, 0.97, 0.92] } else { [0.12, 0.13, 0.15, 0.9] }
+}
+
 /// Nomes das saídas em `xrandr --listmonitors` (última coluna de cada linha " N: ...").
 pub fn monitores_xrandr(saida: &str) -> Vec<String> {
     saida
@@ -412,6 +428,11 @@ inactiveBackground=239,240,241\n";
         assert_eq!(painel_cinnamon("['1:0:bottom']", Painel::EmCima), "['1:0:top']");
         assert_eq!(painel_cinnamon("['1:0:top', '2:1:top']", Painel::Embaixo), "['1:0:bottom', '2:1:bottom']");
         assert_eq!(painel_xfce(Painel::EmCima), "em-cima");
+        assert!(painel_claro(Modo::Claro, false));
+        assert!(!painel_claro(Modo::Claro, true) && !painel_claro(Modo::Escuro, false));
+        assert_eq!(estilo_plasma(true), "default");
+        assert_eq!(estilo_plasma(false), "breeze-dark");
+        assert_eq!(fundo_painel_xfce(false), [0.12, 0.13, 0.15, 0.9]);
     }
 
     #[test]

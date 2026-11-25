@@ -47,6 +47,12 @@ impl Ambiente {
         !matches!(self, Ambiente::Gnome | Ambiente::Outro)
     }
 
+    /// O painel e o menu podem ficar claros no tema claro? (no Cinnamon o tema do painel é
+    /// sempre escuro; no GNOME a barra de cima é sempre escura e os menus já seguem o tema)
+    pub fn tem_painel_claro(self) -> bool {
+        matches!(self, Ambiente::Kde | Ambiente::Xfce)
+    }
+
     /// Tema claro/escuro + cor de destaque.
     pub fn aplicar_tema(self, e: &Estado) -> Result<(), String> {
         match self {
@@ -62,7 +68,7 @@ impl Ambiente {
                 xfconf("xsettings", "/Net/ThemeName", &nome)?;
                 xfconf("xfwm4", "/general/theme", &nome)?;
                 preferencia_escura(e.modo);
-                Ok(())
+                xfce_painel_claro(tema::painel_claro(e.modo, e.painel_escuro))
             }
             Ambiente::Gnome => {
                 let escuro = e.modo == Modo::Escuro;
@@ -215,6 +221,13 @@ fn kde_tema(e: &Estado) -> Result<(), String> {
     // Não usar "plasma-apply-colorscheme --accent-color": o Plasma 6.3 recusa "#rrggbb" ("Cor de destaque inválida").
     let _ = executar("kwriteconfig6", &["--file", "kdeglobals", "--group", "General", "--key", "AccentColor", &e.cor.kde()]);
     executar("plasma-apply-colorscheme", &[&nome_id])?;
+    // painel, menu e bandeja: o estilo do Plasma não muda com o esquema de cores
+    let estilo = tema::estilo_plasma(tema::painel_claro(e.modo, e.painel_escuro));
+    let atual = saida("kreadconfig6", &["--file", "plasmarc", "--group", "Theme", "--key", "name", "--default", "default"])
+        .unwrap_or_default();
+    if atual.trim() != estilo {
+        executar("plasma-apply-desktoptheme", &[estilo])?;
+    }
     // contorno e brilho da janela ativa (efeito "Rounded Corners", pacote doors-kwin-cantos)
     for (chave, valor) in tema::cantos_kde(&e.cor) {
         let _ = executar("kwriteconfig6", &["--file", "kwinrc", "--group", "Round-Corners", "--key", chave, &valor]);
@@ -224,6 +237,30 @@ fn kde_tema(e: &Estado) -> Result<(), String> {
         &["call", "--session", "--dest", "org.kde.KWin", "--object-path", "/Effects",
           "--method", "org.kde.kwin.Effects.reconfigureEffect", "kwin4_effect_shapecorners"],
     );
+    Ok(())
+}
+
+// ------------------------------------------------------------------ XFCE
+
+/// Painel (e o menu Whisker, que roda dentro dele) claro ou escuro: "dark-mode" do
+/// xfce4-panel e a cor de fundo dos painéis com cor própria (o painel flutuante do Doors).
+fn xfce_painel_claro(claro: bool) -> Result<(), String> {
+    executar("xfconf-query", &["-c", "xfce4-panel", "-n", "-t", "bool", "-p", "/panels/dark-mode", "-s", if claro { "false" } else { "true" }])?;
+    let props = saida("xfconf-query", &["-c", "xfce4-panel", "-l"])?;
+    let [r, g, b, a] = tema::fundo_painel_xfce(claro);
+    let cor: Vec<String> = [r, g, b, a].iter().map(|v| format!("{v}")).collect();
+    for p in props.lines().map(str::trim).filter(|p| p.starts_with("/panels/panel-") && p.ends_with("/background-style")) {
+        if saida("xfconf-query", &["-c", "xfce4-panel", "-p", p])?.trim() != "1" {
+            continue; // painel com o fundo do tema: já segue o dark-mode
+        }
+        let rgba = p.replace("/background-style", "/background-rgba");
+        // LC_NUMERIC=C: no pt_BR o separador decimal seria a vírgula
+        let mut args = vec!["LC_NUMERIC=C", "xfconf-query", "-c", "xfce4-panel", "-n", "-p", &rgba];
+        for v in &cor {
+            args.extend(["-t", "double", "-s", v.as_str()]);
+        }
+        executar("env", &args)?;
+    }
     Ok(())
 }
 

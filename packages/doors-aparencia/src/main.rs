@@ -55,6 +55,11 @@ impl App {
         modo_do_app(e.modo);
     }
 
+    /// Painel e menu claros (prévias): tema claro com "Painel e menu escuros" desligado.
+    fn painel_claro(&self, modo: Modo) -> bool {
+        self.ambiente.tem_painel_claro() && tema::painel_claro(modo, self.estado.borrow().painel_escuro)
+    }
+
     fn redesenhar(&self) {
         for p in self.previas.borrow().iter() {
             p.queue_draw();
@@ -172,7 +177,9 @@ fn retangulo_arredondado(cr: &cairo::Context, x: f64, y: f64, w: f64, h: f64, r:
 
 /// Mini área de trabalho: papel de parede, painel (embaixo/em cima) e uma janela
 /// no modo e na cor de destaque dados.
-fn desenhar_desktop(cr: &cairo::Context, w: f64, h: f64, fundo: Option<&gdk_pixbuf::Pixbuf>, modo: Modo, cor: &Cor, painel: Painel) {
+fn desenhar_desktop(
+    cr: &cairo::Context, w: f64, h: f64, fundo: Option<&gdk_pixbuf::Pixbuf>, modo: Modo, cor: &Cor, painel: Painel, painel_claro: bool,
+) {
     retangulo_arredondado(cr, 0.0, 0.0, w, h, 10.0);
     cr.clip();
     match fundo {
@@ -193,14 +200,14 @@ fn desenhar_desktop(cr: &cairo::Context, w: f64, h: f64, fundo: Option<&gdk_pixb
     // painel
     let ph = h * 0.1;
     let py = if painel == Painel::EmCima { 0.0 } else { h - ph };
-    cr.set_source_rgba(0.10, 0.11, 0.13, 0.92);
+    if painel_claro { cr.set_source_rgba(0.96, 0.96, 0.97, 0.92) } else { cr.set_source_rgba(0.10, 0.11, 0.13, 0.92) }
     cr.rectangle(0.0, py, w, ph);
     cr.fill().ok();
     // botão do menu e ícones do painel
     rgb(cr, c0, c1, c2);
     cr.arc(ph * 0.7, py + ph / 2.0, ph * 0.28, 0.0, 6.3);
     cr.fill().ok();
-    cr.set_source_rgba(1.0, 1.0, 1.0, 0.55);
+    if painel_claro { cr.set_source_rgba(0.0, 0.0, 0.0, 0.4) } else { cr.set_source_rgba(1.0, 1.0, 1.0, 0.55) }
     for i in 0..3 {
         cr.rectangle(ph * 1.5 + i as f64 * ph * 0.9, py + ph * 0.28, ph * 0.55, ph * 0.44);
     }
@@ -251,6 +258,12 @@ fn pagina_tema(app: &Rc<App>) -> gtk::Box {
     let p = pagina("Tema", "Escolha entre claro e escuro e a cor de destaque das janelas, seleções e botões.");
     let e0 = app.estado.borrow().clone();
 
+    // "Painel e menu escuros" (KDE e XFCE): só faz diferença no tema claro
+    let chave = gtk::Switch::new();
+    chave.set_valign(gtk::Align::Center);
+    chave.set_active(e0.painel_escuro);
+    chave.set_sensitive(e0.modo == Modo::Claro);
+
     let linha = gtk::Box::new(gtk::Orientation::Horizontal, 16);
     let mut primeiro: Option<gtk::ToggleButton> = None;
     for (modo, nome) in [(Modo::Claro, "Claro"), (Modo::Escuro, "Escuro")] {
@@ -260,15 +273,17 @@ fn pagina_tema(app: &Rc<App>) -> gtk::Box {
             let e = a.estado.borrow();
             // no GNOME a barra fica no topo
             let painel = if a.ambiente == Ambiente::Gnome { Painel::EmCima } else { e.painel };
-            desenhar_desktop(cr, w as f64, h as f64, a.fundo.borrow().as_ref(), modo, &e.cor, painel);
+            desenhar_desktop(cr, w as f64, h as f64, a.fundo.borrow().as_ref(), modo, &e.cor, painel, a.painel_claro(modo));
         });
         app.previas.borrow_mut().push(d.clone());
         let b = cartao(nome, d, primeiro.as_ref());
         b.set_active(e0.modo == modo);
         let a = app.clone();
+        let ch = chave.clone();
         b.connect_toggled(move |b| {
             if b.is_active() && a.estado.borrow().modo != modo {
                 a.estado.borrow_mut().modo = modo;
+                ch.set_sensitive(modo == Modo::Claro);
                 a.aplicar_tema();
             }
         });
@@ -276,6 +291,27 @@ fn pagina_tema(app: &Rc<App>) -> gtk::Box {
         primeiro.get_or_insert(b);
     }
     p.append(&linha);
+
+    if app.ambiente.tem_painel_claro() {
+        let caixa = gtk::Box::new(gtk::Orientation::Horizontal, 12);
+        let textos = gtk::Box::new(gtk::Orientation::Vertical, 2);
+        textos.set_hexpand(true);
+        textos.append(&rotulo("Painel e menu escuros", ""));
+        textos.append(&rotulo(
+            "No tema claro, deixa o painel e o menu escuros. Desligado, eles ficam claros como as janelas (padrão do Doors).",
+            "dim-label",
+        ));
+        caixa.append(&textos);
+        caixa.append(&chave);
+        let a = app.clone();
+        chave.connect_active_notify(move |c| {
+            if a.estado.borrow().painel_escuro != c.is_active() {
+                a.estado.borrow_mut().painel_escuro = c.is_active();
+                a.aplicar_tema();
+            }
+        });
+        p.append(&caixa);
+    }
 
     p.append(&rotulo("Cor de destaque", "secao"));
     let cores = gtk::Box::new(gtk::Orientation::Horizontal, 12);
@@ -397,7 +433,7 @@ fn pagina_layout(app: &Rc<App>) -> gtk::Box {
         let a = app.clone();
         d.set_draw_func(move |_, cr, w, h| {
             let e = a.estado.borrow();
-            desenhar_desktop(cr, w as f64, h as f64, a.fundo.borrow().as_ref(), e.modo, &e.cor, painel);
+            desenhar_desktop(cr, w as f64, h as f64, a.fundo.borrow().as_ref(), e.modo, &e.cor, painel, a.painel_claro(e.modo));
         });
         app.previas.borrow_mut().push(d.clone());
         let b = cartao(nome, d, primeiro.as_ref());
