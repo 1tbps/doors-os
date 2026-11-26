@@ -16,5 +16,13 @@
     },
     "display": {
         "color": "blue"
-    }
+    },
+    // Com um arquivo de configuração, o fastfetch só mostra os módulos listados aqui
+    // (sem esta lista sai só o logo). Mesma lista do padrão do fastfetch.
+    "modules": [
+        "title", "separator", "os", "host", "kernel", "uptime", "packages",
+        "shell", "display", "de", "wm", "wmtheme", "theme", "icons", "font",
+        "cursor", "terminal", "terminalfont", "cpu", "gpu", "memory", "swap",
+        "disk", "localip", "battery", "poweradapter", "locale", "break", "colors"
+    ]
 }
