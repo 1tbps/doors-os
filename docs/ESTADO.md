@@ -3,7 +3,7 @@
 > Versão pública do arquivo de estado do projeto: decisões, versões, validação e lições aprendidas.
 > Dados da máquina de desenvolvimento e anotações pessoais ficam fora deste arquivo.
 
-- **Fase atual:** **Doors OS 0.3 lançado** (tag v0.3, 2026-11-21) — release com a ISO em https://github.com/1tbps/doors-os/releases/tag/v0.3
+- **Fase atual:** **Doors OS 0.4** (versão final, 2026-11-26; mesmo conteúdo da 0.4~rc3) — notas em docs/notas-de-versao-0.4.md. Versão anterior: 0.3 (tag v0.3, 2026-11-21)
 - **Base:** Debian 13 "trixie"; build com live-build + Calamares dentro de um container Debian (`builder/`)
 
 ## Decisões
@@ -196,3 +196,5 @@ Pendente: XFCE "conteúdo furando a borda" não reproduzido em VM (aguardando pr
 
 - Teste da 0.4~rc1 no AD real: ingresso OK depois de trocar no /etc/hosts 127.0.1.1 por 127.0.0.1 (o nome do PC precisa cair no lo do Samba). doors-entrar-dominio corrigido: apaga a linha 127.0.1.1 e põe "127.0.0.1 NOME.dominio NOME" logo depois do localhost (marcada, para reingresso). Investigar: logoff de usuário do AD congela no KDE (SDDM lista todos os usuários com winbind enum users = yes).
 - ISO 0.4~rc2 (SHA-256 d762fb9be8a07c1d…): Entrar no domínio com 127.0.0.1 no /etc/hosts, enum users/groups = no e /etc/sddm.conf.d/doors-dominio.conf (MaximumUid=999, RememberLastUser) — tela do KDE abre no campo de usuário com o último preenchido. Pergunta de grupo de login (require_membership_of) testada e retirada a pedido (grupo não existe; outras unidades devem poder usar). Validado em contêiner AD e em VM KDE (logoff normal pelo menu volta à tela de login em segundos; com loginctl terminate-user a tela fica preta — sddm-helper morto, não é o logoff normal). VMs rc2-kde, rc2-cinnamon, rc2-xfce, rc2-gnome instaladas (teste/0000).
+- ISO 0.4~rc3 (2026-11-25): logo do Doors no fastfetch (com a lista de módulos; sem ela só saía o logo) e fastfetch na ISO; NumLock ligado no SDDM e no Plasma; foto do usuário do AD na tela de login do KDE (tema SDDM "doors"); janelas sem sombra nos 4 ambientes (o contorno flutuante com vão foi testado e descartado, assim como a margem ao maximizar); Nome e IP no papel de parede (widget no KDE, extensão no GNOME, conky no Cinnamon/XFCE); pacotes novos doors-ssh e doors-oh-my-bash; tema claro de fábrica com painel e menu claros (KDE e XFCE). Testada instalando nas 4 VMs ao mesmo tempo (rc3-kde, rc3-gnome, rc3-cinnamon, rc3-xfce; teste/0000). Publicada no APT (Pages) em 2026-11-26.
+- **0.4 final** (2026-11-26): promovida a partir da rc3 a pedido do usuário, trocando só a versão (DOORS_VERSION=0.4, doors-os 0.4).

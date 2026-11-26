@@ -1,3 +1,10 @@
+doors-os (0.4) trixie; urgency=medium
+
+  * Doors OS 0.4: versão final. Mesmo conteúdo da 0.4~rc3, testada nos 4
+    ambientes (KDE, GNOME, Cinnamon e XFCE); muda só o número da versão.
+
+ -- Doors OS Project <noreply@doors-os.invalid>  Wed, 25 Nov 2026 23:55:00 -0300
+
 doors-os (0.4~rc3) trixie; urgency=medium
 
   * doors-artwork: logo do Doors (porta em arco) no fastfetch
